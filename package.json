@@ -1,0 +1,41 @@
+{
+  "name": "mathplay",
+  "version": "1.0.0",
+  "description": "Interactive math practice PWA for kids - Learn math the fun way!",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:gh": "GITHUB_PAGES=true vite build",
+    "preview": "vite preview",
+    "deploy": "vite build && vercel --prod",
+    "deploy:gh": "npm run build:gh && gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aniltv06/mathplay.git"
+  },
+  "keywords": [
+    "math",
+    "education",
+    "kids",
+    "pwa",
+    "worksheet",
+    "learning",
+    "interactive"
+  ],
+  "author": {
+    "name": "Anil Kumar Thatha Venkatachalapathy",
+    "email": "aniltv06@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/aniltv06/mathplay#readme",
+  "bugs": {
+    "url": "https://github.com/aniltv06/mathplay/issues"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vite-plugin-pwa": "^0.17.0"
+  },
+  "dependencies": {}
+}

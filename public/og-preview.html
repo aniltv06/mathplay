@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Fun - Social Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .og-container {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #F5F7FF 0%, #E8EEFF 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            gap: 60px;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .content h1 {
+            font-size: 72px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .content p {
+            font-size: 32px;
+            color: #555;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .icon-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* SVG Styling */
+        svg {
+            filter: drop-shadow(0 15px 40px rgba(102, 126, 234, 0.3));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B6B, #FFE66D);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 20px;
+            width: fit-content;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .og-container {
+                width: 100%;
+                height: auto;
+                flex-direction: column;
+                padding: 40px;
+            }
+
+            .content h1 {
+                font-size: 48px;
+            }
+
+            .content p {
+                font-size: 24px;
+            }
+
+            svg {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="og-container">
+        <div class="content">
+            <h1>Learn Math<br>The Fun Way!</h1>
+            <p>Interactive lessons for kids. Master math with colorful symbols and engaging puzzles.</p>
+            <div class="badge">🎓 Start Learning Today</div>
+        </div>
+
+        <div class="icon-section">
+            <svg width="350" height="350" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background -->
+                <circle cx="100" cy="100" r="95" fill="#F5F7FF"/>
+
+                <!-- Decorative circles background -->
+                <circle cx="50" cy="50" r="35" fill="#FF6B6B" opacity="0.15"/>
+                <circle cx="150" cy="60" r="40" fill="#4ECDC4" opacity="0.15"/>
+                <circle cx="140" cy="150" r="35" fill="#FFE66D" opacity="0.15"/>
+
+                <!-- Plus (Red) - Large, centered top -->
+                <g transform="translate(100, 65)">
+                    <rect x="-8" y="-25" width="16" height="50" rx="4" fill="#FF6B6B"/>
+                    <rect x="-25" y="-8" width="50" height="16" rx="4" fill="#FF6B6B"/>
+                </g>
+
+                <!-- Minus (Teal) - Left -->
+                <g transform="translate(50, 105)">
+                    <rect x="-18" y="-6" width="36" height="12" rx="4" fill="#4ECDC4"/>
+                </g>
+
+                <!-- Multiply (Yellow) - Right -->
+                <g transform="translate(150, 105)">
+                    <line x1="-16" y1="-16" x2="16" y2="16" stroke="#FFE66D" stroke-width="11" stroke-linecap="round"/>
+                    <line x1="16" y1="-16" x2="-16" y2="16" stroke="#FFE66D" stroke-width="11" stroke-linecap="round"/>
+                </g>
+
+                <!-- Division (Green) - Bottom -->
+                <g transform="translate(100, 155)">
+                    <circle cx="0" cy="-8" r="3" fill="#95E1D3"/>
+                    <line x1="-18" y1="0" x2="18" y2="0" stroke="#95E1D3" stroke-width="10" stroke-linecap="round"/>
+                    <circle cx="0" cy="8" r="3" fill="#95E1D3"/>
+                </g>
+            </svg>
+        </div>
+    </div>
+</body>
+</html>

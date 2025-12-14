@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Generator - Math Fun</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #667eea;
+        }
+        canvas {
+            border: 2px solid #ddd;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .controls {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        .size-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .size-btn {
+            background: #51cf66;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        .info {
+            background: #fff4e6;
+            padding: 15px;
+            border-left: 5px solid #ffa500;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 PWA Icon Generator</h1>
+        <p>Create simple placeholder icons for your Math Fun PWA</p>
+
+        <div class="info">
+            <strong>Quick Instructions:</strong><br>
+            1. Customize the emoji and colors below<br>
+            2. Click "Generate All Sizes" to create all icons<br>
+            3. Download will save automatically to your Downloads folder<br>
+            4. Move the downloaded files to the /icons/ directory
+        </div>
+
+        <div class="controls">
+            <div>
+                <label>Icon Emoji/Text:</label>
+                <input type="text" id="iconText" value="🎉" maxlength="3">
+            </div>
+            <div>
+                <label>Background Color:</label>
+                <input type="color" id="bgColor" value="#667eea">
+            </div>
+            <div>
+                <label>Text Color:</label>
+                <input type="color" id="textColor" value="#ffffff">
+            </div>
+        </div>
+
+        <button onclick="generatePreview()">🔄 Preview</button>
+        <button onclick="generateAllSizes()" style="background: #51cf66;">📥 Generate All Sizes</button>
+
+        <h3>Preview (192x192):</h3>
+        <canvas id="canvas" width="192" height="192"></canvas>
+
+        <div class="size-buttons">
+            <button class="size-btn" onclick="downloadIcon(72)">72x72</button>
+            <button class="size-btn" onclick="downloadIcon(96)">96x96</button>
+            <button class="size-btn" onclick="downloadIcon(128)">128x128</button>
+            <button class="size-btn" onclick="downloadIcon(144)">144x144</button>
+            <button class="size-btn" onclick="downloadIcon(152)">152x152</button>
+            <button class="size-btn" onclick="downloadIcon(192)">192x192</button>
+            <button class="size-btn" onclick="downloadIcon(384)">384x384</button>
+            <button class="size-btn" onclick="downloadIcon(512)">512x512</button>
+        </div>
+    </div>
+
+    <script>
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            const bgColor = document.getElementById('bgColor').value;
+            const textColor = document.getElementById('textColor').value;
+            const iconText = document.getElementById('iconText').value;
+
+            // Background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, size, size);
+
+            // Add gradient overlay
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, 'rgba(102, 126, 234, 0.3)');
+            gradient.addColorStop(1, 'rgba(118, 75, 162, 0.3)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // Text/Emoji
+            ctx.fillStyle = textColor;
+            ctx.font = `${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(iconText, size / 2, size / 2);
+
+            return canvas;
+        }
+
+        function generatePreview() {
+            const size = 192;
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const bgColor = document.getElementById('bgColor').value;
+            const textColor = document.getElementById('textColor').value;
+            const iconText = document.getElementById('iconText').value;
+
+            // Background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, size, size);
+
+            // Add gradient overlay
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, 'rgba(102, 126, 234, 0.3)');
+            gradient.addColorStop(1, 'rgba(118, 75, 162, 0.3)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // Text/Emoji
+            ctx.fillStyle = textColor;
+            ctx.font = `${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(iconText, size / 2, size / 2);
+        }
+
+        function downloadIcon(size) {
+            const canvas = generateIcon(size);
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `icon-${size}x${size}.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        function generateAllSizes() {
+            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            sizes.forEach((size, index) => {
+                setTimeout(() => {
+                    downloadIcon(size);
+                }, index * 200); // Stagger downloads
+            });
+            alert('Generating all icon sizes! Check your Downloads folder.');
+        }
+
+        // Generate preview on load
+        window.onload = generatePreview;
+
+        // Update preview on any input change
+        document.getElementById('iconText').addEventListener('input', generatePreview);
+        document.getElementById('bgColor').addEventListener('input', generatePreview);
+        document.getElementById('textColor').addEventListener('input', generatePreview);
+    </script>
+</body>
+</html>
