@@ -798,3 +798,197 @@ body {
         height: 60px;
     }
 }
+
+/* Profile Management Styles */
+.profile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.profile-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-card:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.profile-stats-preview {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.profile-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.profile-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+}
+
+.profile-btn-view {
+    background: #4ECDC4;
+    color: white;
+}
+
+.profile-btn-view:hover {
+    background: #45b8b0;
+}
+
+.profile-btn-delete {
+    background: #ff6b6b;
+    color: white;
+}
+
+.profile-btn-delete:hover {
+    background: #ff5252;
+}
+
+.profile-btn-select {
+    background: #667eea;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1em;
+}
+
+.profile-btn-select:hover {
+    background: #5568d3;
+}
+
+.new-profile-section {
+    border-top: 2px dashed #e0e0e0;
+    padding-top: 15px;
+}
+
+.empty-profiles {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+}
+
+.empty-profiles-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+/* Profile Stats Modal */
+.profile-stats-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.session-history {
+    margin-top: 30px;
+}
+
+.session-history h3 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.session-item {
+    background: #f5f7ff;
+    border-left: 4px solid #667eea;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+.session-date {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.session-details {
+    display: flex;
+    gap: 15px;
+    font-size: 0.95em;
+}
+
+.session-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.no-sessions {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+@media (max-width: 768px) {
+    .profile-stats-details {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .profile-stats-preview {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+    }
+}

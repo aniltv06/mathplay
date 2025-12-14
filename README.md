@@ -2,16 +2,21 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub](https://img.shields.io/badge/GitHub-aniltv06%2Fmathplay-blue)](https://github.com/aniltv06/mathplay)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 
-An interactive, gamified math practice web app for kids to practice addition, subtraction, multiplication, and division. Features a kid-friendly interface with animations, sound effects, streaks, and progress tracking.
+An interactive, gamified math practice web app for kids to practice addition, subtraction, multiplication, and division. Features a kid-friendly interface with animations, sound effects, streaks, and **automatic progress tracking** with user profiles.
 
-Built with **Vite** for fast development and optimized production builds, with full **PWA** support.
+Built with **TypeScript** + **Vite** for fast development and optimized production builds, with full **PWA** support.
 
 ## Features
 
-- **Interactive Number Pad**: Touch-friendly input for iPad and mobile devices
+- **User Profiles with Progress Tracking**: Automatically saves and restores your progress
+- **Interactive Number Pad**: Touch-friendly input for iPad and mobile devices (supports up to 6-digit answers)
 - **Customizable Worksheets**: Adjust number range, problem count, and operation types
+- **Smart Problem Generation**: No duplicate questions, properly scaled division problems
 - **Gamification**: Streak counter, confetti celebrations, progress bar, and score tracking
+- **Persistent Storage**: Your answers and progress are saved automatically and restored when you return
+- **Session History**: Track all your practice sessions with detailed statistics
 - **PWA Support**: Install as an app on any device, works offline
 - **Responsive Design**: Optimized for iPad, tablets, phones, and desktop
 - **Audio Feedback**: Sound effects for correct/incorrect answers
@@ -23,7 +28,9 @@ Built with **Vite** for fast development and optimized production builds, with f
 mathplay/
 ├── index.html              # Main HTML file
 ├── src/
-│   ├── main.js            # JavaScript application logic
+│   ├── main.ts            # TypeScript application logic
+│   ├── types.ts           # TypeScript type definitions
+│   ├── storage.ts         # localStorage utility for profiles
 │   └── style.css          # All styles and animations
 ├── public/
 │   ├── icons/             # PWA icons and favicons
@@ -242,6 +249,54 @@ Once deployed, users can install the app:
 - **App-like Experience**: Fullscreen, no browser UI
 - **Auto-updates**: Service worker automatically updates
 
+## Progress Tracking
+
+### How It Works
+
+MathPlay automatically saves your progress using browser localStorage. Everything persists across page reloads and browser restarts!
+
+**What's Saved:**
+- ✅ User profile with your name
+- ✅ Current practice session (problems and answers)
+- ✅ All completed sessions with timestamps
+- ✅ Statistics (total problems, accuracy, best streak)
+- ✅ Settings preferences
+
+**Auto-Save Triggers:**
+- When you answer a question
+- When you move to the next question
+- When you close the number pad
+- When you complete all problems
+
+**Session Restoration:**
+- Enter your name → automatically loads your last session
+- If you were in the middle of practice, it restores:
+  - All the same problems
+  - Your previous answers
+  - Your progress and stats
+
+### Profile Management
+
+Each profile includes:
+- **Session History**: All past practice sessions
+- **Statistics**:
+  - Total sessions completed
+  - Total problems attempted
+  - Total correct/wrong answers
+  - Best streak achieved
+  - Average percentage
+  - Total time spent
+- **Current Session**: Ongoing worksheet (if any)
+
+### Data Privacy
+
+All data is stored **locally in your browser** using localStorage:
+- ✅ No server uploads
+- ✅ No accounts required
+- ✅ No internet needed after first load
+- ✅ Complete privacy
+- ✅ Clear data anytime via browser settings
+
 ## Development Commands
 
 ```bash
@@ -298,11 +353,17 @@ background: linear-gradient(135deg, #yourcolor1 0%, #yourcolor2 100%);
 
 ### Adding More Features
 
-The code is modular and commented. Key functions in `src/main.js`:
-- `generateProblems()` - Problem generation logic
-- `checkAnswers()` - Answer validation
+The code is modular, typed, and commented. Key functions in `src/main.ts`:
+- `generateProblems()` - Problem generation logic with unique pairs
+- `validateAnswer()` - Single answer validation
+- `updateStats()` - Real-time statistics calculation
+- `saveProgress()` - Auto-save to localStorage
 - `playSound()` - Audio feedback
 - `createConfetti()` - Celebration animations
+
+Key modules:
+- `src/types.ts` - TypeScript type definitions
+- `src/storage.ts` - localStorage utilities for profiles
 
 ## Configuration Files
 
@@ -334,14 +395,15 @@ The code is modular and commented. Key functions in `src/main.js`:
 - **Lighthouse Score**: ~95-100
 - **First Contentful Paint**: < 0.5s (with Vite)
 - **Time to Interactive**: < 1s
-- **Bundle Size**: ~25KB gzipped (main + CSS + JS)
+- **Bundle Size**: ~14KB gzipped (TypeScript + CSS + localStorage)
 - **Build Time**: < 5s
 
 ## Tech Stack
 
+- **Language**: TypeScript 5.x
 - **Build Tool**: Vite 5
 - **PWA**: vite-plugin-pwa
-- **JavaScript**: Vanilla JS (ES6+)
+- **Storage**: Browser localStorage API
 - **CSS**: Pure CSS (no frameworks)
 - **Deployment**: Vercel/Netlify/GitHub Pages
 
@@ -398,17 +460,23 @@ For issues or questions:
 
 ## Roadmap
 
-Potential future enhancements:
-- [ ] TypeScript migration
-- [ ] User profiles with progress tracking
+**Completed Features:**
+- [x] TypeScript migration
+- [x] User profiles with progress tracking
+- [x] Smart problem generation (no duplicates, proper division scaling)
+- [x] 6-digit answer support for advanced math
+
+**Potential Future Enhancements:**
+- [ ] Profile selector UI with statistics preview
 - [ ] Multiple difficulty levels
 - [ ] Timed challenges
 - [ ] Printable worksheet generation
-- [ ] Parent dashboard
+- [ ] Parent dashboard with analytics
 - [ ] Multi-language support
 - [ ] Voice feedback option
 - [ ] Achievement badges
 - [ ] Leaderboards
+- [ ] Cloud sync (optional)
 
 ---
 

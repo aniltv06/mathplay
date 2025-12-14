@@ -94,13 +94,57 @@
             <p id="greetingText">Let's solve some addition and subtraction!</p>
         </div>
 
-        <div id="namePanel" class="settings-panel">
-            <div class="settings-title"><span class="emoji">👤</span> What's your name?</div>
-            <div style="display: flex; gap: 10px; align-items: flex-end;">
-                <div style="flex: 1;">
-                    <input type="text" id="childName" placeholder="Enter your name..." maxlength="20" style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 1.1em; font-family: inherit;">
+        <!-- Profile Management Panel -->
+        <div id="profilePanel" class="settings-panel">
+            <div class="settings-title"><span class="emoji">👥</span> Select Your Profile</div>
+
+            <!-- Profile List -->
+            <div id="profileList" class="profile-list"></div>
+
+            <!-- New Profile Form -->
+            <div class="new-profile-section">
+                <div style="display: flex; gap: 10px; align-items: flex-end; margin-top: 15px;">
+                    <div style="flex: 1;">
+                        <input type="text" id="newProfileName" placeholder="Create new profile..." maxlength="20" style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 1.1em; font-family: inherit;">
+                    </div>
+                    <button class="btn btn-generate" onclick="createNewProfile()" style="margin: 0;">Create 🚀</button>
                 </div>
-                <button class="btn btn-generate" onclick="startWithName()" style="margin: 0;">Let's Go! 🚀</button>
+            </div>
+        </div>
+
+        <!-- Profile Stats Modal -->
+        <div id="profileStatsModal" class="settings-modal" style="display: none;">
+            <div class="settings-modal-content">
+                <button class="close-settings" onclick="closeProfileStats()">✕</button>
+                <div class="settings-title"><span class="emoji">📊</span> <span id="statsProfileName"></span>'s Statistics</div>
+
+                <div class="profile-stats-details">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Sessions</div>
+                        <div class="stat-value" id="statTotalSessions">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Problems</div>
+                        <div class="stat-value" id="statTotalProblems">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Accuracy</div>
+                        <div class="stat-value" id="statAccuracy">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Best Streak</div>
+                        <div class="stat-value" id="statBestStreak">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Time Spent</div>
+                        <div class="stat-value" id="statTimeSpent">0 min</div>
+                    </div>
+                </div>
+
+                <div class="session-history">
+                    <h3>Recent Sessions</h3>
+                    <div id="sessionHistoryList"></div>
+                </div>
             </div>
         </div>
 
@@ -218,6 +262,6 @@
     </div>
 
     <!-- Vite Entry Point -->
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
