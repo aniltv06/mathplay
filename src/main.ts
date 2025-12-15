@@ -16,7 +16,9 @@ import type {
   ProblemSettings,
   SoundType,
   ValidationResult,
-  UserProfile
+  UserProfile,
+  DifficultyLevel,
+  DifficultyPreset
 } from './types';
 
 // Import storage utilities
@@ -30,8 +32,70 @@ import {
   completeSession,
   updateBestStreak,
   getProfileNames,
-  deleteProfile
+  deleteProfile,
+  checkAndAwardBadges,
+  getEarnedBadges,
+  getAllProfiles
 } from './storage';
+
+// Import i18n utilities
+import {
+  loadLanguage,
+  setLanguage,
+  t,
+  getCurrentLanguage,
+  languageNames
+} from './i18n';
+import type { Language } from './types';
+
+// Difficulty Presets
+const DIFFICULTY_PRESETS: DifficultyPreset[] = [
+  {
+    level: 'easy',
+    name: 'Easy',
+    description: 'Addition & Subtraction (1-10)',
+    icon: '🌱',
+    settings: {
+      numProblems: 5,
+      maxNum: 10,
+      minNum: 1,
+      includeAddition: true,
+      includeSubtraction: true,
+      includeMultiplication: false,
+      includeDivision: false
+    }
+  },
+  {
+    level: 'medium',
+    name: 'Medium',
+    description: 'All operations (1-20)',
+    icon: '🌟',
+    settings: {
+      numProblems: 10,
+      maxNum: 20,
+      minNum: 1,
+      includeAddition: true,
+      includeSubtraction: true,
+      includeMultiplication: true,
+      includeDivision: true
+    }
+  },
+  {
+    level: 'hard',
+    name: 'Hard',
+    description: 'All operations (1-100)',
+    icon: '🚀',
+    settings: {
+      numProblems: 15,
+      maxNum: 100,
+      minNum: 1,
+      includeAddition: true,
+      includeSubtraction: true,
+      includeMultiplication: true,
+      includeDivision: true
+    }
+  }
+];
 
 // Application state
 let problems: Problem[] = [];
@@ -42,6 +106,13 @@ let correctStreak: number = 0;
 let totalAnswered: number = 0;
 let sessionStartTime: number = 0;
 let currentProfile: UserProfile | null = null;
+let currentDifficulty: DifficultyLevel = 'medium';
+let timedMode: boolean = false;
+let timeLimit: number = 300; // 5 minutes default
+let timeRemaining: number = 0;
+let timerInterval: number | null = null;
+let showAnswerKey: boolean = false;
+let voiceFeedbackEnabled: boolean = false;
 
 // Sound effects using Web Audio API
 function playSound(type: SoundType): void {
@@ -71,6 +142,39 @@ function playSound(type: SoundType): void {
   }
 }
 
+// Text-to-Speech voice feedback
+function speak(text: string): void {
+  if (!voiceFeedbackEnabled) return;
+
+  // Check if browser supports speech synthesis
+  if ('speechSynthesis' in window) {
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.9; // Slightly slower for clarity
+    utterance.pitch = 1.1; // Slightly higher pitch (kid-friendly)
+    utterance.volume = 0.8;
+
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+// Problem-specific speech
+function speakProblem(problem: Problem): void {
+  if (!voiceFeedbackEnabled) return;
+
+  const operationWords: { [key: string]: string } = {
+    '+': t('plus'),
+    '-': t('minus'),
+    '×': t('times'),
+    '÷': t('dividedBy')
+  };
+
+  const text = `${problem.num1} ${operationWords[problem.operation]} ${problem.num2}`;
+  speak(text);
+}
+
 // Create confetti
 function createConfetti(): void {
   const colors = ['#667eea', '#764ba2', '#51cf66', '#ffa500', '#ff6b6b', '#ffe066'];
@@ -97,6 +201,37 @@ function showBonusMessage(message: string): void {
   bonus.textContent = message;
   document.body.appendChild(bonus);
   setTimeout(() => bonus.remove(), 1500);
+}
+
+// Show badge earned notification
+function showBadgeNotification(badge: any): void {
+  const notification = document.createElement('div');
+  notification.className = 'badge-notification';
+  notification.innerHTML = `
+    <div class="badge-notification-content">
+      <div class="badge-icon">${badge.icon}</div>
+      <div class="badge-info">
+        <div class="badge-name">${t('badgeEarned')}</div>
+        <div class="badge-title">${badge.name}</div>
+        <div class="badge-desc">${badge.description}</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(notification);
+
+  // Play sound
+  playSound('correct');
+
+  // Announce badge
+  speak(`${t('congratulations')} ${badge.name} ${t('badgeEarned')}`);
+
+  // Create extra confetti for badge
+  createConfetti();
+
+  setTimeout(() => {
+    notification.classList.add('fade-out');
+    setTimeout(() => notification.remove(), 500);
+  }, 4000);
 }
 
 // Update streak counter
@@ -292,11 +427,15 @@ function createNewProfile(): void {
   currentProfile = createProfile(name);
 
   const profilePanel = document.getElementById('profilePanel');
+  const userWelcome = document.getElementById('userWelcome');
+  const userName = document.getElementById('userName');
   const greetingText = document.getElementById('greetingText');
 
   if (profilePanel) profilePanel.style.display = 'none';
+  if (userWelcome) userWelcome.style.display = 'inline-flex';
+  if (userName) userName.textContent = childName;
   if (greetingText) {
-    greetingText.textContent = `Great to see you, ${childName}! 🌟 Let's practice!`;
+    greetingText.textContent = `Let's practice some math! 🌟`;
   }
 
   // Start fresh
@@ -317,11 +456,15 @@ function selectProfile(name: string): void {
   }
 
   const profilePanel = document.getElementById('profilePanel');
+  const userWelcome = document.getElementById('userWelcome');
+  const userName = document.getElementById('userName');
   const greetingText = document.getElementById('greetingText');
 
   if (profilePanel) profilePanel.style.display = 'none';
+  if (userWelcome) userWelcome.style.display = 'inline-flex';
+  if (userName) userName.textContent = childName;
   if (greetingText) {
-    greetingText.textContent = `Welcome back, ${childName}! 🌟 Let's practice!`;
+    greetingText.textContent = `Welcome back! Let's practice! 🌟`;
   }
 }
 
@@ -392,6 +535,30 @@ function viewProfileStats(name: string): void {
     }
   }
 
+  // Display badges
+  const badgesListEl = document.getElementById('badgesList');
+  if (badgesListEl && profile.badges) {
+    const earnedBadges = profile.badges.filter(b => b.earned);
+
+    if (earnedBadges.length === 0) {
+      badgesListEl.innerHTML = '<div class="no-badges">No badges earned yet! Keep practicing to unlock achievements!</div>';
+    } else {
+      badgesListEl.innerHTML = earnedBadges.map(badge => {
+        const earnedDate = badge.earnedAt ? new Date(badge.earnedAt).toLocaleDateString() : '';
+        return `
+          <div class="badge-card">
+            <div class="badge-icon-large">${badge.icon}</div>
+            <div class="badge-details">
+              <div class="badge-name">${badge.name}</div>
+              <div class="badge-description">${badge.description}</div>
+              <div class="badge-earned-date">Earned: ${earnedDate}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
   const modal = document.getElementById('profileStatsModal');
   if (modal) modal.style.display = 'block';
 }
@@ -407,6 +574,159 @@ function confirmDeleteProfile(name: string): void {
     deleteProfile(name);
     loadProfiles();
   }
+}
+
+// Parent Dashboard Functions
+function openParentDashboard(): void {
+  const data = getAllProfiles();
+  const profiles = Object.values(data.profiles);
+
+  if (profiles.length === 0) {
+    alert('No profiles to display! Create some profiles first.');
+    return;
+  }
+
+  // Calculate summary stats
+  const totalSessions = profiles.reduce((sum, p) => sum + p.stats.totalSessions, 0);
+  const totalProblems = profiles.reduce((sum, p) => sum + p.stats.totalProblems, 0);
+  const totalCorrect = profiles.reduce((sum, p) => sum + p.stats.totalCorrect, 0);
+  const totalWrong = profiles.reduce((sum, p) => sum + p.stats.totalWrong, 0);
+  const totalAccuracy = totalCorrect + totalWrong > 0
+    ? Math.round((totalCorrect / (totalCorrect + totalWrong)) * 100)
+    : 0;
+  const totalBadges = profiles.reduce((sum, p) =>
+    sum + (p.badges?.filter(b => b.earned).length || 0), 0
+  );
+
+  // Summary cards
+  const summaryEl = document.getElementById('dashboardSummary');
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      <div class="dashboard-stats-grid">
+        <div class="dashboard-stat-card">
+          <div class="dashboard-stat-icon">👥</div>
+          <div class="dashboard-stat-value">${profiles.length}</div>
+          <div class="dashboard-stat-label">Active Profiles</div>
+        </div>
+        <div class="dashboard-stat-card">
+          <div class="dashboard-stat-icon">📝</div>
+          <div class="dashboard-stat-value">${totalSessions}</div>
+          <div class="dashboard-stat-label">Total Sessions</div>
+        </div>
+        <div class="dashboard-stat-card">
+          <div class="dashboard-stat-icon">🎯</div>
+          <div class="dashboard-stat-value">${totalProblems}</div>
+          <div class="dashboard-stat-label">Problems Solved</div>
+        </div>
+        <div class="dashboard-stat-card">
+          <div class="dashboard-stat-icon">✅</div>
+          <div class="dashboard-stat-value">${totalAccuracy}%</div>
+          <div class="dashboard-stat-label">Overall Accuracy</div>
+        </div>
+        <div class="dashboard-stat-card">
+          <div class="dashboard-stat-icon">🏆</div>
+          <div class="dashboard-stat-value">${totalBadges}</div>
+          <div class="dashboard-stat-label">Badges Earned</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Profile comparison
+  const comparisonEl = document.getElementById('profileComparison');
+  if (comparisonEl) {
+    comparisonEl.innerHTML = profiles.map(profile => {
+      const accuracy = profile.stats.totalCorrect + profile.stats.totalWrong > 0
+        ? Math.round((profile.stats.totalCorrect / (profile.stats.totalCorrect + profile.stats.totalWrong)) * 100)
+        : 0;
+      const earnedBadges = profile.badges?.filter(b => b.earned).length || 0;
+
+      return `
+        <div class="comparison-card">
+          <div class="comparison-header">${profile.name}</div>
+          <div class="comparison-stats">
+            <div class="comparison-stat">
+              <span>Sessions:</span> <strong>${profile.stats.totalSessions}</strong>
+            </div>
+            <div class="comparison-stat">
+              <span>Problems:</span> <strong>${profile.stats.totalProblems}</strong>
+            </div>
+            <div class="comparison-stat">
+              <span>Accuracy:</span> <strong>${accuracy}%</strong>
+            </div>
+            <div class="comparison-stat">
+              <span>Best Streak:</span> <strong>${profile.stats.bestStreak}</strong>
+            </div>
+            <div class="comparison-stat">
+              <span>Badges:</span> <strong>${earnedBadges}</strong>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Recent activity
+  const recentActivityEl = document.getElementById('recentActivity');
+  if (recentActivityEl) {
+    const allSessions: Array<{ profile: string; session: any }> = [];
+
+    profiles.forEach(profile => {
+      profile.history.forEach(session => {
+        allSessions.push({ profile: profile.name, session });
+      });
+    });
+
+    allSessions.sort((a, b) =>
+      new Date(b.session.date).getTime() - new Date(a.session.date).getTime()
+    );
+
+    if (allSessions.length === 0) {
+      recentActivityEl.innerHTML = '<div class="no-activity">No activity yet!</div>';
+    } else {
+      recentActivityEl.innerHTML = allSessions.slice(0, 10).map(({ profile, session }) => {
+        const date = new Date(session.date).toLocaleDateString();
+        const time = new Date(session.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <div class="activity-item">
+            <div class="activity-profile">👤 ${profile}</div>
+            <div class="activity-details">
+              <span>📅 ${date} at ${time}</span>
+              <span>📝 ${session.problems.length} problems</span>
+              <span>✅ ${session.correctCount} correct</span>
+              <span>📊 ${session.percentage}%</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // Badge leaderboard
+  const badgeLeaderboardEl = document.getElementById('badgeLeaderboard');
+  if (badgeLeaderboardEl) {
+    const profileBadges = profiles.map(profile => ({
+      name: profile.name,
+      badges: profile.badges?.filter(b => b.earned).length || 0
+    })).sort((a, b) => b.badges - a.badges);
+
+    badgeLeaderboardEl.innerHTML = profileBadges.map((item, index) => `
+      <div class="leaderboard-item">
+        <div class="leaderboard-rank">${index + 1}</div>
+        <div class="leaderboard-name">${item.name}</div>
+        <div class="leaderboard-badges">🏆 ${item.badges} badges</div>
+      </div>
+    `).join('');
+  }
+
+  const modal = document.getElementById('parentDashboardModal');
+  if (modal) modal.style.display = 'block';
+}
+
+function closeParentDashboard(): void {
+  const modal = document.getElementById('parentDashboardModal');
+  if (modal) modal.style.display = 'none';
 }
 
 // Allow Enter key to submit name
@@ -427,6 +747,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Load profiles on startup
   loadProfiles();
+
+  // Initialize language settings
+  initializeApp();
 });
 
 function openSettings(): void {
@@ -441,9 +764,29 @@ function closeSettings(): void {
 
 // Close settings modal when clicking outside
 window.addEventListener('click', function (event: MouseEvent) {
-  const modal = document.getElementById('settingsModal');
-  if (event.target === modal) {
+  const settingsModal = document.getElementById('settingsModal');
+  const numberpadModal = document.getElementById('numberpadModal');
+  const profileStatsModal = document.getElementById('profileStatsModal');
+  const parentDashboardModal = document.getElementById('parentDashboardModal');
+
+  // Close settings modal if clicking on backdrop
+  if (event.target === settingsModal) {
     closeSettings();
+  }
+
+  // Close number pad modal if clicking on backdrop
+  if (event.target === numberpadModal) {
+    closeNumberPad();
+  }
+
+  // Close profile stats modal if clicking on backdrop
+  if (event.target === profileStatsModal) {
+    closeProfileStats();
+  }
+
+  // Close parent dashboard modal if clicking on backdrop
+  if (event.target === parentDashboardModal) {
+    closeParentDashboard();
   }
 });
 
@@ -466,6 +809,9 @@ function openNumberPad(inputIndex: number): void {
   if (questionNum2) questionNum2.textContent = problem.num2.toString();
   if (currentQuestion) currentQuestion.textContent = (inputIndex + 1).toString();
   if (totalQuestions) totalQuestions.textContent = problems.length.toString();
+
+  // Speak the problem
+  speakProblem(problem);
 
   const modal = document.getElementById('numberpadModal');
   if (modal) modal.style.display = 'block';
@@ -554,6 +900,8 @@ function validateAnswer(index: number): ValidationResult {
   } else if (userAnswer === problem.correct) {
     // Correct answer
     playSound('correct');
+    speak(t('greatJob'));
+
     const modal = document.getElementById('numberpadModal');
     if (modal && modal.style.display === 'block') {
       createConfetti(); // Only show confetti during initial answering
@@ -574,6 +922,7 @@ function validateAnswer(index: number): ValidationResult {
   } else {
     // Wrong answer
     playSound('wrong');
+    speak(t('tryAgain'));
 
     input.style.borderColor = '#ff6b6b';
     input.style.backgroundColor = '#ffe0e0';
@@ -701,6 +1050,9 @@ function showCompletionMessage(): void {
 }
 
 function checkAnswers(): void {
+  // Stop timer if running
+  stopTimer();
+
   // Validate all answers and update visual feedback
   problems.forEach((problem, index) => {
     validateAnswer(index);
@@ -716,23 +1068,118 @@ function checkAnswers(): void {
   if (childName) {
     const timeSpent = Math.floor((Date.now() - sessionStartTime) / 1000); // in seconds
     completeSession(childName, timeSpent);
+
+    // Check and award badges
+    const newBadges = checkAndAwardBadges(childName);
+
+    // Show badge notifications
+    if (newBadges.length > 0) {
+      newBadges.forEach((badge, index) => {
+        setTimeout(() => {
+          showBadgeNotification(badge);
+        }, index * 1000); // Stagger notifications by 1 second
+      });
+    }
   }
 }
 
-// Close pad when clicking outside
-window.onclick = function (event: MouseEvent) {
-  const modal = document.getElementById('numberpadModal');
-  if (event.target === modal) {
-    closeNumberPad();
-  }
-};
-
-// Close pad on Escape key
+// Close modals on Escape key
 document.addEventListener('keydown', function (event: KeyboardEvent) {
   if (event.key === 'Escape') {
     closeNumberPad();
+    closeSettings();
+    closeProfileStats();
+    closeParentDashboard();
   }
 });
+
+// Set difficulty level and update UI
+function setDifficulty(level: DifficultyLevel): void {
+  currentDifficulty = level;
+
+  // Update button states
+  document.querySelectorAll('.difficulty-btn').forEach(btn => {
+    btn.classList.remove('difficulty-btn-active');
+  });
+
+  const activeBtn = document.querySelector(`[data-difficulty="${level}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add('difficulty-btn-active');
+  }
+
+  // Apply preset if not custom
+  if (level !== 'custom') {
+    const preset = DIFFICULTY_PRESETS.find(p => p.level === level);
+    if (preset) {
+      applyDifficultyPreset(preset);
+    }
+  }
+}
+
+// Apply difficulty preset to settings
+function applyDifficultyPreset(preset: DifficultyPreset): void {
+  const numProblemsInput = document.getElementById('numProblems') as HTMLInputElement;
+  const maxNumInput = document.getElementById('maxNum') as HTMLInputElement;
+  const minNumInput = document.getElementById('minNum') as HTMLInputElement;
+  const includeAdditionInput = document.getElementById('includeAddition') as HTMLInputElement;
+  const includeSubtractionInput = document.getElementById('includeSubtraction') as HTMLInputElement;
+  const includeMultiplicationInput = document.getElementById('includeMultiplication') as HTMLInputElement;
+  const includeDivisionInput = document.getElementById('includeDivision') as HTMLInputElement;
+
+  if (numProblemsInput) numProblemsInput.value = preset.settings.numProblems.toString();
+  if (maxNumInput) maxNumInput.value = preset.settings.maxNum.toString();
+  if (minNumInput) minNumInput.value = preset.settings.minNum.toString();
+  if (includeAdditionInput) includeAdditionInput.checked = preset.settings.includeAddition;
+  if (includeSubtractionInput) includeSubtractionInput.checked = preset.settings.includeSubtraction;
+  if (includeMultiplicationInput) includeMultiplicationInput.checked = preset.settings.includeMultiplication;
+  if (includeDivisionInput) includeDivisionInput.checked = preset.settings.includeDivision;
+}
+
+// Timer Functions
+function startTimer(): void {
+  const timerDisplay = document.getElementById('timerDisplay');
+  if (timerDisplay) timerDisplay.style.display = 'block';
+
+  timerInterval = window.setInterval(() => {
+    timeRemaining--;
+    updateTimerDisplay();
+
+    if (timeRemaining <= 0) {
+      stopTimer();
+      handleTimeUp();
+    }
+  }, 1000);
+}
+
+function stopTimer(): void {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function updateTimerDisplay(): void {
+  const timerText = document.getElementById('timerText');
+  const timerDisplay = document.getElementById('timerDisplay');
+
+  if (timerText && timerDisplay) {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    timerText.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+    // Warning when under 1 minute
+    if (timeRemaining <= 60) {
+      timerDisplay.classList.add('timer-warning');
+    } else {
+      timerDisplay.classList.remove('timer-warning');
+    }
+  }
+}
+
+function handleTimeUp(): void {
+  alert(`⏰ Time's up! Let's see how you did!`);
+  checkAnswers();
+}
 
 function generateProblems(): void {
   const numProblemsInput = document.getElementById('numProblems') as HTMLInputElement;
@@ -876,6 +1323,30 @@ function generateProblems(): void {
   correctStreak = 0;
   updateStreakDisplay();
 
+  // Handle timed mode
+  const timedModeInput = document.getElementById('timedMode') as HTMLInputElement;
+  const timeLimitInput = document.getElementById('timeLimit') as HTMLInputElement;
+
+  timedMode = timedModeInput?.checked || false;
+  timeLimit = parseInt(timeLimitInput?.value || '5') * 60; // Convert minutes to seconds
+
+  // Stop any existing timer
+  stopTimer();
+
+  // Start timer if enabled
+  if (timedMode) {
+    timeRemaining = timeLimit;
+    updateTimerDisplay();
+    startTimer();
+  } else {
+    const timerDisplay = document.getElementById('timerDisplay');
+    if (timerDisplay) timerDisplay.style.display = 'none';
+  }
+
+  // Handle voice feedback
+  const voiceFeedbackInput = document.getElementById('voiceFeedback') as HTMLInputElement;
+  voiceFeedbackEnabled = voiceFeedbackInput?.checked || false;
+
   renderProblems();
 
   const resultDiv = document.getElementById('result');
@@ -905,7 +1376,7 @@ function renderProblems(): void {
   let html = '';
 
   if (additionProblems.length > 0) {
-    html += '<div class="section-title"><span class="emoji">➕</span> Addition Problems</div>';
+    html += `<div class="section-title"><span class="emoji">➕</span> ${t('additionProblems')}</div>`;
     html += '<div class="problems-grid">';
     additionProblems.forEach(problem => {
       const globalIndex = problems.indexOf(problem);
@@ -915,7 +1386,7 @@ function renderProblems(): void {
   }
 
   if (subtractionProblems.length > 0) {
-    html += '<div class="section-title"><span class="emoji">➖</span> Subtraction Problems</div>';
+    html += `<div class="section-title"><span class="emoji">➖</span> ${t('subtractionProblems')}</div>`;
     html += '<div class="problems-grid">';
     subtractionProblems.forEach(problem => {
       const globalIndex = problems.indexOf(problem);
@@ -925,7 +1396,7 @@ function renderProblems(): void {
   }
 
   if (multiplicationProblems.length > 0) {
-    html += '<div class="section-title"><span class="emoji">✖️</span> Multiplication Problems</div>';
+    html += `<div class="section-title"><span class="emoji">✖️</span> ${t('multiplicationProblems')}</div>`;
     html += '<div class="problems-grid">';
     multiplicationProblems.forEach(problem => {
       const globalIndex = problems.indexOf(problem);
@@ -935,7 +1406,7 @@ function renderProblems(): void {
   }
 
   if (divisionProblems.length > 0) {
-    html += '<div class="section-title"><span class="emoji">➗</span> Division Problems</div>';
+    html += `<div class="section-title"><span class="emoji">➗</span> ${t('divisionProblems')}</div>`;
     html += '<div class="problems-grid">';
     divisionProblems.forEach(problem => {
       const globalIndex = problems.indexOf(problem);
@@ -945,11 +1416,6 @@ function renderProblems(): void {
   }
 
   container.innerHTML = html;
-
-  // Auto-open the first problem
-  setTimeout(() => {
-    openNumberPad(0);
-  }, 300);
 }
 
 function renderProblemBox(problem: Problem, index: number): string {
@@ -1001,13 +1467,18 @@ function changeName(): void {
 
   const profilePanel = document.getElementById('profilePanel');
   const newProfileInput = document.getElementById('newProfileName') as HTMLInputElement;
+  const userWelcome = document.getElementById('userWelcome');
   const greetingText = document.getElementById('greetingText');
 
   if (profilePanel) profilePanel.style.display = 'block';
   if (newProfileInput) {
     newProfileInput.value = '';
   }
-  if (greetingText) greetingText.textContent = "Let's solve some addition and subtraction!";
+  if (userWelcome) userWelcome.style.display = 'none';
+  if (greetingText) {
+    greetingText.style.display = 'block';
+    greetingText.textContent = "Let's solve some addition and subtraction!";
+  }
 
   updateStreakDisplay();
   updateProgressBar();
@@ -1017,6 +1488,163 @@ function changeName(): void {
   loadProfiles();
 }
 
+// Print worksheet functions
+function printWorksheet(): void {
+  if (problems.length === 0) {
+    alert('Please generate problems first!');
+    return;
+  }
+
+  // Add print footer info
+  const container = document.querySelector('.container');
+  if (!container) return;
+
+  // Create print-only elements
+  let printFooter = document.querySelector('.print-footer');
+  if (!printFooter) {
+    printFooter = document.createElement('div');
+    printFooter.className = 'print-footer';
+    printFooter.innerHTML = `
+      <p><strong>Name:</strong> _____________________________________ <strong>Date:</strong> _______________</p>
+      <p>Complete all problems and check your answers!</p>
+      <p>Generated by Math Fun - Practice Makes Perfect! 🎉</p>
+    `;
+    container.appendChild(printFooter);
+  }
+
+  // Show/hide answer key based on toggle
+  updateAnswerKeyDisplay();
+
+  // Trigger print dialog
+  window.print();
+}
+
+function toggleAnswerKey(): void {
+  showAnswerKey = !showAnswerKey;
+  updateAnswerKeyDisplay();
+
+  // Update button text
+  const btn = document.querySelector('[onclick="toggleAnswerKey()"]');
+  if (btn) {
+    btn.textContent = showAnswerKey
+      ? 'Hide Answer Key 🔒'
+      : 'Show Answer Key (for printing) 🔑';
+  }
+}
+
+function updateAnswerKeyDisplay(): void {
+  // Remove existing answer key
+  let answerKey = document.querySelector('.answer-key');
+  if (answerKey) {
+    answerKey.remove();
+  }
+
+  // Add answer key if enabled
+  if (showAnswerKey && problems.length > 0) {
+    const container = document.querySelector('.container');
+    if (!container) return;
+
+    answerKey = document.createElement('div');
+    answerKey.className = 'answer-key';
+
+    const answersByOperation: { [key: string]: { num1: number; num2: number; op: string; answer: number; index: number }[] } = {};
+
+    problems.forEach((problem, index) => {
+      if (!answersByOperation[problem.operation]) {
+        answersByOperation[problem.operation] = [];
+      }
+      answersByOperation[problem.operation].push({
+        num1: problem.num1,
+        num2: problem.num2,
+        op: problem.operation,
+        answer: problem.correct,
+        index: index + 1
+      });
+    });
+
+    let html = '<h2>Answer Key</h2>';
+
+    Object.keys(answersByOperation).forEach(op => {
+      const opName = {
+        '+': 'Addition',
+        '-': 'Subtraction',
+        '×': 'Multiplication',
+        '÷': 'Division'
+      }[op] || '';
+
+      html += `<h3>${opName}</h3>`;
+      html += '<div class="answer-key-grid">';
+
+      answersByOperation[op].forEach(item => {
+        html += `
+          <div class="answer-key-item">
+            <strong>#${item.index}:</strong> ${item.num1} ${item.op} ${item.num2} = <strong>${item.answer}</strong>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+    });
+
+    answerKey.innerHTML = html;
+    container.appendChild(answerKey);
+  }
+}
+
+
+// Language Management Functions
+function changeLanguage(): void {
+  const selectEl = document.getElementById('languageSelect') as HTMLSelectElement;
+  if (!selectEl) return;
+
+  const newLang = selectEl.value as Language;
+  setLanguage(newLang);
+
+  // Update all UI text with new language
+  updateUIText();
+}
+
+function updateUIText(): void {
+  // Update header
+  const appTitleEl = document.querySelector('.header h1');
+  if (appTitleEl) {
+    appTitleEl.textContent = t('appTitle');
+  }
+
+  const greetingEl = document.getElementById('greetingText');
+  if (greetingEl && !childName) {
+    greetingEl.textContent = t('greeting');
+  }
+
+  // Update section titles
+  const sectionTitles = document.querySelectorAll('.section-title');
+  sectionTitles.forEach(el => {
+    const text = el.textContent || '';
+    if (text.includes('Addition') || text.includes('Suma') || text.includes('加法')) {
+      el.innerHTML = `<span class="emoji">➕</span> ${t('additionProblems')}`;
+    } else if (text.includes('Subtraction') || text.includes('Resta') || text.includes('减法')) {
+      el.innerHTML = `<span class="emoji">➖</span> ${t('subtractionProblems')}`;
+    } else if (text.includes('Multiplication') || text.includes('Multiplicación') || text.includes('乘法')) {
+      el.innerHTML = `<span class="emoji">✖️</span> ${t('multiplicationProblems')}`;
+    } else if (text.includes('Division') || text.includes('División') || text.includes('除法')) {
+      el.innerHTML = `<span class="emoji">➗</span> ${t('divisionProblems')}`;
+    }
+  });
+}
+
+function initializeApp(): void {
+  // Load saved language
+  const savedLang = loadLanguage();
+  const selectEl = document.getElementById('languageSelect') as HTMLSelectElement;
+  if (selectEl) {
+    selectEl.value = savedLang;
+  }
+
+  // Update UI with loaded language
+  updateUIText();
+}
+
+
 // Expose functions to window for inline onclick handlers (Vite ES modules fix)
 (window as any).startWithName = startWithName;
 (window as any).createNewProfile = createNewProfile;
@@ -1024,6 +1652,7 @@ function changeName(): void {
 (window as any).viewProfileStats = viewProfileStats;
 (window as any).closeProfileStats = closeProfileStats;
 (window as any).confirmDeleteProfile = confirmDeleteProfile;
+(window as any).setDifficulty = setDifficulty;
 (window as any).openSettings = openSettings;
 (window as any).closeSettings = closeSettings;
 (window as any).openNumberPad = openNumberPad;
@@ -1036,3 +1665,8 @@ function changeName(): void {
 (window as any).generateProblems = generateProblems;
 (window as any).resetWorksheet = resetWorksheet;
 (window as any).changeName = changeName;
+(window as any).printWorksheet = printWorksheet;
+(window as any).toggleAnswerKey = toggleAnswerKey;
+(window as any).openParentDashboard = openParentDashboard;
+(window as any).closeParentDashboard = closeParentDashboard;
+(window as any).changeLanguage = changeLanguage;

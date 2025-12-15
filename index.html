@@ -52,51 +52,74 @@
         <div class="progress-bar" id="progressBar"></div>
     </div>
     <div class="streak-counter" id="streakCounter">🔥 Streak: 0</div>
+    <div class="timer-display" id="timerDisplay" style="display: none;">⏱️ <span id="timerText">5:00</span></div>
     <div class="container">
         <div class="header">
             <button class="settings-icon" onclick="openSettings()" title="Settings">⚙️</button>
-            <div class="header-icon-section">
-                <svg width="80" height="80" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Background -->
-                    <circle cx="100" cy="100" r="95" fill="rgba(245, 247, 255, 0.5)"/>
 
-                    <!-- Decorative circles background -->
-                    <circle cx="50" cy="50" r="35" fill="#FF6B6B" opacity="0.15"/>
-                    <circle cx="150" cy="60" r="40" fill="#4ECDC4" opacity="0.15"/>
-                    <circle cx="140" cy="150" r="35" fill="#FFE66D" opacity="0.15"/>
+            <div class="header-main">
+                <!-- Math Icon on Left -->
+                <div class="header-icon">
+                    <svg width="60" height="60" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Background -->
+                        <circle cx="100" cy="100" r="95" fill="#F5F7FF"></circle>
 
-                    <!-- Plus (Red) - Large, centered top -->
-                    <g transform="translate(100, 65)">
-                        <rect x="-8" y="-25" width="16" height="50" rx="4" fill="#FF6B6B"/>
-                        <rect x="-25" y="-8" width="50" height="16" rx="4" fill="#FF6B6B"/>
-                    </g>
+                        <!-- Decorative circles background -->
+                        <circle cx="50" cy="50" r="35" fill="#FF6B6B" opacity="0.15"></circle>
+                        <circle cx="150" cy="60" r="40" fill="#4ECDC4" opacity="0.15"></circle>
+                        <circle cx="140" cy="150" r="35" fill="#FFE66D" opacity="0.15"></circle>
 
-                    <!-- Minus (Teal) - Left -->
-                    <g transform="translate(50, 105)">
-                        <rect x="-18" y="-6" width="36" height="12" rx="4" fill="#4ECDC4"/>
-                    </g>
+                        <!-- Plus (Red) - Large, centered top -->
+                        <g transform="translate(100, 65)">
+                            <rect x="-8" y="-25" width="16" height="50" rx="4" fill="#FF6B6B"></rect>
+                            <rect x="-25" y="-8" width="50" height="16" rx="4" fill="#FF6B6B"></rect>
+                        </g>
 
-                    <!-- Multiply (Yellow) - Right -->
-                    <g transform="translate(150, 105)">
-                        <line x1="-16" y1="-16" x2="16" y2="16" stroke="#FFE66D" stroke-width="11" stroke-linecap="round"/>
-                        <line x1="16" y1="-16" x2="-16" y2="16" stroke="#FFE66D" stroke-width="11" stroke-linecap="round"/>
-                    </g>
+                        <!-- Minus (Teal) - Left -->
+                        <g transform="translate(50, 105)">
+                            <rect x="-18" y="-6" width="36" height="12" rx="4" fill="#4ECDC4"></rect>
+                        </g>
 
-                    <!-- Division (Green) - Bottom -->
-                    <g transform="translate(100, 155)">
-                        <circle cx="0" cy="-8" r="3" fill="#95E1D3"/>
-                        <line x1="-18" y1="0" x2="18" y2="0" stroke="#95E1D3" stroke-width="10" stroke-linecap="round"/>
-                        <circle cx="0" cy="8" r="3" fill="#95E1D3"/>
-                    </g>
-                </svg>
+                        <!-- Multiply (Yellow) - Right -->
+                        <g transform="translate(150, 105)">
+                            <line x1="-16" y1="-16" x2="16" y2="16" stroke="#FFE66D" stroke-width="11" stroke-linecap="round"></line>
+                            <line x1="16" y1="-16" x2="-16" y2="16" stroke="#FFE66D" stroke-width="11" stroke-linecap="round"></line>
+                        </g>
+
+                        <!-- Division (Green) - Bottom -->
+                        <g transform="translate(100, 155)">
+                            <circle cx="0" cy="-8" r="3" fill="#95E1D3"></circle>
+                            <line x1="-18" y1="0" x2="18" y2="0" stroke="#95E1D3" stroke-width="10" stroke-linecap="round"></line>
+                            <circle cx="0" cy="8" r="3" fill="#95E1D3"></circle>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Title in Center -->
+                <div class="header-title-section">
+                    <h1 class="app-title">Math Fun!</h1>
+                    <div class="user-welcome" id="userWelcome" style="display: none;">
+                        <div class="user-avatar">👋</div>
+                        <div class="user-info">
+                            <div class="user-greeting">Hello,</div>
+                            <div class="user-name" id="userName"></div>
+                        </div>
+                    </div>
+                    <p class="header-subtitle" id="greetingText">Let's solve some addition and subtraction!</p>
+                </div>
             </div>
-            <h1><span class="emoji">🎉</span>Math Fun!<span class="emoji">🎉</span></h1>
-            <p id="greetingText">Let's solve some addition and subtraction!</p>
         </div>
 
         <!-- Profile Management Panel -->
         <div id="profilePanel" class="settings-panel">
             <div class="settings-title"><span class="emoji">👥</span> Select Your Profile</div>
+
+            <!-- Parent Dashboard Button -->
+            <div style="text-align: center; margin-bottom: 15px;">
+                <button class="btn btn-generate" onclick="openParentDashboard()" style="background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%); margin: 0;">
+                    Parent Dashboard <span class="emoji">👨‍👩‍👧‍👦</span>
+                </button>
+            </div>
 
             <!-- Profile List -->
             <div id="profileList" class="profile-list"></div>
@@ -145,6 +168,36 @@
                     <h3>Recent Sessions</h3>
                     <div id="sessionHistoryList"></div>
                 </div>
+
+                <div class="badges-section">
+                    <h3>Badges <span class="emoji">🏆</span></h3>
+                    <div id="badgesList" class="badges-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parent Dashboard Modal -->
+        <div id="parentDashboardModal" class="settings-modal" style="display: none;">
+            <div class="settings-modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+                <button class="close-settings" onclick="closeParentDashboard()">✕</button>
+                <div class="settings-title"><span class="emoji">👨‍👩‍👧‍👦</span> Parent Dashboard - All Profiles</div>
+
+                <div id="dashboardSummary" class="dashboard-summary"></div>
+
+                <div class="dashboard-section">
+                    <h3>Profile Comparison <span class="emoji">📊</span></h3>
+                    <div id="profileComparison" class="profile-comparison"></div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>Recent Activity <span class="emoji">📅</span></h3>
+                    <div id="recentActivity" class="recent-activity"></div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>Badge Leaderboard <span class="emoji">🏆</span></h3>
+                    <div id="badgeLeaderboard" class="badge-leaderboard"></div>
+                </div>
             </div>
         </div>
 
@@ -153,6 +206,29 @@
             <div class="settings-modal-content">
                 <button class="close-settings" onclick="closeSettings()">✕</button>
                 <div class="settings-title"><span class="emoji">⚙️</span> Customize Your Practice</div>
+
+                <!-- Difficulty Selector -->
+                <div class="difficulty-selector">
+                    <h3 style="margin-bottom: 15px; color: #333;">Choose Difficulty</h3>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn" data-difficulty="easy" onclick="setDifficulty('easy')">
+                            <span class="difficulty-icon">🌱</span>
+                            <span class="difficulty-name">Easy</span>
+                            <span class="difficulty-desc">Addition & Subtraction (1-10)</span>
+                        </button>
+                        <button class="difficulty-btn difficulty-btn-active" data-difficulty="medium" onclick="setDifficulty('medium')">
+                            <span class="difficulty-icon">🌟</span>
+                            <span class="difficulty-name">Medium</span>
+                            <span class="difficulty-desc">All operations (1-20)</span>
+                        </button>
+                        <button class="difficulty-btn" data-difficulty="hard" onclick="setDifficulty('hard')">
+                            <span class="difficulty-icon">🚀</span>
+                            <span class="difficulty-name">Hard</span>
+                            <span class="difficulty-desc">All operations (1-100)</span>
+                        </button>
+                    </div>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 10px; text-align: center;">Or customize your own settings below</p>
+                </div>
 
                 <div class="settings-grid">
                     <div class="setting-group">
@@ -190,15 +266,57 @@
                     </div>
                 </div>
 
+                <!-- Timed Mode -->
+                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="timedMode">
+                        <label for="timedMode">⏱️ Timed Challenge</label>
+                    </div>
+                    <div class="setting-group" style="margin-top: 10px;">
+                        <label for="timeLimit">Time Limit (minutes):</label>
+                        <input type="number" id="timeLimit" min="1" max="30" value="5" style="width: 80px;">
+                    </div>
+                </div>
+
+                <!-- Voice Feedback -->
+                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="voiceFeedback">
+                        <label for="voiceFeedback">🔊 Voice Feedback (Text-to-Speech)</label>
+                    </div>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 8px; margin-left: 30px;">Hear problems read aloud and get spoken encouragement!</p>
+                </div>
+
+                <!-- Language Selection -->
+                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                    <div class="setting-group">
+                        <label for="languageSelect">🌐 Language:</label>
+                        <select id="languageSelect" onchange="changeLanguage()" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; font-family: inherit; width: 100%;">
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                            <option value="zh">中文</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="button-group-settings">
-                    <button class="btn btn-generate" onclick="generateProblems(); closeSettings();">Generate New Problems <span class="emoji">✨</span></button>
-                    <button class="btn btn-reset" onclick="changeName(); closeSettings();" style="background: #667eea; margin-left: 10px;">Change Name <span class="emoji">👤</span></button>
+                    <button class="btn btn-primary" onclick="generateProblems(); closeSettings();">
+                        <span class="emoji">✨</span> Start Practice
+                    </button>
+                    <button class="btn btn-secondary" onclick="changeName(); closeSettings();">
+                        <span class="emoji">👤</span> Switch Profile
+                    </button>
+                    <button class="btn btn-tertiary" onclick="closeSettings();">
+                        <span class="emoji">❌</span> Close
+                    </button>
                 </div>
             </div>
         </div>
 
         <div class="instructions">
-            <p><span class="emoji">👉</span> Write your answers in the boxes below and click "Check My Answers" to see how you did!</p>
+            <p><span class="emoji">👉</span> Tap on each problem box to open the number pad and enter your answer. You'll see instant feedback as you solve each problem!</p>
         </div>
 
         <div id="problemsContainer">
@@ -207,6 +325,8 @@
 
         <div class="button-group" id="actionButtons">
             <button class="btn btn-reset" onclick="resetWorksheet()">Clear All <span class="emoji">🔄</span></button>
+            <button class="btn btn-generate" onclick="printWorksheet()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Print Worksheet <span class="emoji">🖨️</span></button>
+            <button class="btn btn-generate" onclick="toggleAnswerKey()" style="background: #ffa500;">Show Answer Key (for printing) <span class="emoji">🔑</span></button>
         </div>
 
         <div class="result" id="result"></div>

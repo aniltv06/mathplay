@@ -10,6 +10,11 @@
 export type Operation = '+' | '-' | '×' | '÷';
 
 /**
+ * Difficulty levels
+ */
+export type DifficultyLevel = 'easy' | 'medium' | 'hard' | 'custom';
+
+/**
  * Represents a single math problem
  */
 export interface Problem {
@@ -30,6 +35,28 @@ export interface ProblemSettings {
   includeSubtraction: boolean;
   includeMultiplication: boolean;
   includeDivision: boolean;
+  difficulty?: DifficultyLevel;
+  timedMode?: boolean;
+  timeLimit?: number; // in seconds
+}
+
+/**
+ * Difficulty preset configuration
+ */
+export interface DifficultyPreset {
+  level: DifficultyLevel;
+  name: string;
+  description: string;
+  icon: string;
+  settings: {
+    numProblems: number;
+    maxNum: number;
+    minNum: number;
+    includeAddition: boolean;
+    includeSubtraction: boolean;
+    includeMultiplication: boolean;
+    includeDivision: boolean;
+  };
 }
 
 /**
@@ -70,6 +97,7 @@ export interface UserProfile {
   stats: ProfileStats;
   history: Session[];
   currentSession: Session | null;
+  badges: Badge[];
 }
 
 /**
@@ -89,3 +117,143 @@ export type SoundType = 'correct' | 'wrong';
  * Answer validation result
  */
 export type ValidationResult = boolean | null;
+
+/**
+ * Badge types for achievements
+ */
+export type BadgeId =
+  | 'first-steps'
+  | 'perfect-score'
+  | 'speed-demon'
+  | 'marathon'
+  | 'streak-master'
+  | 'division-expert'
+  | 'math-wizard'
+  | 'persistent'
+  | 'time-master'
+  | 'accuracy-master';
+
+/**
+ * Achievement badge
+ */
+export interface Badge {
+  id: BadgeId;
+  name: string;
+  description: string;
+  icon: string;
+  earned: boolean;
+  earnedAt?: string;
+}
+
+/**
+ * Badge criteria checker function
+ */
+export type BadgeCriteria = (profile: UserProfile, session?: Session) => boolean;
+
+/**
+ * Supported languages for i18n
+ */
+export type Language = 'en' | 'es' | 'fr' | 'de' | 'zh';
+
+/**
+ * Translation keys for all UI text
+ */
+export interface Translations {
+  // Header
+  appTitle: string;
+  greeting: string;
+
+  // Profile Management
+  selectProfile: string;
+  createNewProfile: string;
+  createButton: string;
+  noProfiles: string;
+  parentDashboard: string;
+
+  // Settings
+  settings: string;
+  customizeTitle: string;
+  chooseDifficulty: string;
+  easy: string;
+  medium: string;
+  hard: string;
+  easyDesc: string;
+  mediumDesc: string;
+  hardDesc: string;
+  customizeBelow: string;
+  numProblems: string;
+  maxNumber: string;
+  minNumber: string;
+  includeAddition: string;
+  includeSubtraction: string;
+  includeMultiplication: string;
+  includeDivision: string;
+  timedChallenge: string;
+  timeLimit: string;
+  voiceFeedback: string;
+  voiceFeedbackDesc: string;
+  language: string;
+  generateNew: string;
+  changeName: string;
+
+  // Instructions
+  instructionsText: string;
+
+  // Buttons
+  clearAll: string;
+  printWorksheet: string;
+  showAnswerKey: string;
+  hideAnswerKey: string;
+  checkAnswers: string;
+  select: string;
+  stats: string;
+  delete: string;
+
+  // Stats
+  resultsTitle: string;
+  correct: string;
+  wrong: string;
+  score: string;
+  totalSessions: string;
+  totalProblems: string;
+  accuracy: string;
+  bestStreak: string;
+  timeSpent: string;
+
+  // Messages
+  greatJob: string;
+  tryAgain: string;
+  fillRemaining: string;
+  timeUp: string;
+  badgeEarned: string;
+  congratulations: string;
+  streakBonus: string;
+
+  // Dashboard
+  allProfiles: string;
+  profileComparison: string;
+  recentActivity: string;
+  badgeLeaderboard: string;
+  sessions: string;
+  problems: string;
+  badges: string;
+
+  // Sections
+  additionProblems: string;
+  subtractionProblems: string;
+  multiplicationProblems: string;
+  divisionProblems: string;
+
+  // Number pad
+  question: string;
+  of: string;
+  skip: string;
+  next: string;
+  back: string;
+
+  // Operations (spoken)
+  plus: string;
+  minus: string;
+  times: string;
+  dividedBy: string;
+}

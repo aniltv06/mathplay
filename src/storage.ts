@@ -4,9 +4,87 @@
  * @email aniltv06@gmail.com
  */
 
-import type { UserProfile, ProfilesData, Session, ProblemSettings, Problem } from './types';
+import type { UserProfile, ProfilesData, Session, ProblemSettings, Problem, Badge, BadgeId } from './types';
 
 const STORAGE_KEY = 'mathplay_profiles';
+
+/**
+ * Initialize all available badges (unearned)
+ */
+function initializeBadges(): Badge[] {
+  return [
+    {
+      id: 'first-steps',
+      name: 'First Steps',
+      description: 'Complete your first practice session',
+      icon: '🎯',
+      earned: false
+    },
+    {
+      id: 'perfect-score',
+      name: 'Perfect Score',
+      description: 'Get 100% on a session',
+      icon: '🌟',
+      earned: false
+    },
+    {
+      id: 'speed-demon',
+      name: 'Speed Demon',
+      description: 'Complete 10 problems in under 2 minutes',
+      icon: '⚡',
+      earned: false
+    },
+    {
+      id: 'marathon',
+      name: 'Marathon',
+      description: 'Complete 20+ problems in one session',
+      icon: '🏃',
+      earned: false
+    },
+    {
+      id: 'streak-master',
+      name: 'Streak Master',
+      description: 'Get 10 correct answers in a row',
+      icon: '🔥',
+      earned: false
+    },
+    {
+      id: 'division-expert',
+      name: 'Division Expert',
+      description: 'Solve 50 division problems',
+      icon: '➗',
+      earned: false
+    },
+    {
+      id: 'math-wizard',
+      name: 'Math Wizard',
+      description: 'Solve 100 total problems',
+      icon: '🧙',
+      earned: false
+    },
+    {
+      id: 'persistent',
+      name: 'Persistent Learner',
+      description: 'Complete 10 practice sessions',
+      icon: '💪',
+      earned: false
+    },
+    {
+      id: 'time-master',
+      name: 'Time Master',
+      description: 'Complete a timed challenge',
+      icon: '⏱️',
+      earned: false
+    },
+    {
+      id: 'accuracy-master',
+      name: 'Accuracy Master',
+      description: 'Maintain 90%+ accuracy over 5 sessions',
+      icon: '🎖️',
+      earned: false
+    }
+  ];
+}
 
 /**
  * Get all profiles from localStorage
@@ -63,7 +141,8 @@ export function createProfile(name: string): UserProfile {
       timeSpent: 0
     },
     history: [],
-    currentSession: null
+    currentSession: null,
+    badges: initializeBadges()
   };
 
   data.profiles[name] = newProfile;
@@ -238,4 +317,154 @@ export function getProfileNames(): string[] {
  */
 export function clearAllData(): void {
   localStorage.removeItem(STORAGE_KEY);
+}
+
+/**
+ * Check and award badges based on profile stats and latest session
+ */
+export function checkAndAwardBadges(name: string): Badge[] {
+  const data = getAllProfiles();
+  const profile = data.profiles[name];
+
+  if (!profile) return [];
+
+  // Ensure badges array exists (migration for old profiles)
+  if (!profile.badges) {
+    profile.badges = initializeBadges();
+  }
+
+  const newlyEarned: Badge[] = [];
+  const latestSession = profile.history[profile.history.length - 1];
+
+  // Check each badge criteria
+  profile.badges.forEach(badge => {
+    if (badge.earned) return; // Already earned
+
+    let shouldEarn = false;
+
+    switch (badge.id) {
+      case 'first-steps':
+        shouldEarn = profile.stats.totalSessions >= 1;
+        break;
+
+      case 'perfect-score':
+        shouldEarn = latestSession?.percentage === 100;
+        break;
+
+      case 'speed-demon':
+        shouldEarn = latestSession &&
+                     latestSession.problems.length >= 10 &&
+                     latestSession.timeSpent <= 120;
+        break;
+
+      case 'marathon':
+        shouldEarn = latestSession && latestSession.problems.length >= 20;
+        break;
+
+      case 'streak-master':
+        shouldEarn = profile.stats.bestStreak >= 10;
+        break;
+
+      case 'division-expert':
+        const divisionProblems = profile.history.reduce((count, session) => {
+          return count + session.problems.filter(p => p.operation === '÷').length;
+        }, 0);
+        shouldEarn = divisionProblems >= 50;
+        break;
+
+      case 'math-wizard':
+        shouldEarn = profile.stats.totalProblems >= 100;
+        break;
+
+      case 'persistent':
+        shouldEarn = profile.stats.totalSessions >= 10;
+        break;
+
+      case 'time-master':
+        shouldEarn = latestSession?.settings.timedMode === true;
+        break;
+
+      case 'accuracy-master':
+        // Check last 5 sessions for 90%+ average
+        const recentSessions = profile.history.slice(-5);
+        if (recentSessions.length >= 5) {
+          const avgAccuracy = recentSessions.reduce((sum, s) => sum + s.percentage, 0) / 5;
+          shouldEarn = avgAccuracy >= 90;
+        }
+        break;
+    }
+
+    if (shouldEarn) {
+      badge.earned = true;
+      badge.earnedAt = new Date().toISOString();
+      newlyEarned.push(badge);
+    }
+  });
+
+  if (newlyEarned.length > 0) {
+    saveAllProfiles(data);
+  }
+
+  return newlyEarned;
+}
+
+/**
+ * Get all earned badges for a profile
+ */
+export function getEarnedBadges(name: string): Badge[] {
+  const profile = getProfile(name);
+  if (!profile || !profile.badges) return [];
+  return profile.badges.filter(b => b.earned);
+}
+
+/**
+ * Get badge progress percentage for a specific badge
+ */
+export function getBadgeProgress(name: string, badgeId: BadgeId): number {
+  const profile = getProfile(name);
+  if (!profile) return 0;
+
+  const latestSession = profile.history[profile.history.length - 1];
+
+  switch (badgeId) {
+    case 'first-steps':
+      return Math.min(100, (profile.stats.totalSessions / 1) * 100);
+
+    case 'perfect-score':
+      return latestSession?.percentage || 0;
+
+    case 'speed-demon':
+      if (!latestSession || latestSession.problems.length < 10) return 0;
+      return Math.min(100, (120 / latestSession.timeSpent) * 100);
+
+    case 'marathon':
+      return Math.min(100, (latestSession?.problems.length || 0) / 20 * 100);
+
+    case 'streak-master':
+      return Math.min(100, (profile.stats.bestStreak / 10) * 100);
+
+    case 'division-expert':
+      const divisionProblems = profile.history.reduce((count, session) => {
+        return count + session.problems.filter(p => p.operation === '÷').length;
+      }, 0);
+      return Math.min(100, (divisionProblems / 50) * 100);
+
+    case 'math-wizard':
+      return Math.min(100, (profile.stats.totalProblems / 100) * 100);
+
+    case 'persistent':
+      return Math.min(100, (profile.stats.totalSessions / 10) * 100);
+
+    case 'time-master':
+      return profile.history.some(s => s.settings.timedMode) ? 100 : 0;
+
+    case 'accuracy-master':
+      const recentSessions = profile.history.slice(-5);
+      if (recentSessions.length < 5) return (recentSessions.length / 5) * 100;
+      const avgAccuracy = recentSessions.reduce((sum, s) => sum + s.percentage, 0) / 5;
+      return Math.min(100, (avgAccuracy / 90) * 100);
+
+    default:
+      return 0;
+  }
 }
