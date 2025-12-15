@@ -122,13 +122,26 @@ export function getProfile(name: string): UserProfile | null {
 }
 
 /**
+ * Default avatar options for profiles
+ */
+const DEFAULT_AVATARS = ['😊', '🚀', '🌟', '🐶', '🐱', '🦁', '🐼', '🦊', '🐸', '🦄', '🐙', '🦉', '🐢', '🦋', '🌈', '⚡'];
+
+/**
+ * Get a random avatar
+ */
+function getRandomAvatar(): string {
+  return DEFAULT_AVATARS[Math.floor(Math.random() * DEFAULT_AVATARS.length)];
+}
+
+/**
  * Create a new user profile
  */
-export function createProfile(name: string): UserProfile {
+export function createProfile(name: string, avatar?: string): UserProfile {
   const data = getAllProfiles();
 
   const newProfile: UserProfile = {
     name,
+    avatar: avatar || getRandomAvatar(),
     createdAt: new Date().toISOString(),
     lastActive: new Date().toISOString(),
     stats: {
@@ -150,6 +163,51 @@ export function createProfile(name: string): UserProfile {
   saveAllProfiles(data);
 
   return newProfile;
+}
+
+/**
+ * Update profile information (name or avatar)
+ */
+export function updateProfile(oldName: string, newName?: string, newAvatar?: string): UserProfile | null {
+  const data = getAllProfiles();
+  const profile = data.profiles[oldName];
+
+  if (!profile) {
+    return null;
+  }
+
+  // Update avatar if provided
+  if (newAvatar) {
+    profile.avatar = newAvatar;
+  }
+
+  // Update name if provided and different
+  if (newName && newName !== oldName) {
+    // Check if new name already exists
+    if (data.profiles[newName]) {
+      throw new Error(`Profile "${newName}" already exists`);
+    }
+
+    // Update name and move to new key
+    profile.name = newName;
+    data.profiles[newName] = profile;
+    delete data.profiles[oldName];
+
+    // Update lastActiveProfile if this was the active one
+    if (data.lastActiveProfile === oldName) {
+      data.lastActiveProfile = newName;
+    }
+  }
+
+  saveAllProfiles(data);
+  return profile;
+}
+
+/**
+ * Get all available avatar options
+ */
+export function getAvatarOptions(): string[] {
+  return DEFAULT_AVATARS;
 }
 
 /**

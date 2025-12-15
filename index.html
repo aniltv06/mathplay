@@ -55,7 +55,10 @@
     <div class="timer-display" id="timerDisplay" style="display: none;">⏱️ <span id="timerText">5:00</span></div>
     <div class="container">
         <div class="header">
-            <button class="settings-icon" onclick="openSettings()" title="Settings">⚙️</button>
+            <div class="header-action-buttons">
+                <button class="header-icon-btn" onclick="openParentDashboard()" title="Parent Dashboard">👨‍👩‍👧‍👦</button>
+                <button class="header-icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+            </div>
 
             <div class="header-main">
                 <!-- Math Icon on Left -->
@@ -112,12 +115,11 @@
 
         <!-- Profile Management Panel -->
         <div id="profilePanel" class="settings-panel">
-            <div class="settings-title"><span class="emoji">👥</span> Select Your Profile</div>
-
-            <!-- Parent Dashboard Button -->
-            <div style="text-align: center; margin-bottom: 15px;">
-                <button class="btn btn-generate" onclick="openParentDashboard()" style="background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%); margin: 0;">
-                    Parent Dashboard <span class="emoji">👨‍👩‍👧‍👦</span>
+            <!-- Header with Title and Parent Dashboard Button -->
+            <div class="panel-header">
+                <div class="settings-title"><span class="emoji">👥</span> Select Your Profile</div>
+                <button class="btn-parent-dashboard" onclick="openParentDashboard()">
+                    <span class="emoji">👨‍👩‍👧‍👦</span> Parent Dashboard
                 </button>
             </div>
 
@@ -126,11 +128,12 @@
 
             <!-- New Profile Form -->
             <div class="new-profile-section">
-                <div style="display: flex; gap: 10px; align-items: flex-end; margin-top: 15px;">
-                    <div style="flex: 1;">
-                        <input type="text" id="newProfileName" placeholder="Create new profile..." maxlength="20" style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 1.1em; font-family: inherit;">
-                    </div>
-                    <button class="btn btn-generate" onclick="createNewProfile()" style="margin: 0;">Create 🚀</button>
+                <div class="new-profile-header">
+                    <span class="emoji">➕</span> Create New Profile
+                </div>
+                <div class="new-profile-form">
+                    <input type="text" id="newProfileName" placeholder="Enter name..." maxlength="20" class="profile-name-input">
+                    <button class="btn btn-generate" onclick="createNewProfile()">Create 🚀</button>
                 </div>
             </div>
         </div>
@@ -172,6 +175,42 @@
                 <div class="badges-section">
                     <h3>Badges <span class="emoji">🏆</span></h3>
                     <div id="badgesList" class="badges-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Modal -->
+        <div id="editProfileModal" class="settings-modal" style="display: none;">
+            <div class="settings-modal-content" style="max-width: 500px;">
+                <button class="close-settings" onclick="closeEditProfile()">✕</button>
+                <div class="settings-title"><span class="emoji">✏️</span> Edit Profile</div>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="setting-group">
+                        <label for="editProfileName">Name:</label>
+                        <input type="text" id="editProfileName" maxlength="20" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="setting-group">
+                        <label>Choose Avatar:</label>
+                        <div style="text-align: center; margin: 15px 0;">
+                            <div style="font-size: 4em; margin-bottom: 10px;">
+                                <span id="currentAvatar">😊</span>
+                            </div>
+                            <div id="avatarOptions" class="avatar-options-grid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group-settings">
+                    <button class="btn btn-primary" onclick="saveProfileEdits()">
+                        <span class="emoji">💾</span> Save Changes
+                    </button>
+                    <button class="btn btn-tertiary" onclick="closeEditProfile()">
+                        <span class="emoji">❌</span> Cancel
+                    </button>
                 </div>
             </div>
         </div>
@@ -281,7 +320,7 @@
                 <!-- Voice Feedback -->
                 <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
                     <div class="checkbox-group">
-                        <input type="checkbox" id="voiceFeedback">
+                        <input type="checkbox" id="voiceFeedback" onchange="handleVoiceFeedbackChange()">
                         <label for="voiceFeedback">🔊 Voice Feedback (Text-to-Speech)</label>
                     </div>
                     <p style="font-size: 0.85em; color: #666; margin-top: 8px; margin-left: 30px;">Hear problems read aloud and get spoken encouragement!</p>
@@ -315,6 +354,59 @@
             </div>
         </div>
 
+        <!-- Print Settings Modal -->
+        <div id="printSettingsModal" class="settings-modal" style="display: none;">
+            <div class="settings-modal-content" style="max-width: 500px;">
+                <button class="close-settings" onclick="closePrintSettings()">✕</button>
+                <div class="settings-title"><span class="emoji">🖨️</span> Print Settings</div>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="setting-group">
+                        <label for="printFont">Font Style:</label>
+                        <select id="printFont" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
+                            <option value="Arial">Arial (Clean & Clear)</option>
+                            <option value="Times New Roman">Times New Roman (Traditional)</option>
+                            <option value="Comic Sans MS" selected>Comic Sans MS (Kid-Friendly)</option>
+                            <option value="Courier New">Courier New (Monospace)</option>
+                            <option value="Georgia">Georgia (Readable)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="setting-group">
+                        <label for="printColumns">Problems Per Row:</label>
+                        <select id="printColumns" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
+                            <option value="3">3 (Spacious)</option>
+                            <option value="4" selected>4 (Balanced)</option>
+                            <option value="5">5 (Compact)</option>
+                            <option value="6">6 (Very Compact)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="printShowAnswers" checked>
+                        <label for="printShowAnswers">Include Answer Key (separate page)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="printShowName" checked>
+                        <label for="printShowName">Show Student Name Line</label>
+                    </div>
+                </div>
+
+                <div class="button-group-settings">
+                    <button class="btn btn-primary" onclick="doPrint()">
+                        <span class="emoji">🖨️</span> Print Now
+                    </button>
+                    <button class="btn btn-tertiary" onclick="closePrintSettings()">
+                        <span class="emoji">❌</span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="instructions">
             <p><span class="emoji">👉</span> Tap on each problem box to open the number pad and enter your answer. You'll see instant feedback as you solve each problem!</p>
         </div>
@@ -325,8 +417,7 @@
 
         <div class="button-group" id="actionButtons">
             <button class="btn btn-reset" onclick="resetWorksheet()">Clear All <span class="emoji">🔄</span></button>
-            <button class="btn btn-generate" onclick="printWorksheet()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Print Worksheet <span class="emoji">🖨️</span></button>
-            <button class="btn btn-generate" onclick="toggleAnswerKey()" style="background: #ffa500;">Show Answer Key (for printing) <span class="emoji">🔑</span></button>
+            <button class="btn btn-generate" onclick="openPrintSettings()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Print Worksheet <span class="emoji">🖨️</span></button>
         </div>
 
         <div class="result" id="result"></div>

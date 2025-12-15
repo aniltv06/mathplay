@@ -35,7 +35,9 @@ import {
   deleteProfile,
   checkAndAwardBadges,
   getEarnedBadges,
-  getAllProfiles
+  getAllProfiles,
+  updateProfile,
+  getAvatarOptions
 } from './storage';
 
 // Import i18n utilities
@@ -111,8 +113,32 @@ let timedMode: boolean = false;
 let timeLimit: number = 300; // 5 minutes default
 let timeRemaining: number = 0;
 let timerInterval: number | null = null;
-let showAnswerKey: boolean = false;
 let voiceFeedbackEnabled: boolean = false;
+
+// Load voice feedback preference from localStorage
+function loadVoiceFeedbackPreference(): boolean {
+  const saved = localStorage.getItem('mathplay_voiceFeedback');
+  return saved === 'true';
+}
+
+// Save voice feedback preference to localStorage
+function saveVoiceFeedbackPreference(enabled: boolean): void {
+  localStorage.setItem('mathplay_voiceFeedback', enabled.toString());
+}
+
+// Toggle voice feedback and save preference
+function toggleVoiceFeedback(enabled: boolean): void {
+  voiceFeedbackEnabled = enabled;
+  saveVoiceFeedbackPreference(enabled);
+}
+
+// Handle voice feedback checkbox change
+function handleVoiceFeedbackChange(): void {
+  const voiceFeedbackInput = document.getElementById('voiceFeedback') as HTMLInputElement;
+  if (voiceFeedbackInput) {
+    toggleVoiceFeedback(voiceFeedbackInput.checked);
+  }
+}
 
 // Sound effects using Web Audio API
 function playSound(type: SoundType): void {
@@ -151,12 +177,33 @@ function speak(text: string): void {
     // Cancel any ongoing speech
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9; // Slightly slower for clarity
-    utterance.pitch = 1.1; // Slightly higher pitch (kid-friendly)
-    utterance.volume = 0.8;
+    // Small delay to ensure cancel completes before starting new speech
+    setTimeout(() => {
+      // Resume speech synthesis (needed for iOS Safari)
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
 
-    window.speechSynthesis.speak(utterance);
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9; // Slightly slower for clarity
+      utterance.pitch = 1.1; // Slightly higher pitch (kid-friendly)
+      utterance.volume = 0.8;
+
+      // Handle speech errors
+      utterance.onerror = (event) => {
+        console.log('Speech synthesis error:', event);
+      };
+
+      // Handle speech end
+      utterance.onend = () => {
+        // Resume after each utterance for iOS compatibility
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }, 100);
   }
 }
 
@@ -379,10 +426,12 @@ function loadProfiles(): void {
       ? Math.round((profile.stats.totalCorrect / totalAnswered) * 100)
       : 0;
 
+    const avatar = profile.avatar || '😊';
+
     return `
       <div class="profile-card">
         <div class="profile-info">
-          <div class="profile-name">👤 ${profile.name}</div>
+          <div class="profile-name"><span class="profile-avatar">${avatar}</span> ${profile.name}</div>
           <div class="profile-stats-preview">
             <div class="profile-stat-item">
               <span>📊</span>
@@ -400,6 +449,7 @@ function loadProfiles(): void {
         </div>
         <div class="profile-actions">
           <button class="profile-btn profile-btn-select" onclick="selectProfile('${name}')">Select</button>
+          <button class="profile-btn profile-btn-edit" onclick="openEditProfile('${name}')">Edit</button>
           <button class="profile-btn profile-btn-view" onclick="viewProfileStats('${name}')">Stats</button>
           <button class="profile-btn profile-btn-delete" onclick="confirmDeleteProfile('${name}')">Delete</button>
         </div>
@@ -574,6 +624,105 @@ function confirmDeleteProfile(name: string): void {
     deleteProfile(name);
     loadProfiles();
   }
+}
+
+// Edit Profile Functions
+function openEditProfile(name: string): void {
+  const profile = getProfile(name);
+  if (!profile) return;
+
+  const modal = document.getElementById('editProfileModal');
+  if (!modal) return;
+
+  // Set current values
+  const nameInput = document.getElementById('editProfileName') as HTMLInputElement;
+  const currentAvatarEl = document.getElementById('currentAvatar');
+
+  if (nameInput) nameInput.value = profile.name;
+  if (currentAvatarEl) currentAvatarEl.textContent = profile.avatar || '😊';
+
+  // Store the original name for updating
+  modal.setAttribute('data-original-name', name);
+
+  // Render avatar options
+  renderAvatarOptions(profile.avatar || '😊');
+
+  modal.style.display = 'block';
+}
+
+function renderAvatarOptions(selectedAvatar: string): void {
+  const container = document.getElementById('avatarOptions');
+  if (!container) return;
+
+  const avatars = getAvatarOptions();
+
+  container.innerHTML = avatars.map(avatar => `
+    <button
+      class="avatar-option ${avatar === selectedAvatar ? 'avatar-option-selected' : ''}"
+      onclick="selectAvatar('${avatar}')"
+      type="button"
+    >
+      ${avatar}
+    </button>
+  `).join('');
+}
+
+function selectAvatar(avatar: string): void {
+  const currentAvatarEl = document.getElementById('currentAvatar');
+  if (currentAvatarEl) currentAvatarEl.textContent = avatar;
+
+  // Update selected state
+  document.querySelectorAll('.avatar-option').forEach(btn => {
+    btn.classList.remove('avatar-option-selected');
+  });
+
+  const selectedBtn = Array.from(document.querySelectorAll('.avatar-option'))
+    .find(btn => btn.textContent?.trim() === avatar);
+  if (selectedBtn) {
+    selectedBtn.classList.add('avatar-option-selected');
+  }
+}
+
+function saveProfileEdits(): void {
+  const modal = document.getElementById('editProfileModal');
+  if (!modal) return;
+
+  const originalName = modal.getAttribute('data-original-name');
+  if (!originalName) return;
+
+  const nameInput = document.getElementById('editProfileName') as HTMLInputElement;
+  const currentAvatarEl = document.getElementById('currentAvatar');
+
+  const newName = nameInput?.value.trim();
+  const newAvatar = currentAvatarEl?.textContent?.trim();
+
+  if (!newName) {
+    alert('Please enter a name! 😊');
+    return;
+  }
+
+  try {
+    const updatedProfile = updateProfile(originalName, newName !== originalName ? newName : undefined, newAvatar);
+
+    if (updatedProfile) {
+      // If this was the current active profile, update the UI
+      if (childName === originalName) {
+        childName = updatedProfile.name;
+        const userName = document.getElementById('userName');
+        if (userName) userName.textContent = childName;
+      }
+
+      closeEditProfile();
+      loadProfiles();
+    }
+  } catch (error: any) {
+    alert(error.message || 'Error updating profile');
+  }
+}
+
+function closeEditProfile(): void {
+  const modal = document.getElementById('editProfileModal');
+  if (modal) modal.style.display = 'none';
 }
 
 // Parent Dashboard Functions
@@ -768,6 +917,8 @@ window.addEventListener('click', function (event: MouseEvent) {
   const numberpadModal = document.getElementById('numberpadModal');
   const profileStatsModal = document.getElementById('profileStatsModal');
   const parentDashboardModal = document.getElementById('parentDashboardModal');
+  const printSettingsModal = document.getElementById('printSettingsModal');
+  const editProfileModal = document.getElementById('editProfileModal');
 
   // Close settings modal if clicking on backdrop
   if (event.target === settingsModal) {
@@ -787,6 +938,16 @@ window.addEventListener('click', function (event: MouseEvent) {
   // Close parent dashboard modal if clicking on backdrop
   if (event.target === parentDashboardModal) {
     closeParentDashboard();
+  }
+
+  // Close print settings modal if clicking on backdrop
+  if (event.target === printSettingsModal) {
+    closePrintSettings();
+  }
+
+  // Close edit profile modal if clicking on backdrop
+  if (event.target === editProfileModal) {
+    closeEditProfile();
   }
 });
 
@@ -810,14 +971,21 @@ function openNumberPad(inputIndex: number): void {
   if (currentQuestion) currentQuestion.textContent = (inputIndex + 1).toString();
   if (totalQuestions) totalQuestions.textContent = problems.length.toString();
 
-  // Speak the problem
-  speakProblem(problem);
-
   const modal = document.getElementById('numberpadModal');
   if (modal) modal.style.display = 'block';
+
+  // Speak the problem after modal is visible
+  setTimeout(() => {
+    speakProblem(problem);
+  }, 200);
 }
 
 function closeNumberPad(): void {
+  // Cancel any ongoing speech
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+
   // If there's a value entered, save and validate it
   if (currentInputIndex !== null && padValue !== '') {
     const input = document.getElementById(`answer${currentInputIndex}`) as HTMLInputElement;
@@ -836,8 +1004,8 @@ function closeNumberPad(): void {
 }
 
 function padNumber(num: number): void {
-  if (padValue.length < 6) {
-    // Limit to 6 digits max (supports up to 999,999)
+  if (padValue.length < 8) {
+    // Limit to 8 digits max (supports up to 99,999,999)
     padValue += num.toString();
     updatePadDisplay();
   }
@@ -1090,6 +1258,8 @@ document.addEventListener('keydown', function (event: KeyboardEvent) {
     closeSettings();
     closeProfileStats();
     closeParentDashboard();
+    closePrintSettings();
+    closeEditProfile();
   }
 });
 
@@ -1343,9 +1513,8 @@ function generateProblems(): void {
     if (timerDisplay) timerDisplay.style.display = 'none';
   }
 
-  // Handle voice feedback
-  const voiceFeedbackInput = document.getElementById('voiceFeedback') as HTMLInputElement;
-  voiceFeedbackEnabled = voiceFeedbackInput?.checked || false;
+  // Voice feedback is already loaded from localStorage and set globally
+  // No need to read from checkbox here - it's managed by handleVoiceFeedbackChange
 
   renderProblems();
 
@@ -1425,7 +1594,7 @@ function renderProblemBox(problem: Problem, index: number): string {
       <div class="operation">${problem.operation}</div>
       <div class="operation">${problem.num2}</div>
       <div style="border-top: 2px solid #667eea; margin: 10px 0;"></div>
-      <input type="number" class="answer-input" id="answer${index}" placeholder="?" min="0" max="999999" readonly style="cursor: pointer;">
+      <input type="number" class="answer-input" id="answer${index}" min="0" max="99999999" readonly style="cursor: pointer;">
     </div>
   `;
 }
@@ -1489,58 +1658,133 @@ function changeName(): void {
 }
 
 // Print worksheet functions
-function printWorksheet(): void {
+function openPrintSettings(): void {
   if (problems.length === 0) {
     alert('Please generate problems first!');
     return;
   }
 
-  // Add print footer info
+  const modal = document.getElementById('printSettingsModal');
+  if (modal) modal.style.display = 'block';
+}
+
+function closePrintSettings(): void {
+  const modal = document.getElementById('printSettingsModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function doPrint(): void {
+  // Get user settings
+  const fontSelect = document.getElementById('printFont') as HTMLSelectElement;
+  const columnsSelect = document.getElementById('printColumns') as HTMLSelectElement;
+  const showAnswersCheckbox = document.getElementById('printShowAnswers') as HTMLInputElement;
+  const showNameCheckbox = document.getElementById('printShowName') as HTMLInputElement;
+
+  const selectedFont = fontSelect?.value || 'Comic Sans MS';
+  const selectedColumns = columnsSelect?.value || '4';
+  const showAnswers = showAnswersCheckbox?.checked ?? true;
+  const showName = showNameCheckbox?.checked ?? true;
+
+  // Generate simple unique worksheet code (format: WS-12345)
+  const timestamp = Date.now().toString().slice(-5); // Last 5 digits
+  const worksheetCode = `WS-${timestamp}`;
+
+  // Apply CSS variables to document root
+  document.documentElement.style.setProperty('--print-font', selectedFont);
+  document.documentElement.style.setProperty('--print-columns', selectedColumns);
+
+  // Create/update print header
   const container = document.querySelector('.container');
   if (!container) return;
 
-  // Create print-only elements
+  // Remove existing print elements
+  let printHeader = document.querySelector('.print-header');
+  if (printHeader) printHeader.remove();
   let printFooter = document.querySelector('.print-footer');
-  if (!printFooter) {
-    printFooter = document.createElement('div');
-    printFooter.className = 'print-footer';
-    printFooter.innerHTML = `
-      <p><strong>Name:</strong> _____________________________________ <strong>Date:</strong> _______________</p>
-      <p>Complete all problems and check your answers!</p>
-      <p>Generated by Math Fun - Practice Makes Perfect! 🎉</p>
+  if (printFooter) printFooter.remove();
+
+  // Create new print header
+  if (showName) {
+    printHeader = document.createElement('div');
+    printHeader.className = 'print-header';
+    printHeader.innerHTML = `
+      <div class="print-title">Math Fun Worksheet</div>
+      <div class="print-name-line">
+        Name: ____________________
+      </div>
     `;
+    container.insertBefore(printHeader, container.firstChild);
+  }
+
+  // Create print footer with code
+  printFooter = document.createElement('div');
+  printFooter.className = 'print-footer';
+  printFooter.innerHTML = `Code: <strong>${worksheetCode}</strong>`;
+  // Insert footer before answer key or at end
+  const answerKey = document.querySelector('.answer-key');
+  if (answerKey) {
+    container.insertBefore(printFooter, answerKey);
+  } else {
     container.appendChild(printFooter);
   }
 
-  // Show/hide answer key based on toggle
-  updateAnswerKeyDisplay();
+  // Add section titles to print view
+  addPrintSectionTitles();
 
-  // Trigger print dialog
-  window.print();
-}
-
-function toggleAnswerKey(): void {
-  showAnswerKey = !showAnswerKey;
-  updateAnswerKeyDisplay();
-
-  // Update button text
-  const btn = document.querySelector('[onclick="toggleAnswerKey()"]');
-  if (btn) {
-    btn.textContent = showAnswerKey
-      ? 'Hide Answer Key 🔒'
-      : 'Show Answer Key (for printing) 🔑';
+  // Handle answer key
+  if (showAnswers) {
+    updateAnswerKeyDisplay(worksheetCode);
+  } else {
+    // Remove answer key if exists
+    const answerKey = document.querySelector('.answer-key');
+    if (answerKey) answerKey.remove();
   }
+
+  // Close modal
+  closePrintSettings();
+
+  // Trigger print
+  setTimeout(() => {
+    window.print();
+
+    // Cleanup after print
+    setTimeout(() => {
+      if (printHeader) printHeader.remove();
+      if (printFooter) printFooter.remove();
+      removePrintSectionTitles();
+      if (!showAnswers) {
+        const answerKey = document.querySelector('.answer-key');
+        if (answerKey) answerKey.remove();
+      }
+    }, 100);
+  }, 100);
 }
 
-function updateAnswerKeyDisplay(): void {
+// Add section titles for print view
+function addPrintSectionTitles(): void {
+  const sectionTitles = document.querySelectorAll('.section-title');
+  sectionTitles.forEach(title => {
+    title.classList.add('print-section-visible');
+  });
+}
+
+// Remove print section titles after print
+function removePrintSectionTitles(): void {
+  const sectionTitles = document.querySelectorAll('.section-title');
+  sectionTitles.forEach(title => {
+    title.classList.remove('print-section-visible');
+  });
+}
+
+function updateAnswerKeyDisplay(worksheetCode?: string): void {
   // Remove existing answer key
   let answerKey = document.querySelector('.answer-key');
   if (answerKey) {
     answerKey.remove();
   }
 
-  // Add answer key if enabled
-  if (showAnswerKey && problems.length > 0) {
+  // Add answer key
+  if (problems.length > 0) {
     const container = document.querySelector('.container');
     if (!container) return;
 
@@ -1563,6 +1807,11 @@ function updateAnswerKeyDisplay(): void {
     });
 
     let html = '<h2>Answer Key</h2>';
+
+    // Add worksheet code if provided
+    if (worksheetCode) {
+      html += `<div style="text-align: right; font-size: 9pt; color: #999; margin-bottom: 15px;">Code: <strong>${worksheetCode}</strong></div>`;
+    }
 
     Object.keys(answersByOperation).forEach(op => {
       const opName = {
@@ -1640,6 +1889,13 @@ function initializeApp(): void {
     selectEl.value = savedLang;
   }
 
+  // Load voice feedback preference
+  voiceFeedbackEnabled = loadVoiceFeedbackPreference();
+  const voiceFeedbackInput = document.getElementById('voiceFeedback') as HTMLInputElement;
+  if (voiceFeedbackInput) {
+    voiceFeedbackInput.checked = voiceFeedbackEnabled;
+  }
+
   // Update UI with loaded language
   updateUIText();
 }
@@ -1652,6 +1908,10 @@ function initializeApp(): void {
 (window as any).viewProfileStats = viewProfileStats;
 (window as any).closeProfileStats = closeProfileStats;
 (window as any).confirmDeleteProfile = confirmDeleteProfile;
+(window as any).openEditProfile = openEditProfile;
+(window as any).closeEditProfile = closeEditProfile;
+(window as any).selectAvatar = selectAvatar;
+(window as any).saveProfileEdits = saveProfileEdits;
 (window as any).setDifficulty = setDifficulty;
 (window as any).openSettings = openSettings;
 (window as any).closeSettings = closeSettings;
@@ -1665,8 +1925,9 @@ function initializeApp(): void {
 (window as any).generateProblems = generateProblems;
 (window as any).resetWorksheet = resetWorksheet;
 (window as any).changeName = changeName;
-(window as any).printWorksheet = printWorksheet;
-(window as any).toggleAnswerKey = toggleAnswerKey;
+(window as any).openPrintSettings = openPrintSettings;
+(window as any).closePrintSettings = closePrintSettings;
+(window as any).doPrint = doPrint;
 (window as any).openParentDashboard = openParentDashboard;
 (window as any).closeParentDashboard = closeParentDashboard;
 (window as any).changeLanguage = changeLanguage;

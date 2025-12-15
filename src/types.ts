@@ -92,6 +92,7 @@ export interface ProfileStats {
  */
 export interface UserProfile {
   name: string;
+  avatar: string; // Character emoji for the profile
   createdAt: string;
   lastActive: string;
   stats: ProfileStats;
