@@ -2086,3 +2086,23 @@ body {
     color: #667eea;
     font-weight: bold;
 }
+
+/* Import/Export Result Messages */
+.import-result {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.import-result.success {
+    background: linear-gradient(135deg, #e8f8f5 0%, #c3fdd8 100%);
+    border: 2px solid #51cf66;
+    color: #2f9e44;
+}
+
+.import-result.error {
+    background: linear-gradient(135deg, #ffe0e0 0%, #ffc9c9 100%);
+    border: 2px solid #ff6b6b;
+    color: #c92a2a;
+}

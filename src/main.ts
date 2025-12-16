@@ -37,7 +37,9 @@ import {
   getEarnedBadges,
   getAllProfiles,
   updateProfile,
-  getAvatarOptions
+  getAvatarOptions,
+  exportProfiles,
+  importProfiles
 } from './storage';
 
 // Import i18n utilities
@@ -1018,6 +1020,8 @@ window.addEventListener('click', function (event: MouseEvent) {
   const editProfileModal = document.getElementById('editProfileModal');
   const profileSwitcherMenu = document.getElementById('profileSwitcherMenu');
   const profileAvatarBtn = document.getElementById('profileAvatarBtn');
+  const exportModal = document.getElementById('exportModal');
+  const importModal = document.getElementById('importModal');
 
   // Close settings modal if clicking on backdrop
   if (event.target === settingsModal) {
@@ -1047,6 +1051,16 @@ window.addEventListener('click', function (event: MouseEvent) {
   // Close edit profile modal if clicking on backdrop
   if (event.target === editProfileModal) {
     closeEditProfile();
+  }
+
+  // Close export modal if clicking on backdrop
+  if (event.target === exportModal) {
+    closeExportModal();
+  }
+
+  // Close import modal if clicking on backdrop
+  if (event.target === importModal) {
+    closeImportModal();
   }
 
   // Close profile switcher menu if clicking outside
@@ -1367,6 +1381,8 @@ document.addEventListener('keydown', function (event: KeyboardEvent) {
     closeParentDashboard();
     closePrintSettings();
     closeEditProfile();
+    closeExportModal();
+    closeImportModal();
   }
 });
 
@@ -2008,6 +2024,116 @@ function initializeApp(): void {
 }
 
 
+// Sync Functions - Export and Import Profiles
+function openExportModal(): void {
+  const modal = document.getElementById('exportModal');
+  if (!modal) return;
+
+  // Generate share code
+  const shareCode = exportProfiles();
+  const codeDisplay = document.getElementById('exportCodeDisplay') as HTMLTextAreaElement;
+  if (codeDisplay) {
+    codeDisplay.value = shareCode;
+  }
+
+  modal.style.display = 'block';
+}
+
+function closeExportModal(): void {
+  const modal = document.getElementById('exportModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function copyExportCode(): void {
+  const codeDisplay = document.getElementById('exportCodeDisplay') as HTMLTextAreaElement;
+  if (!codeDisplay) return;
+
+  codeDisplay.select();
+  codeDisplay.setSelectionRange(0, 99999); // For mobile devices
+
+  navigator.clipboard.writeText(codeDisplay.value).then(() => {
+    const copyBtn = document.getElementById('copyExportBtn');
+    if (copyBtn) {
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = '✅ Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 2000);
+    }
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+    alert('Failed to copy code. Please copy it manually.');
+  });
+}
+
+function openImportModal(): void {
+  const modal = document.getElementById('importModal');
+  if (!modal) return;
+
+  // Clear previous input
+  const codeInput = document.getElementById('importCodeInput') as HTMLTextAreaElement;
+  if (codeInput) {
+    codeInput.value = '';
+  }
+
+  const resultEl = document.getElementById('importResult');
+  if (resultEl) {
+    resultEl.style.display = 'none';
+  }
+
+  modal.style.display = 'block';
+}
+
+function closeImportModal(): void {
+  const modal = document.getElementById('importModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function doImport(): void {
+  const codeInput = document.getElementById('importCodeInput') as HTMLTextAreaElement;
+  const resultEl = document.getElementById('importResult');
+
+  if (!codeInput || !resultEl) return;
+
+  const shareCode = codeInput.value.trim();
+
+  if (!shareCode) {
+    alert('Please enter a share code!');
+    return;
+  }
+
+  try {
+    const importedNames = importProfiles(shareCode);
+
+    resultEl.style.display = 'block';
+    resultEl.className = 'import-result success';
+    resultEl.innerHTML = `
+      <div style="font-size: 1.2em; margin-bottom: 10px;">✅ Success!</div>
+      <div>Imported ${importedNames.length} profile${importedNames.length > 1 ? 's' : ''}:</div>
+      <ul style="margin-top: 10px; text-align: left;">
+        ${importedNames.map(name => `<li><strong>${name}</strong></li>`).join('')}
+      </ul>
+      <div style="margin-top: 15px; font-size: 0.9em; color: #666;">
+        Profiles have been merged with your existing data.
+      </div>
+    `;
+
+    // Reload profiles list
+    loadProfiles();
+
+    // Clear input
+    codeInput.value = '';
+  } catch (error: any) {
+    resultEl.style.display = 'block';
+    resultEl.className = 'import-result error';
+    resultEl.innerHTML = `
+      <div style="font-size: 1.2em; margin-bottom: 10px;">❌ Error</div>
+      <div>${error.message || 'Failed to import profiles'}</div>
+    `;
+  }
+}
+
+
 // Expose functions to window for inline onclick handlers (Vite ES modules fix)
 (window as any).startWithName = startWithName;
 (window as any).createNewProfile = createNewProfile;
@@ -2041,3 +2167,9 @@ function initializeApp(): void {
 (window as any).openParentDashboard = openParentDashboard;
 (window as any).closeParentDashboard = closeParentDashboard;
 (window as any).changeLanguage = changeLanguage;
+(window as any).openExportModal = openExportModal;
+(window as any).closeExportModal = closeExportModal;
+(window as any).copyExportCode = copyExportCode;
+(window as any).openImportModal = openImportModal;
+(window as any).closeImportModal = closeImportModal;
+(window as any).doImport = doImport;

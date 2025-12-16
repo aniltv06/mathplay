@@ -249,6 +249,86 @@
             </div>
         </div>
 
+        <!-- Export Profiles Modal -->
+        <div id="exportModal" class="settings-modal" style="display: none;">
+            <div class="settings-modal-content" style="max-width: 600px;">
+                <button class="close-settings" onclick="closeExportModal()">✕</button>
+                <div class="settings-title"><span class="emoji">📤</span> Export Profiles - Share Code</div>
+
+                <div style="margin-bottom: 20px;">
+                    <p style="color: #666; font-size: 0.95em; line-height: 1.5;">
+                        Copy this code to save or share your profiles. You can import it on another device or send it to friends/family.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: bold; color: #333; margin-bottom: 8px; display: block;">Share Code:</label>
+                    <textarea
+                        id="exportCodeDisplay"
+                        readonly
+                        style="width: 100%; height: 200px; padding: 15px; border: 2px solid #667eea; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85em; resize: vertical; background: #f5f7ff;"
+                    ></textarea>
+                </div>
+
+                <div class="button-group-settings">
+                    <button class="btn btn-primary" id="copyExportBtn" onclick="copyExportCode()">
+                        <span class="emoji">📋</span> Copy Code
+                    </button>
+                    <button class="btn btn-tertiary" onclick="closeExportModal()">
+                        <span class="emoji">✅</span> Done
+                    </button>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #fff4e6; border-left: 4px solid #ffa500; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #333; margin-bottom: 5px;">💡 Tip:</div>
+                    <div style="font-size: 0.9em; color: #666;">
+                        Save this code in a safe place (notes app, email to yourself, etc.) to backup your progress!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Profiles Modal -->
+        <div id="importModal" class="settings-modal" style="display: none;">
+            <div class="settings-modal-content" style="max-width: 600px;">
+                <button class="close-settings" onclick="closeImportModal()">✕</button>
+                <div class="settings-title"><span class="emoji">📥</span> Import Profiles - Share Code</div>
+
+                <div style="margin-bottom: 20px;">
+                    <p style="color: #666; font-size: 0.95em; line-height: 1.5;">
+                        Paste a share code below to import profiles. Profiles will be merged with your existing data.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: bold; color: #333; margin-bottom: 8px; display: block;">Share Code:</label>
+                    <textarea
+                        id="importCodeInput"
+                        placeholder="Paste share code here..."
+                        style="width: 100%; height: 200px; padding: 15px; border: 2px solid #667eea; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85em; resize: vertical;"
+                    ></textarea>
+                </div>
+
+                <div id="importResult" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+
+                <div class="button-group-settings">
+                    <button class="btn btn-primary" onclick="doImport()">
+                        <span class="emoji">📥</span> Import Profiles
+                    </button>
+                    <button class="btn btn-tertiary" onclick="closeImportModal()">
+                        <span class="emoji">❌</span> Cancel
+                    </button>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #e8f8f5; border-left: 4px solid #51cf66; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #333; margin-bottom: 5px;">ℹ️ Note:</div>
+                    <div style="font-size: 0.9em; color: #666;">
+                        If a profile name already exists, the imported profile will be renamed (e.g., "John (1)").
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Settings Modal -->
         <div id="settingsModal" class="settings-modal">
             <div class="settings-modal-content">
@@ -346,6 +426,24 @@
                             <option value="de">Deutsch</option>
                             <option value="zh">中文</option>
                         </select>
+                    </div>
+                </div>
+
+                <!-- Sync Section -->
+                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #333; margin-bottom: 12px;">
+                        <span class="emoji">☁️</span> Sync & Backup
+                    </div>
+                    <p style="font-size: 0.9em; color: #666; margin-bottom: 12px;">
+                        Save or share your profiles using a share code. Works offline - no cloud account needed!
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="openExportModal()" style="font-size: 0.95em; padding: 12px 15px;">
+                            <span class="emoji">📤</span> Export
+                        </button>
+                        <button class="btn btn-secondary" onclick="openImportModal()" style="font-size: 0.95em; padding: 12px 15px;">
+                            <span class="emoji">📥</span> Import
+                        </button>
                     </div>
                 </div>
 

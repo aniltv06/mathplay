@@ -5,6 +5,7 @@
  */
 
 import type { UserProfile, ProfilesData, Session, ProblemSettings, Problem, Badge, BadgeId } from './types';
+import { compress, decompress } from 'lz-string';
 
 const STORAGE_KEY = 'mathplay_profiles';
 
@@ -524,5 +525,68 @@ export function getBadgeProgress(name: string, badgeId: BadgeId): number {
 
     default:
       return 0;
+  }
+}
+
+/**
+ * Export all profiles as a compressed share code
+ */
+export function exportProfiles(): string {
+  const data = getAllProfiles();
+  const jsonString = JSON.stringify(data);
+  const compressed = compress(jsonString);
+  return compressed;
+}
+
+/**
+ * Import profiles from a share code
+ * Merges imported profiles with existing ones
+ * Returns array of imported profile names
+ */
+export function importProfiles(shareCode: string): string[] {
+  try {
+    const decompressed = decompress(shareCode);
+    if (!decompressed) {
+      throw new Error('Invalid share code - decompression failed');
+    }
+
+    const importedData = JSON.parse(decompressed) as ProfilesData;
+    if (!importedData.profiles) {
+      throw new Error('Invalid share code - no profiles found');
+    }
+
+    const currentData = getAllProfiles();
+    const importedNames: string[] = [];
+
+    // Merge profiles - handle name conflicts
+    Object.entries(importedData.profiles).forEach(([name, profile]) => {
+      let finalName = name;
+      let counter = 1;
+
+      // If profile name exists, append number
+      while (currentData.profiles[finalName]) {
+        finalName = `${name} (${counter})`;
+        counter++;
+      }
+
+      // Update profile name if it was changed
+      if (finalName !== name) {
+        profile.name = finalName;
+      }
+
+      // Ensure badges exist (migration)
+      if (!profile.badges) {
+        profile.badges = initializeBadges();
+      }
+
+      currentData.profiles[finalName] = profile;
+      importedNames.push(finalName);
+    });
+
+    saveAllProfiles(currentData);
+    return importedNames;
+  } catch (error) {
+    console.error('Error importing profiles:', error);
+    throw new Error('Failed to import profiles. Please check the share code and try again.');
   }
 }
