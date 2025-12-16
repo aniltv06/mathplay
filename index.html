@@ -56,8 +56,17 @@
     <div class="container">
         <div class="header">
             <div class="header-action-buttons">
+                <button class="header-icon-btn profile-avatar-btn" id="profileAvatarBtn" onclick="toggleProfileSwitcher()" title="Switch Profile" style="display: none;">
+                    <span id="headerAvatar">😊</span>
+                </button>
                 <button class="header-icon-btn" onclick="openParentDashboard()" title="Parent Dashboard">👨‍👩‍👧‍👦</button>
                 <button class="header-icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+            </div>
+
+            <!-- Profile Switcher Menu -->
+            <div class="profile-switcher-menu" id="profileSwitcherMenu" style="display: none;">
+                <div class="profile-switcher-header">Switch Profile</div>
+                <div class="profile-switcher-list" id="profileSwitcherList"></div>
             </div>
 
             <div class="header-main">

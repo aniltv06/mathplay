@@ -136,6 +136,125 @@ body {
     animation: slideIn 0.5s ease-out;
 }
 
+/* Profile Switcher */
+.profile-switcher {
+    display: none;
+    margin-left: 15px;
+    padding-left: 15px;
+    border-left: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.profile-dropdown {
+    padding: 8px 12px;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-family: inherit;
+    background: white;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 60px;
+    text-align: center;
+}
+
+.profile-dropdown:hover {
+    border-color: #764ba2;
+    background: #f0f4ff;
+}
+
+.profile-dropdown:focus {
+    outline: none;
+    border-color: #764ba2;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Profile Avatar Button in Header */
+.profile-avatar-btn {
+    font-size: 1.5em !important;
+}
+
+/* Profile Switcher Menu */
+.profile-switcher-menu {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border: 2px solid #667eea;
+    z-index: 150;
+    min-width: 250px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-switcher-header {
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: bold;
+    font-size: 1.1em;
+    border-radius: 10px 10px 0 0;
+    text-align: center;
+}
+
+.profile-switcher-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.profile-switcher-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.profile-switcher-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 10px 10px;
+}
+
+.profile-switcher-item:hover {
+    background: linear-gradient(135deg, #f5f7ff 0%, #e8f0fe 100%);
+}
+
+.profile-switcher-avatar {
+    font-size: 2em;
+    min-width: 40px;
+    text-align: center;
+}
+
+.profile-switcher-info {
+    flex: 1;
+}
+
+.profile-switcher-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 1em;
+}
+
+.profile-switcher-stat {
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 2px;
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -1287,6 +1406,20 @@ body {
 
     .new-profile-form {
         flex-direction: column;
+    }
+
+    .profile-switcher {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        border-top: 2px solid rgba(102, 126, 234, 0.2);
+        padding-top: 10px;
+        margin-top: 10px;
+    }
+
+    .profile-dropdown {
+        min-width: 150px;
+        font-size: 0.9em;
     }
 }
 

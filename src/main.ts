@@ -479,17 +479,22 @@ function createNewProfile(): void {
   const profilePanel = document.getElementById('profilePanel');
   const userWelcome = document.getElementById('userWelcome');
   const userName = document.getElementById('userName');
+  const userAvatar = document.querySelector('.user-avatar');
   const greetingText = document.getElementById('greetingText');
 
   if (profilePanel) profilePanel.style.display = 'none';
   if (userWelcome) userWelcome.style.display = 'inline-flex';
   if (userName) userName.textContent = childName;
+  if (userAvatar && currentProfile) userAvatar.textContent = currentProfile.avatar || '😊';
   if (greetingText) {
     greetingText.textContent = `Let's practice some math! 🌟`;
   }
 
   // Start fresh
   generateProblems();
+
+  // Update profile switcher
+  updateProfileSwitcher();
 }
 
 function selectProfile(name: string): void {
@@ -508,14 +513,106 @@ function selectProfile(name: string): void {
   const profilePanel = document.getElementById('profilePanel');
   const userWelcome = document.getElementById('userWelcome');
   const userName = document.getElementById('userName');
+  const userAvatar = document.querySelector('.user-avatar');
   const greetingText = document.getElementById('greetingText');
 
   if (profilePanel) profilePanel.style.display = 'none';
   if (userWelcome) userWelcome.style.display = 'inline-flex';
   if (userName) userName.textContent = childName;
+  if (userAvatar && currentProfile) userAvatar.textContent = currentProfile.avatar || '😊';
   if (greetingText) {
     greetingText.textContent = `Welcome back! Let's practice! 🌟`;
   }
+
+  // Update profile switcher
+  updateProfileSwitcher();
+}
+
+// Update profile switcher button and menu
+function updateProfileSwitcher(): void {
+  const profileAvatarBtn = document.getElementById('profileAvatarBtn');
+  const headerAvatar = document.getElementById('headerAvatar');
+  const profileNames = getProfileNames();
+
+  if (!profileAvatarBtn || !headerAvatar) return;
+
+  // Show avatar button only if there are multiple profiles and a user is logged in
+  if (profileNames.length > 1 && childName) {
+    profileAvatarBtn.style.display = 'flex';
+
+    // Update button with current user's avatar
+    const currentProfile = getProfile(childName);
+    if (currentProfile) {
+      headerAvatar.textContent = currentProfile.avatar || '😊';
+    }
+  } else {
+    profileAvatarBtn.style.display = 'none';
+  }
+}
+
+// Toggle profile switcher menu
+function toggleProfileSwitcher(): void {
+  const menu = document.getElementById('profileSwitcherMenu');
+  const list = document.getElementById('profileSwitcherList');
+
+  if (!menu || !list) return;
+
+  // Toggle menu visibility
+  if (menu.style.display === 'none' || menu.style.display === '') {
+    // Populate the list
+    const profileNames = getProfileNames();
+
+    list.innerHTML = profileNames
+      .filter(name => name !== childName)
+      .map(name => {
+        const profile = getProfile(name);
+        const avatar = profile?.avatar || '😊';
+        const accuracy = profile ?
+          (profile.stats.totalCorrect + profile.stats.totalWrong > 0
+            ? Math.round((profile.stats.totalCorrect / (profile.stats.totalCorrect + profile.stats.totalWrong)) * 100)
+            : 0)
+          : 0;
+
+        return `
+          <div class="profile-switcher-item" onclick="switchToProfile('${name}')">
+            <span class="profile-switcher-avatar">${avatar}</span>
+            <div class="profile-switcher-info">
+              <div class="profile-switcher-name">${name}</div>
+              <div class="profile-switcher-stat">${accuracy}% accuracy</div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+
+    menu.style.display = 'block';
+  } else {
+    menu.style.display = 'none';
+  }
+}
+
+// Switch to a different profile
+function switchToProfile(name: string): void {
+  // Close the menu
+  const menu = document.getElementById('profileSwitcherMenu');
+  if (menu) menu.style.display = 'none';
+
+  // Switch to the profile
+  selectProfile(name);
+}
+
+// Handle profile switch from dropdown
+function switchProfile(): void {
+  const dropdown = document.getElementById('profileDropdown') as HTMLSelectElement;
+  if (!dropdown || !dropdown.value) return;
+
+  const selectedProfile = dropdown.value;
+
+  // Reset dropdown to default
+  dropdown.value = '';
+
+  // Switch to selected profile
+  selectProfile(selectedProfile);
 }
 
 function viewProfileStats(name: string): void {
@@ -919,6 +1016,8 @@ window.addEventListener('click', function (event: MouseEvent) {
   const parentDashboardModal = document.getElementById('parentDashboardModal');
   const printSettingsModal = document.getElementById('printSettingsModal');
   const editProfileModal = document.getElementById('editProfileModal');
+  const profileSwitcherMenu = document.getElementById('profileSwitcherMenu');
+  const profileAvatarBtn = document.getElementById('profileAvatarBtn');
 
   // Close settings modal if clicking on backdrop
   if (event.target === settingsModal) {
@@ -948,6 +1047,14 @@ window.addEventListener('click', function (event: MouseEvent) {
   // Close edit profile modal if clicking on backdrop
   if (event.target === editProfileModal) {
     closeEditProfile();
+  }
+
+  // Close profile switcher menu if clicking outside
+  if (profileSwitcherMenu && profileSwitcherMenu.style.display === 'block') {
+    const target = event.target as HTMLElement;
+    if (!profileSwitcherMenu.contains(target) && !profileAvatarBtn?.contains(target)) {
+      profileSwitcherMenu.style.display = 'none';
+    }
   }
 });
 
@@ -1905,6 +2012,9 @@ function initializeApp(): void {
 (window as any).startWithName = startWithName;
 (window as any).createNewProfile = createNewProfile;
 (window as any).selectProfile = selectProfile;
+(window as any).switchProfile = switchProfile;
+(window as any).toggleProfileSwitcher = toggleProfileSwitcher;
+(window as any).switchToProfile = switchToProfile;
 (window as any).viewProfileStats = viewProfileStats;
 (window as any).closeProfileStats = closeProfileStats;
 (window as any).confirmDeleteProfile = confirmDeleteProfile;
