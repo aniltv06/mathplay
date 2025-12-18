@@ -105,6 +105,7 @@ const DIFFICULTY_PRESETS: DifficultyPreset[] = [
 let problems: Problem[] = [];
 let currentInputIndex: number | null = null;
 let padValue: string = '';
+let padValueChanged: boolean = false; // Track if user made changes in number pad
 let childName: string = '';
 let correctStreak: number = 0;
 let totalAnswered: number = 0;
@@ -130,6 +131,7 @@ function saveVoiceFeedbackPreference(enabled: boolean): void {
 
 // Toggle voice feedback and save preference
 function toggleVoiceFeedback(enabled: boolean): void {
+  console.log('Toggling voice feedback to:', enabled);
   voiceFeedbackEnabled = enabled;
   saveVoiceFeedbackPreference(enabled);
 }
@@ -138,74 +140,178 @@ function toggleVoiceFeedback(enabled: boolean): void {
 function handleVoiceFeedbackChange(): void {
   const voiceFeedbackInput = document.getElementById('voiceFeedback') as HTMLInputElement;
   if (voiceFeedbackInput) {
+    console.log('Voice feedback checkbox changed to:', voiceFeedbackInput.checked);
     toggleVoiceFeedback(voiceFeedbackInput.checked);
+
+    // Test speech immediately when enabled
+    if (voiceFeedbackInput.checked) {
+      speak('Voice feedback enabled!');
+    }
+  }
+}
+
+// Global AudioContext for sound effects (iOS compatibility)
+let audioContext: AudioContext | null = null;
+
+// Initialize AudioContext on first user interaction (required for iOS)
+function initAudioContext(): void {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  }
+
+  // Resume context if suspended (iOS requirement)
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
   }
 }
 
 // Sound effects using Web Audio API
 function playSound(type: SoundType): void {
-  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
+  try {
+    // Initialize or resume AudioContext
+    initAudioContext();
 
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+    if (!audioContext) return;
 
-  if (type === 'correct') {
-    // Happy "ding" sound
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.2);
-  } else if (type === 'wrong') {
-    // Gentle "buzz" sound
-    oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
-    oscillator.frequency.setValueAtTime(250, audioContext.currentTime + 0.1);
-    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.3);
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    if (type === 'correct') {
+      // Happy "ding" sound
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.2);
+    } else if (type === 'wrong') {
+      // Gentle "buzz" sound
+      oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(250, audioContext.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    }
+  } catch (error) {
+    console.log('Audio playback error:', error);
   }
 }
 
+// Keep track of current utterance to prevent garbage collection
+let currentUtterance: SpeechSynthesisUtterance | null = null;
+
 // Text-to-Speech voice feedback
 function speak(text: string): void {
-  if (!voiceFeedbackEnabled) return;
+  if (!voiceFeedbackEnabled) {
+    console.log('Voice feedback disabled');
+    return;
+  }
+
+  console.log('=== TTS Debug: Attempting to speak:', text);
 
   // Check if browser supports speech synthesis
-  if ('speechSynthesis' in window) {
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
+  if (!('speechSynthesis' in window)) {
+    console.log('Speech synthesis not supported');
+    return;
+  }
 
-    // Small delay to ensure cancel completes before starting new speech
-    setTimeout(() => {
-      // Resume speech synthesis (needed for iOS Safari)
-      if (window.speechSynthesis.paused) {
-        window.speechSynthesis.resume();
+  try {
+    // Check speech synthesis state
+    console.log('=== TTS Debug: speechSynthesis.speaking:', window.speechSynthesis.speaking);
+    console.log('=== TTS Debug: speechSynthesis.pending:', window.speechSynthesis.pending);
+    console.log('=== TTS Debug: speechSynthesis.paused:', window.speechSynthesis.paused);
+
+    // Cancel any previous speech
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      console.log('=== TTS Debug: Canceling previous speech');
+      window.speechSynthesis.cancel();
+
+      // Small delay to ensure cancellation completes
+      setTimeout(() => {
+        actuallySpeak(text);
+      }, 50);
+    } else {
+      actuallySpeak(text);
+    }
+  } catch (error) {
+    console.error('=== TTS Debug: Speech synthesis error:', error);
+  }
+}
+
+// Separated function to actually perform speech
+function actuallySpeak(text: string): void {
+  console.log('=== TTS Debug: actuallySpeak called with:', text);
+
+  // Create new utterance
+  currentUtterance = new SpeechSynthesisUtterance(text);
+
+  // Set basic properties
+  currentUtterance.lang = 'en-US';
+  currentUtterance.rate = 0.9;
+  currentUtterance.pitch = 1.1;
+  currentUtterance.volume = 1.0;
+
+  // Handle speech errors
+  currentUtterance.onerror = (event) => {
+    console.error('=== TTS Debug: Speech error:', event.error, event);
+  };
+
+  // Handle speech start
+  currentUtterance.onstart = () => {
+    console.log('=== TTS Debug: Speech STARTED successfully');
+  };
+
+  // Handle speech end
+  currentUtterance.onend = () => {
+    console.log('=== TTS Debug: Speech ENDED successfully');
+    currentUtterance = null;
+  };
+
+  // Function to actually speak
+  const doSpeak = () => {
+    const voices = window.speechSynthesis.getVoices();
+    console.log('=== TTS Debug: Available voices:', voices.length);
+
+    if (voices.length > 0) {
+      // Try to find an English voice
+      const englishVoice = voices.find(voice =>
+        voice.lang.startsWith('en')
+      );
+
+      if (englishVoice) {
+        currentUtterance!.voice = englishVoice;
+        console.log('=== TTS Debug: Using voice:', englishVoice.name, '| Lang:', englishVoice.lang);
+      } else {
+        console.log('=== TTS Debug: No English voice found, using default');
       }
+    } else {
+      console.log('=== TTS Debug: No voices available!');
+    }
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9; // Slightly slower for clarity
-      utterance.pitch = 1.1; // Slightly higher pitch (kid-friendly)
-      utterance.volume = 0.8;
+    console.log('=== TTS Debug: Calling speechSynthesis.speak()...');
+    window.speechSynthesis.speak(currentUtterance!);
 
-      // Handle speech errors
-      utterance.onerror = (event) => {
-        console.log('Speech synthesis error:', event);
-      };
+    // Verify it was added to queue
+    setTimeout(() => {
+      console.log('=== TTS Debug: After speak() - speaking:', window.speechSynthesis.speaking);
+      console.log('=== TTS Debug: After speak() - pending:', window.speechSynthesis.pending);
+    }, 10);
+  };
 
-      // Handle speech end
-      utterance.onend = () => {
-        // Resume after each utterance for iOS compatibility
-        if (window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
-        }
-      };
-
-      window.speechSynthesis.speak(utterance);
-    }, 100);
+  // Chrome/Safari may need to wait for voices to load
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) {
+    console.log('=== TTS Debug: Waiting for voices to load...');
+    window.speechSynthesis.onvoiceschanged = () => {
+      console.log('=== TTS Debug: Voices loaded event fired');
+      doSpeak();
+    };
+  } else {
+    doSpeak();
   }
 }
 
@@ -392,14 +498,14 @@ function restoreSession(session: any): void {
     updateStreakDisplay();
   }
 
-  // Restore answers
+  // Restore answers silently (no sounds, no streak updates)
   setTimeout(() => {
     session.answers.forEach((answer: number | null, index: number) => {
       if (answer !== null) {
         const input = document.getElementById(`answer${index}`) as HTMLInputElement;
         if (input) {
           input.value = answer.toString();
-          validateAnswer(index);
+          validateAnswer(index, true); // silent = true
         }
       }
     });
@@ -1114,9 +1220,13 @@ window.addEventListener('click', function (event: MouseEvent) {
 });
 
 function openNumberPad(inputIndex: number): void {
+  // Initialize audio context on first user interaction (iOS requirement)
+  initAudioContext();
+
   currentInputIndex = inputIndex;
   const input = document.getElementById(`answer${inputIndex}`) as HTMLInputElement;
   padValue = input.value || '';
+  padValueChanged = false; // Reset changed flag when opening
   updatePadDisplay();
 
   // Display the question in the number pad
@@ -1154,8 +1264,8 @@ function closeNumberPad(): void {
   // Remove keyboard event listener
   document.removeEventListener('keydown', handleNumberPadKeyboard);
 
-  // If there's a value entered, save and validate it
-  if (currentInputIndex !== null && padValue !== '') {
+  // Only validate if user actually made changes in the number pad
+  if (currentInputIndex !== null && padValue !== '' && padValueChanged) {
     const input = document.getElementById(`answer${currentInputIndex}`) as HTMLInputElement;
     if (input) {
       input.value = padValue;
@@ -1169,6 +1279,7 @@ function closeNumberPad(): void {
   if (modal) modal.style.display = 'none';
   currentInputIndex = null;
   padValue = '';
+  padValueChanged = false; // Reset flag
 }
 
 // Handle keyboard input for number pad
@@ -1205,17 +1316,20 @@ function padNumber(num: number): void {
   if (padValue.length < 8) {
     // Limit to 8 digits max (supports up to 99,999,999)
     padValue += num.toString();
+    padValueChanged = true; // Mark as changed
     updatePadDisplay();
   }
 }
 
 function padBackspace(): void {
   padValue = padValue.slice(0, -1);
+  padValueChanged = true; // Mark as changed
   updatePadDisplay();
 }
 
 function padClear(): void {
   padValue = '';
+  padValueChanged = true; // Mark as changed
   updatePadDisplay();
 }
 
@@ -1264,7 +1378,7 @@ function confirmAndNext(): void {
 }
 
 // Validate a single answer
-function validateAnswer(index: number): ValidationResult {
+function validateAnswer(index: number, silent: boolean = false): ValidationResult {
   const problem = problems[index];
   const problemBox = document.querySelector(`[data-problem-index="${index}"]`);
   const input = document.getElementById(`answer${index}`) as HTMLInputElement;
@@ -1280,12 +1394,14 @@ function validateAnswer(index: number): ValidationResult {
     return null; // Not answered
   } else if (userAnswer === problem.correct) {
     // Correct answer
-    playSound('correct');
-    speak(t('greatJob'));
+    if (!silent) {
+      playSound('correct');
+      speak(t('greatJob'));
 
-    const modal = document.getElementById('numberpadModal');
-    if (modal && modal.style.display === 'block') {
-      createConfetti(); // Only show confetti during initial answering
+      const modal = document.getElementById('numberpadModal');
+      if (modal && modal.style.display === 'block') {
+        createConfetti(); // Only show confetti during initial answering
+      }
     }
 
     input.style.borderColor = '#51cf66';
@@ -1295,29 +1411,33 @@ function validateAnswer(index: number): ValidationResult {
       problemBox.classList.add('correct');
     }
 
-    // Update streak
-    correctStreak++;
-    updateStreakDisplay();
+    // Update streak only if not silent
+    if (!silent) {
+      correctStreak++;
+      updateStreakDisplay();
 
-    // Check for streak master badge immediately (10 correct in a row)
-    if (correctStreak === 10 && childName) {
-      const newBadges = checkAndAwardBadges(childName);
-      if (newBadges.length > 0) {
-        newBadges.forEach((badge) => {
-          if (badge.id === 'streak-master') {
-            setTimeout(() => {
-              showBadgeNotification(badge);
-            }, 500); // Small delay for smooth UX
-          }
-        });
+      // Check for streak master badge immediately (10 correct in a row)
+      if (correctStreak === 10 && childName) {
+        const newBadges = checkAndAwardBadges(childName);
+        if (newBadges.length > 0) {
+          newBadges.forEach((badge) => {
+            if (badge.id === 'streak-master') {
+              setTimeout(() => {
+                showBadgeNotification(badge);
+              }, 500); // Small delay for smooth UX
+            }
+          });
+        }
       }
     }
 
     return true; // Correct
   } else {
     // Wrong answer
-    playSound('wrong');
-    speak(t('tryAgain'));
+    if (!silent) {
+      playSound('wrong');
+      speak(t('tryAgain'));
+    }
 
     input.style.borderColor = '#ff6b6b';
     input.style.backgroundColor = '#ffe0e0';
@@ -1326,9 +1446,11 @@ function validateAnswer(index: number): ValidationResult {
       problemBox.classList.add('incorrect');
     }
 
-    // Reset streak
-    correctStreak = 0;
-    updateStreakDisplay();
+    // Reset streak only if not silent
+    if (!silent) {
+      correctStreak = 0;
+      updateStreakDisplay();
+    }
 
     return false; // Incorrect
   }
@@ -1515,6 +1637,15 @@ function setDifficulty(level: DifficultyLevel): void {
   }
 }
 
+// Quick start with difficulty - used by quick start card
+function startWithDifficulty(level: DifficultyLevel): void {
+  // Set the difficulty
+  setDifficulty(level);
+
+  // Generate problems immediately
+  generateProblems();
+}
+
 // Apply difficulty preset to settings
 function applyDifficultyPreset(preset: DifficultyPreset): void {
   const numProblemsInput = document.getElementById('numProblems') as HTMLInputElement;
@@ -1581,6 +1712,9 @@ function handleTimeUp(): void {
 }
 
 function generateProblems(): void {
+  // Initialize audio context on user interaction (iOS requirement)
+  initAudioContext();
+
   const numProblemsInput = document.getElementById('numProblems') as HTMLInputElement;
   const maxNumInput = document.getElementById('maxNum') as HTMLInputElement;
   const minNumInput = document.getElementById('minNum') as HTMLInputElement;
@@ -1761,7 +1895,36 @@ function renderProblems(): void {
   container.innerHTML = '';
 
   if (problems.length === 0) {
-    container.innerHTML = '<div class="no-problems">No problems generated yet!</div>';
+    // Show quick start card with difficulty options
+    container.innerHTML = `
+      <div class="quick-start-card">
+        <div class="quick-start-icon">🎯</div>
+        <div class="quick-start-title">Ready to Practice Math?</div>
+        <div class="quick-start-subtitle">Choose your difficulty level to get started!</div>
+
+        <div class="quick-start-buttons">
+          <button class="quick-start-btn quick-start-easy" onclick="startWithDifficulty('easy')">
+            <span class="quick-start-btn-icon">🌱</span>
+            <span class="quick-start-btn-name">Easy</span>
+            <span class="quick-start-btn-desc">Addition & Subtraction (1-10)</span>
+          </button>
+          <button class="quick-start-btn quick-start-medium" onclick="startWithDifficulty('medium')">
+            <span class="quick-start-btn-icon">🌟</span>
+            <span class="quick-start-btn-name">Medium</span>
+            <span class="quick-start-btn-desc">All operations (1-20)</span>
+          </button>
+          <button class="quick-start-btn quick-start-hard" onclick="startWithDifficulty('hard')">
+            <span class="quick-start-btn-icon">🚀</span>
+            <span class="quick-start-btn-name">Hard</span>
+            <span class="quick-start-btn-desc">All operations (1-100)</span>
+          </button>
+        </div>
+
+        <div class="quick-start-footer">
+          Or <a href="#" onclick="openSettings(); return false;" class="quick-start-link">customize settings ⚙️</a>
+        </div>
+      </div>
+    `;
     return;
   }
 
@@ -2255,6 +2418,8 @@ function doImport(): void {
 (window as any).selectAvatar = selectAvatar;
 (window as any).saveProfileEdits = saveProfileEdits;
 (window as any).setDifficulty = setDifficulty;
+(window as any).startWithDifficulty = startWithDifficulty;
+(window as any).handleVoiceFeedbackChange = handleVoiceFeedbackChange;
 (window as any).openSettings = openSettings;
 (window as any).closeSettings = closeSettings;
 (window as any).openNumberPad = openNumberPad;
