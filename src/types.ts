@@ -72,6 +72,7 @@ export interface Session {
   correctCount: number;
   wrongCount: number;
   percentage: number;
+  currentStreak?: number; // Track streak during session
 }
 
 /**

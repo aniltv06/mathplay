@@ -261,7 +261,8 @@ export function saveSessionProgress(
   answers: (number | null)[],
   correctCount: number,
   wrongCount: number,
-  percentage: number
+  percentage: number,
+  currentStreak?: number
 ): void {
   const data = getAllProfiles();
   const profile = data.profiles[name];
@@ -271,6 +272,7 @@ export function saveSessionProgress(
     profile.currentSession.correctCount = correctCount;
     profile.currentSession.wrongCount = wrongCount;
     profile.currentSession.percentage = percentage;
+    profile.currentSession.currentStreak = currentStreak;
     updateLastActive(name);
     saveAllProfiles(data);
   }

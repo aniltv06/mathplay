@@ -341,7 +341,7 @@ function saveProgress(): void {
   const total = correct + wrong;
   const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
 
-  saveSessionProgress(childName, answers, correct, wrong, percentage);
+  saveSessionProgress(childName, answers, correct, wrong, percentage, correctStreak);
 }
 
 function startWithName(): void {
@@ -385,6 +385,12 @@ function startWithName(): void {
 function restoreSession(session: any): void {
   problems = session.problems;
   renderProblems();
+
+  // Restore streak if it exists
+  if (session.currentStreak !== undefined) {
+    correctStreak = session.currentStreak;
+    updateStreakDisplay();
+  }
 
   // Restore answers
   setTimeout(() => {
@@ -503,6 +509,10 @@ function selectProfile(name: string): void {
   childName = name;
   sessionStartTime = Date.now();
   currentProfile = getProfile(name);
+
+  // Reset streak before restoring or starting new session
+  correctStreak = 0;
+  updateStreakDisplay();
 
   // Check if there's a current session to restore
   if (currentProfile?.currentSession && !currentProfile.currentSession.completed) {
@@ -629,7 +639,7 @@ function viewProfileStats(name: string): void {
   const statTimeSpentEl = document.getElementById('statTimeSpent');
   const sessionHistoryListEl = document.getElementById('sessionHistoryList');
 
-  if (statsProfileNameEl) statsProfileNameEl.textContent = profile.name;
+  if (statsProfileNameEl) statsProfileNameEl.innerHTML = `${profile.avatar || '😊'} ${profile.name}`;
   if (statTotalSessionsEl) statTotalSessionsEl.textContent = profile.stats.totalSessions.toString();
   if (statTotalProblemsEl) statTotalProblemsEl.textContent = profile.stats.totalProblems.toString();
 
@@ -834,11 +844,26 @@ function openParentDashboard(): void {
     return;
   }
 
-  // Calculate summary stats
-  const totalSessions = profiles.reduce((sum, p) => sum + p.stats.totalSessions, 0);
-  const totalProblems = profiles.reduce((sum, p) => sum + p.stats.totalProblems, 0);
-  const totalCorrect = profiles.reduce((sum, p) => sum + p.stats.totalCorrect, 0);
-  const totalWrong = profiles.reduce((sum, p) => sum + p.stats.totalWrong, 0);
+  // Calculate summary stats (including current sessions)
+  let totalSessions = 0;
+  let totalProblems = 0;
+  let totalCorrect = 0;
+  let totalWrong = 0;
+
+  profiles.forEach(p => {
+    totalSessions += p.stats.totalSessions;
+    totalProblems += p.stats.totalProblems;
+    totalCorrect += p.stats.totalCorrect;
+    totalWrong += p.stats.totalWrong;
+
+    // Include current session if exists
+    if (p.currentSession) {
+      totalProblems += p.currentSession.problems.length;
+      totalCorrect += p.currentSession.correctCount;
+      totalWrong += p.currentSession.wrongCount;
+    }
+  });
+
   const totalAccuracy = totalCorrect + totalWrong > 0
     ? Math.round((totalCorrect / (totalCorrect + totalWrong)) * 100)
     : 0;
@@ -884,26 +909,40 @@ function openParentDashboard(): void {
   const comparisonEl = document.getElementById('profileComparison');
   if (comparisonEl) {
     comparisonEl.innerHTML = profiles.map(profile => {
-      const accuracy = profile.stats.totalCorrect + profile.stats.totalWrong > 0
-        ? Math.round((profile.stats.totalCorrect / (profile.stats.totalCorrect + profile.stats.totalWrong)) * 100)
+      // Include current session in calculations
+      let totalCorrect = profile.stats.totalCorrect;
+      let totalWrong = profile.stats.totalWrong;
+      let totalProblems = profile.stats.totalProblems;
+      let currentStreak = 0;
+
+      if (profile.currentSession) {
+        totalCorrect += profile.currentSession.correctCount;
+        totalWrong += profile.currentSession.wrongCount;
+        totalProblems += profile.currentSession.problems.length;
+        currentStreak = profile.currentSession.currentStreak || 0;
+      }
+
+      const accuracy = totalCorrect + totalWrong > 0
+        ? Math.round((totalCorrect / (totalCorrect + totalWrong)) * 100)
         : 0;
       const earnedBadges = profile.badges?.filter(b => b.earned).length || 0;
+      const bestStreak = Math.max(profile.stats.bestStreak, currentStreak);
 
       return `
         <div class="comparison-card">
-          <div class="comparison-header">${profile.name}</div>
+          <div class="comparison-header"><span style="font-size: 1.5em; margin-right: 8px;">${profile.avatar || '😊'}</span>${profile.name}${profile.currentSession ? ' 🎮' : ''}</div>
           <div class="comparison-stats">
             <div class="comparison-stat">
-              <span>Sessions:</span> <strong>${profile.stats.totalSessions}</strong>
+              <span>Sessions:</span> <strong>${profile.stats.totalSessions}${profile.currentSession ? ' (+ current)' : ''}</strong>
             </div>
             <div class="comparison-stat">
-              <span>Problems:</span> <strong>${profile.stats.totalProblems}</strong>
+              <span>Problems:</span> <strong>${totalProblems}</strong>
             </div>
             <div class="comparison-stat">
               <span>Accuracy:</span> <strong>${accuracy}%</strong>
             </div>
             <div class="comparison-stat">
-              <span>Best Streak:</span> <strong>${profile.stats.bestStreak}</strong>
+              <span>Best Streak:</span> <strong>${bestStreak}</strong>
             </div>
             <div class="comparison-stat">
               <span>Badges:</span> <strong>${earnedBadges}</strong>
@@ -917,11 +956,11 @@ function openParentDashboard(): void {
   // Recent activity
   const recentActivityEl = document.getElementById('recentActivity');
   if (recentActivityEl) {
-    const allSessions: Array<{ profile: string; session: any }> = [];
+    const allSessions: Array<{ profileData: typeof profiles[0]; session: any }> = [];
 
     profiles.forEach(profile => {
       profile.history.forEach(session => {
-        allSessions.push({ profile: profile.name, session });
+        allSessions.push({ profileData: profile, session });
       });
     });
 
@@ -932,13 +971,14 @@ function openParentDashboard(): void {
     if (allSessions.length === 0) {
       recentActivityEl.innerHTML = '<div class="no-activity">No activity yet!</div>';
     } else {
-      recentActivityEl.innerHTML = allSessions.slice(0, 10).map(({ profile, session }) => {
+      recentActivityEl.innerHTML = allSessions.slice(0, 10).map(({ profileData, session }) => {
         const date = new Date(session.date).toLocaleDateString();
         const time = new Date(session.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const avatar = profileData.avatar || '😊';
 
         return `
           <div class="activity-item">
-            <div class="activity-profile">👤 ${profile}</div>
+            <div class="activity-profile">${avatar} ${profileData.name}</div>
             <div class="activity-details">
               <span>📅 ${date} at ${time}</span>
               <span>📝 ${session.problems.length} problems</span>
@@ -956,13 +996,14 @@ function openParentDashboard(): void {
   if (badgeLeaderboardEl) {
     const profileBadges = profiles.map(profile => ({
       name: profile.name,
+      avatar: profile.avatar || '😊',
       badges: profile.badges?.filter(b => b.earned).length || 0
     })).sort((a, b) => b.badges - a.badges);
 
     badgeLeaderboardEl.innerHTML = profileBadges.map((item, index) => `
       <div class="leaderboard-item">
         <div class="leaderboard-rank">${index + 1}</div>
-        <div class="leaderboard-name">${item.name}</div>
+        <div class="leaderboard-name">${item.avatar} ${item.name}</div>
         <div class="leaderboard-badges">🏆 ${item.badges} badges</div>
       </div>
     `).join('');
@@ -1257,6 +1298,20 @@ function validateAnswer(index: number): ValidationResult {
     // Update streak
     correctStreak++;
     updateStreakDisplay();
+
+    // Check for streak master badge immediately (10 correct in a row)
+    if (correctStreak === 10 && childName) {
+      const newBadges = checkAndAwardBadges(childName);
+      if (newBadges.length > 0) {
+        newBadges.forEach((badge) => {
+          if (badge.id === 'streak-master') {
+            setTimeout(() => {
+              showBadgeNotification(badge);
+            }, 500); // Small delay for smooth UX
+          }
+        });
+      }
+    }
 
     return true; // Correct
   } else {
