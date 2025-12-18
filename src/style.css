@@ -655,6 +655,10 @@ body {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
     animation: fadeIn 0.3s;
+    user-select: none; /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 @keyframes fadeIn {
@@ -700,6 +704,14 @@ body {
     color: #667eea;
     margin-bottom: 20px;
     min-height: 50px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .numberpad-grid {
@@ -718,17 +730,26 @@ body {
     background: white;
     color: #667eea;
     cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: all 0.15s ease;
     font-family: inherit;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .numberpad-btn:hover {
-    transform: scale(0.95);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    background: #f0f4ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 .numberpad-btn:active {
-    transform: scale(0.9);
+    transform: scale(0.95);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    background: #667eea;
+    color: white;
 }
 
 .numberpad-actions {
@@ -746,12 +767,24 @@ body {
     font-size: 1.2em;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: all 0.15s ease;
     font-family: inherit;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
 }
 
 .numberpad-clear:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+.numberpad-clear:active {
     transform: scale(0.95);
+    box-shadow: 0 1px 4px rgba(255, 107, 107, 0.2);
 }
 
 .numberpad-confirm {
@@ -763,12 +796,24 @@ body {
     font-size: 1.2em;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: all 0.15s ease;
     font-family: inherit;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    box-shadow: 0 2px 8px rgba(81, 207, 102, 0.3);
 }
 
 .numberpad-confirm:hover {
+    background: #40c057;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(81, 207, 102, 0.4);
+}
+
+.numberpad-confirm:active {
     transform: scale(0.95);
+    box-shadow: 0 1px 4px rgba(81, 207, 102, 0.2);
 }
 
 .close-numberpad {

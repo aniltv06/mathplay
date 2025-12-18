@@ -1095,6 +1095,9 @@ function openNumberPad(inputIndex: number): void {
   const modal = document.getElementById('numberpadModal');
   if (modal) modal.style.display = 'block';
 
+  // Add keyboard event listener
+  document.addEventListener('keydown', handleNumberPadKeyboard);
+
   // Speak the problem after modal is visible
   setTimeout(() => {
     speakProblem(problem);
@@ -1106,6 +1109,9 @@ function closeNumberPad(): void {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
   }
+
+  // Remove keyboard event listener
+  document.removeEventListener('keydown', handleNumberPadKeyboard);
 
   // If there's a value entered, save and validate it
   if (currentInputIndex !== null && padValue !== '') {
@@ -1124,6 +1130,36 @@ function closeNumberPad(): void {
   padValue = '';
 }
 
+// Handle keyboard input for number pad
+function handleNumberPadKeyboard(event: KeyboardEvent): void {
+  // Only handle keyboard if number pad is open
+  const modal = document.getElementById('numberpadModal');
+  if (!modal || modal.style.display !== 'block') return;
+
+  // Prevent default for handled keys
+  const handledKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'Delete', 'Enter'];
+  if (handledKeys.includes(event.key)) {
+    event.preventDefault();
+  }
+
+  // Handle number keys
+  if (event.key >= '0' && event.key <= '9') {
+    padNumber(parseInt(event.key));
+  }
+  // Handle backspace/delete
+  else if (event.key === 'Backspace' || event.key === 'Delete') {
+    if (event.ctrlKey || event.metaKey) {
+      padClear(); // Ctrl+Backspace clears all
+    } else {
+      padBackspace();
+    }
+  }
+  // Handle Enter key
+  else if (event.key === 'Enter') {
+    confirmAndNext();
+  }
+}
+
 function padNumber(num: number): void {
   if (padValue.length < 8) {
     // Limit to 8 digits max (supports up to 99,999,999)
@@ -1137,9 +1173,24 @@ function padBackspace(): void {
   updatePadDisplay();
 }
 
+function padClear(): void {
+  padValue = '';
+  updatePadDisplay();
+}
+
 function updatePadDisplay(): void {
   const display = document.getElementById('numberpadDisplay');
-  if (display) display.textContent = padValue || '0';
+  if (display) {
+    display.textContent = padValue || '';
+
+    // Add placeholder styling when empty
+    if (!padValue) {
+      display.style.opacity = '0.5';
+      display.textContent = 'Tap numbers';
+    } else {
+      display.style.opacity = '1';
+    }
+  }
 }
 
 function confirmAndNext(): void {
@@ -2155,6 +2206,7 @@ function doImport(): void {
 (window as any).closeNumberPad = closeNumberPad;
 (window as any).padNumber = padNumber;
 (window as any).padBackspace = padBackspace;
+(window as any).padClear = padClear;
 (window as any).confirmAndNext = confirmAndNext;
 (window as any).skipQuestion = skipQuestion;
 (window as any).checkAnswers = checkAnswers;

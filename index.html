@@ -447,6 +447,19 @@
                     </div>
                 </div>
 
+                <!-- Print Section -->
+                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                    <div style="font-weight: bold; color: #333; margin-bottom: 12px;">
+                        <span class="emoji">🖨️</span> Print Worksheet
+                    </div>
+                    <p style="font-size: 0.9em; color: #666; margin-bottom: 12px;">
+                        Generate problems first, then print a customized worksheet with optional answer key.
+                    </p>
+                    <button class="btn btn-secondary" onclick="openPrintSettings()" style="font-size: 0.95em; padding: 12px 15px; width: 100%;">
+                        <span class="emoji">🖨️</span> Print Worksheet
+                    </button>
+                </div>
+
                 <div class="button-group-settings">
                     <button class="btn btn-primary" onclick="generateProblems(); closeSettings();">
                         <span class="emoji">✨</span> Start Practice
@@ -524,7 +537,6 @@
 
         <div class="button-group" id="actionButtons">
             <button class="btn btn-reset" onclick="resetWorksheet()">Clear All <span class="emoji">🔄</span></button>
-            <button class="btn btn-generate" onclick="openPrintSettings()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Print Worksheet <span class="emoji">🖨️</span></button>
         </div>
 
         <div class="result" id="result"></div>
@@ -558,23 +570,27 @@
                 <div style="font-size: 1.8em; font-weight: bold; color: #667eea;" id="questionNum2">3</div>
                 <div style="font-size: 1.8em; font-weight: bold; color: #333;">= ?</div>
             </div>
-            <div class="numberpad-display" id="numberpadDisplay">0</div>
+            <div class="numberpad-display" id="numberpadDisplay">Tap numbers</div>
             <div class="numberpad-grid">
-                <button class="numberpad-btn" onclick="padNumber('1')">1</button>
-                <button class="numberpad-btn" onclick="padNumber('2')">2</button>
-                <button class="numberpad-btn" onclick="padNumber('3')">3</button>
-                <button class="numberpad-btn" onclick="padNumber('4')">4</button>
-                <button class="numberpad-btn" onclick="padNumber('5')">5</button>
-                <button class="numberpad-btn" onclick="padNumber('6')">6</button>
-                <button class="numberpad-btn" onclick="padNumber('7')">7</button>
-                <button class="numberpad-btn" onclick="padNumber('8')">8</button>
-                <button class="numberpad-btn" onclick="padNumber('9')">9</button>
-                <button class="numberpad-btn" onclick="padNumber('0')" style="grid-column: 2;">0</button>
-                <button class="numberpad-btn" onclick="padBackspace()" style="grid-column: 1 / 3;">← Back</button>
+                <button class="numberpad-btn" onclick="padNumber(1)">1</button>
+                <button class="numberpad-btn" onclick="padNumber(2)">2</button>
+                <button class="numberpad-btn" onclick="padNumber(3)">3</button>
+                <button class="numberpad-btn" onclick="padNumber(4)">4</button>
+                <button class="numberpad-btn" onclick="padNumber(5)">5</button>
+                <button class="numberpad-btn" onclick="padNumber(6)">6</button>
+                <button class="numberpad-btn" onclick="padNumber(7)">7</button>
+                <button class="numberpad-btn" onclick="padNumber(8)">8</button>
+                <button class="numberpad-btn" onclick="padNumber(9)">9</button>
+                <button class="numberpad-btn" onclick="padClear()" style="background: #ffe0e0; color: #ff6b6b;">C</button>
+                <button class="numberpad-btn" onclick="padNumber(0)">0</button>
+                <button class="numberpad-btn" onclick="padBackspace()" style="background: #fff4e6; color: #ffa500;">←</button>
             </div>
             <div class="numberpad-actions">
                 <button class="numberpad-clear" onclick="skipQuestion()" style="background: #ffa500;">Skip ⏭️</button>
                 <button class="numberpad-confirm" onclick="confirmAndNext()">Next ✅</button>
+            </div>
+            <div style="text-align: center; margin-top: 10px; font-size: 0.85em; color: rgba(255, 255, 255, 0.7);">
+                💡 Use keyboard: 0-9, Backspace, Enter
             </div>
         </div>
     </div>
