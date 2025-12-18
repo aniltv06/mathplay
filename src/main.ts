@@ -338,8 +338,8 @@ function saveProgress(): void {
     }
   });
 
-  const total = correct + wrong;
-  const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+  // Calculate percentage based on total problems, not just answered ones
+  const percentage = problems.length > 0 ? Math.round((correct / problems.length) * 100) : 0;
 
   saveSessionProgress(childName, answers, correct, wrong, percentage, correctStreak);
 }
