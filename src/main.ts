@@ -225,18 +225,14 @@ function speak(text: string): void {
     console.log('=== TTS Debug: speechSynthesis.pending:', window.speechSynthesis.pending);
     console.log('=== TTS Debug: speechSynthesis.paused:', window.speechSynthesis.paused);
 
-    // Cancel any previous speech
-    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-      console.log('=== TTS Debug: Canceling previous speech');
-      window.speechSynthesis.cancel();
+    // ALWAYS cancel any previous speech to prevent queue buildup
+    console.log('=== TTS Debug: Canceling all previous speech');
+    window.speechSynthesis.cancel();
 
-      // Small delay to ensure cancellation completes
-      setTimeout(() => {
-        actuallySpeak(text);
-      }, 50);
-    } else {
+    // Small delay to ensure cancellation completes before speaking
+    setTimeout(() => {
       actuallySpeak(text);
-    }
+    }, 100);
   } catch (error) {
     console.error('=== TTS Debug: Speech synthesis error:', error);
   }
@@ -1317,20 +1313,20 @@ function padNumber(num: number): void {
     // Limit to 8 digits max (supports up to 99,999,999)
     padValue += num.toString();
     padValueChanged = true; // Mark as changed
-    updatePadDisplay();
+    updatePadDisplay(); // This now also updates the button
   }
 }
 
 function padBackspace(): void {
   padValue = padValue.slice(0, -1);
   padValueChanged = true; // Mark as changed
-  updatePadDisplay();
+  updatePadDisplay(); // This now also updates the button
 }
 
 function padClear(): void {
   padValue = '';
   padValueChanged = true; // Mark as changed
-  updatePadDisplay();
+  updatePadDisplay(); // This now also updates the button
 }
 
 function updatePadDisplay(): void {
@@ -1346,34 +1342,85 @@ function updatePadDisplay(): void {
       display.style.opacity = '1';
     }
   }
+
+  // Update the confirm button text based on current state
+  updateConfirmButton();
+}
+
+// Update the confirm button text and behavior
+function updateConfirmButton(): void {
+  const confirmBtn = document.getElementById('numberpadConfirmBtn');
+  if (!confirmBtn || currentInputIndex === null) return;
+
+  const problem = problems[currentInputIndex];
+  const userAnswer = parseInt(padValue);
+  const input = document.getElementById(`answer${currentInputIndex}`) as HTMLInputElement;
+  const savedAnswer = input ? parseInt(input.value) : NaN;
+
+  // Check if current padValue matches the correct answer
+  const isCurrentCorrect = !isNaN(userAnswer) && userAnswer === problem.correct;
+
+  // Check if saved answer is wrong
+  const isSavedWrong = !isNaN(savedAnswer) && savedAnswer !== problem.correct;
+
+  if (isCurrentCorrect) {
+    // Current answer is correct - show "Next Question"
+    confirmBtn.innerHTML = 'Next Question →';
+    confirmBtn.style.background = '#51cf66';
+  } else if (isSavedWrong && padValue !== '') {
+    // User is trying again after wrong answer
+    confirmBtn.innerHTML = 'Check Answer ✓';
+    confirmBtn.style.background = '#667eea';
+  } else if (padValue !== '') {
+    // User has entered something - show "Check Answer"
+    confirmBtn.innerHTML = 'Check Answer ✓';
+    confirmBtn.style.background = '#667eea';
+  } else {
+    // No answer yet
+    confirmBtn.innerHTML = 'Check Answer ✓';
+    confirmBtn.style.background = '#667eea';
+  }
 }
 
 function confirmAndNext(): void {
-  if (currentInputIndex !== null) {
+  if (currentInputIndex !== null && padValue !== '') {
+    const problem = problems[currentInputIndex];
+    const userAnswer = parseInt(padValue);
     const input = document.getElementById(`answer${currentInputIndex}`) as HTMLInputElement;
+
     if (input) {
       input.value = padValue;
 
       // Validate and update immediately
-      validateAnswer(currentInputIndex);
+      const result = validateAnswer(currentInputIndex);
 
       // Update stats in real-time
       updateStats();
 
       // Auto-save progress
       saveProgress();
-    }
-  }
 
-  // Move to next question
-  const nextIndex = (currentInputIndex ?? -1) + 1;
-  if (nextIndex < problems.length) {
-    padValue = '';
-    openNumberPad(nextIndex);
-  } else {
-    // All questions answered
-    closeNumberPad();
-    showCompletionMessage();
+      // If answer is wrong, don't move to next - let them try again
+      if (result === false) {
+        // Wrong answer - update button to encourage retry
+        updateConfirmButton();
+        return; // Don't move to next question
+      }
+
+      // If answer is correct, move to next question
+      if (result === true) {
+        const nextIndex = currentInputIndex + 1;
+        if (nextIndex < problems.length) {
+          padValue = '';
+          padValueChanged = false;
+          openNumberPad(nextIndex);
+        } else {
+          // All questions answered
+          closeNumberPad();
+          showCompletionMessage();
+        }
+      }
+    }
   }
 }
 
@@ -2274,6 +2321,12 @@ function updateUIText(): void {
 }
 
 function initializeApp(): void {
+  // Clear any persisted speech synthesis queue from previous sessions
+  if ('speechSynthesis' in window) {
+    console.log('=== TTS Debug: Clearing speech synthesis queue on page load');
+    window.speechSynthesis.cancel();
+  }
+
   // Load saved language
   const savedLang = loadLanguage();
   const selectEl = document.getElementById('languageSelect') as HTMLSelectElement;
