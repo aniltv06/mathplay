@@ -523,6 +523,212 @@ const zh: Translations = {
 };
 
 /**
+ * Kannada translations
+ */
+const kn: Translations = {
+  // Header
+  appTitle: 'ಮ್ಯಾಥ್ ಫನ್!',
+  greeting: 'ಬನ್ನಿ ಸೇರಿಕೆ ಮತ್ತು ವ್ಯವಕಲನ ಮಾಡೋಣ!',
+
+  // Profile Management
+  selectProfile: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆ ಮಾಡಿ',
+  createNewProfile: 'ಹೊಸ ಪ್ರೊಫೈಲ್ ರಚಿಸಿ...',
+  createButton: 'ರಚಿಸಿ',
+  noProfiles: 'ಇನ್ನೂ ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ! ಪ್ರಾರಂಭಿಸಲು ಕೆಳಗೆ ಒಂದನ್ನು ರಚಿಸಿ.',
+  parentDashboard: 'ಪೋಷಕರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
+
+  // Settings
+  settings: 'ಸೆಟ್ಟಿಂಗ್‌ಗಳು',
+  customizeTitle: 'ನಿಮ್ಮ ಅಭ್ಯಾಸವನ್ನು ಕಸ್ಟಮೈಸ್ ಮಾಡಿ',
+  chooseDifficulty: 'ಕಷ್ಟತೆ ಆಯ್ಕೆ ಮಾಡಿ',
+  easy: 'ಸುಲಭ',
+  medium: 'ಮಧ್ಯಮ',
+  hard: 'ಕಠಿಣ',
+  easyDesc: 'ಸೇರಿಕೆ ಮತ್ತು ವ್ಯವಕಲನ (1-10)',
+  mediumDesc: 'ಎಲ್ಲಾ ಕಾರ್ಯಾಚರಣೆಗಳು (1-20)',
+  hardDesc: 'ಎಲ್ಲಾ ಕಾರ್ಯಾಚರಣೆಗಳು (1-100)',
+  customizeBelow: 'ಅಥವಾ ಕೆಳಗೆ ನಿಮ್ಮ ಸ್ವಂತ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಕಸ್ಟಮೈಸ್ ಮಾಡಿ',
+  numProblems: 'ಸಮಸ್ಯೆಗಳ ಸಂಖ್ಯೆ:',
+  maxNumber: 'ಗರಿಷ್ಠ ಸಂಖ್ಯೆ:',
+  minNumber: 'ಕನಿಷ್ಠ ಸಂಖ್ಯೆ:',
+  includeAddition: 'ಸೇರಿಕೆ ಸೇರಿಸಿ',
+  includeSubtraction: 'ವ್ಯವಕಲನ ಸೇರಿಸಿ',
+  includeMultiplication: 'ಗುಣಾಕಾರ ಸೇರಿಸಿ',
+  includeDivision: 'ಭಾಗಾಕಾರ ಸೇರಿಸಿ',
+  timedChallenge: 'ಸಮಯ ಸವಾಲು',
+  timeLimit: 'ಸಮಯ ಮಿತಿ (ನಿಮಿಷಗಳು):',
+  voiceFeedback: 'ಧ್ವನಿ ಪ್ರತಿಕ್ರಿಯೆ',
+  voiceFeedbackDesc: 'ಸಮಸ್ಯೆಗಳನ್ನು ಓದುವುದನ್ನು ಕೇಳಿ ಮತ್ತು ಪ್ರೋತ್ಸಾಹವನ್ನು ಪಡೆಯಿರಿ!',
+  language: 'ಭಾಷೆ:',
+  generateNew: 'ಹೊಸ ಸಮಸ್ಯೆಗಳನ್ನು ರಚಿಸಿ',
+  changeName: 'ಹೆಸರು ಬದಲಾಯಿಸಿ',
+
+  // Instructions
+  instructionsText: 'ಕೆಳಗಿನ ಪೆಟ್ಟಿಗೆಗಳಲ್ಲಿ ನಿಮ್ಮ ಉತ್ತರಗಳನ್ನು ಬರೆಯಿರಿ ಮತ್ತು ನಿಮ್ಮ ಫಲಿತಾಂಶಗಳನ್ನು ನೋಡಲು "ನನ್ನ ಉತ್ತರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ" ಕ್ಲಿಕ್ ಮಾಡಿ!',
+
+  // Buttons
+  clearAll: 'ಎಲ್ಲವನ್ನೂ ತೆರವುಗೊಳಿಸಿ',
+  printWorksheet: 'ವರ್ಕ್‌ಶೀಟ್ ಮುದ್ರಿಸಿ',
+  showAnswerKey: 'ಉತ್ತರ ಕೀ ತೋರಿಸಿ (ಮುದ್ರಣಕ್ಕಾಗಿ)',
+  hideAnswerKey: 'ಉತ್ತರ ಕೀ ಮರೆಮಾಡಿ',
+  checkAnswers: 'ನನ್ನ ಉತ್ತರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ',
+  select: 'ಆಯ್ಕೆ ಮಾಡಿ',
+  stats: 'ಅಂಕಿಅಂಶಗಳು',
+  delete: 'ಅಳಿಸಿ',
+
+  // Stats
+  resultsTitle: 'ಫಲಿತಾಂಶಗಳು',
+  correct: 'ಸರಿಯಾದವು',
+  wrong: 'ತಪ್ಪಾದವು',
+  score: 'ಸ್ಕೋರ್',
+  totalSessions: 'ಒಟ್ಟು ಸೆಷನ್‌ಗಳು',
+  totalProblems: 'ಒಟ್ಟು ಸಮಸ್ಯೆಗಳು',
+  accuracy: 'ನಿಖರತೆ',
+  bestStreak: 'ಅತ್ಯುತ್ತಮ ಸರಣಿ',
+  timeSpent: 'ಖರ್ಚು ಮಾಡಿದ ಸಮಯ',
+
+  // Messages
+  greatJob: 'ಅದ್ಭುತ ಕೆಲಸ!',
+  tryAgain: 'ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ! ನೀವು ಮಾಡಬಹುದು!',
+  fillRemaining: 'ಹೆಚ್ಚು ಭರ್ತಿ ಮಾಡಿ:',
+  timeUp: 'ಸಮಯ ಮುಗಿದಿದೆ! ನೀವು ಹೇಗೆ ಮಾಡಿದ್ದೀರಿ ನೋಡೋಣ!',
+  badgeEarned: 'ಬ್ಯಾಡ್ಜ್ ಗಳಿಸಿದ್ದೀರಿ!',
+  congratulations: 'ಅಭಿನಂದನೆಗಳು! ನೀವು ಬ್ಯಾಡ್ಜ್ ಗಳಿಸಿದ್ದೀರಿ',
+  streakBonus: 'ಸತತವಾಗಿ! ಅದ್ಭುತ!',
+
+  // Dashboard
+  allProfiles: 'ಎಲ್ಲಾ ಪ್ರೊಫೈಲ್‌ಗಳು',
+  profileComparison: 'ಪ್ರೊಫೈಲ್ ಹೋಲಿಕೆ',
+  recentActivity: 'ಇತ್ತೀಚಿನ ಚಟುವಟಿಕೆ',
+  badgeLeaderboard: 'ಬ್ಯಾಡ್ಜ್ ಲೀಡರ್‌ಬೋರ್ಡ್',
+  sessions: 'ಸೆಷನ್‌ಗಳು',
+  problems: 'ಸಮಸ್ಯೆಗಳು',
+  badges: 'ಬ್ಯಾಡ್ಜ್‌ಗಳು',
+
+  // Sections
+  additionProblems: 'ಸೇರಿಕೆ ಸಮಸ್ಯೆಗಳು',
+  subtractionProblems: 'ವ್ಯವಕಲನ ಸಮಸ್ಯೆಗಳು',
+  multiplicationProblems: 'ಗುಣಾಕಾರ ಸಮಸ್ಯೆಗಳು',
+  divisionProblems: 'ಭಾಗಾಕಾರ ಸಮಸ್ಯೆಗಳು',
+
+  // Number pad
+  question: 'ಪ್ರಶ್ನೆ',
+  of: 'ರಲ್ಲಿ',
+  skip: 'ಬಿಟ್ಟುಬಿಡಿ',
+  next: 'ಮುಂದೆ',
+  back: 'ಹಿಂದೆ',
+
+  // Operations (spoken)
+  plus: 'ಸೇರಿಸಿ',
+  minus: 'ಕಳೆಯಿರಿ',
+  times: 'ಗುಣಿಸಿ',
+  dividedBy: 'ಭಾಗಿಸಿ'
+};
+
+/**
+ * Telugu translations
+ */
+const te: Translations = {
+  // Header
+  appTitle: 'మ్యాథ్ ఫన్!',
+  greeting: 'రండి కూడిక మరియు వ్యవకలనం చేద్దాం!',
+
+  // Profile Management
+  selectProfile: 'మీ ప్రొఫైల్‌ను ఎంచుకోండి',
+  createNewProfile: 'కొత్త ప్రొఫైల్ సృష్టించండి...',
+  createButton: 'సృష్టించు',
+  noProfiles: 'ఇంకా ప్రొఫైల్‌లు లేవు! ప్రారంభించడానికి క్రింద ఒకదాన్ని సృష్టించండి.',
+  parentDashboard: 'తల్లిదండ్రుల డాష్‌బోర్డ్',
+
+  // Settings
+  settings: 'సెట్టింగ్‌లు',
+  customizeTitle: 'మీ అభ్యాసాన్ని అనుకూలీకరించండి',
+  chooseDifficulty: 'కష్టతను ఎంచుకోండి',
+  easy: 'సులభం',
+  medium: 'మధ్యస్థ',
+  hard: 'కష్టం',
+  easyDesc: 'కూడిక & వ్యవకలనం (1-10)',
+  mediumDesc: 'అన్ని కార్యకలాపాలు (1-20)',
+  hardDesc: 'అన్ని కార్యకలాపాలు (1-100)',
+  customizeBelow: 'లేదా క్రింద మీ స్వంత సెట్టింగ్‌లను అనుకూలీకరించండి',
+  numProblems: 'సమస్యల సంఖ్య:',
+  maxNumber: 'గరిష్ట సంఖ్య:',
+  minNumber: 'కనిష్ట సంఖ్య:',
+  includeAddition: 'కూడికను చేర్చు',
+  includeSubtraction: 'వ్యవకలనం చేర్చు',
+  includeMultiplication: 'గుణకారం చేర్చు',
+  includeDivision: 'భాగహారం చేర్చు',
+  timedChallenge: 'సమయ సవాలు',
+  timeLimit: 'సమయ పరిమితి (నిమిషాలు):',
+  voiceFeedback: 'వాయిస్ ఫీడ్‌బ్యాక్',
+  voiceFeedbackDesc: 'సమస్యలను వినండి మరియు ప్రోత్సాహాన్ని పొందండి!',
+  language: 'భాష:',
+  generateNew: 'కొత్త సమస్యలను రూపొందించు',
+  changeName: 'పేరు మార్చు',
+
+  // Instructions
+  instructionsText: 'క్రింది పెట్టెల్లో మీ సమాధానాలను వ్రాయండి మరియు మీ ఫలితాలను చూడటానికి "నా సమాధానాలను తనిఖీ చేయి" క్లిక్ చేయండి!',
+
+  // Buttons
+  clearAll: 'అన్నీ క్లియర్ చేయి',
+  printWorksheet: 'వర్క్‌షీట్ ముద్రించు',
+  showAnswerKey: 'సమాధాన కీని చూపు (ముద్రణ కోసం)',
+  hideAnswerKey: 'సమాధాన కీని దాచు',
+  checkAnswers: 'నా సమాధానాలను తనిఖీ చేయి',
+  select: 'ఎంచుకో',
+  stats: 'గణాంకాలు',
+  delete: 'తొలగించు',
+
+  // Stats
+  resultsTitle: 'ఫలితాలు',
+  correct: 'సరైనవి',
+  wrong: 'తప్పులు',
+  score: 'స్కోర్',
+  totalSessions: 'మొత్తం సెషన్లు',
+  totalProblems: 'మొత్తం సమస్యలు',
+  accuracy: 'ఖచ్చితత్వం',
+  bestStreak: 'ఉత్తమ పరంపర',
+  timeSpent: 'గడిపిన సమయం',
+
+  // Messages
+  greatJob: 'అద్భుతమైన పని!',
+  tryAgain: 'మళ్లీ ప్రయత్నించండి! మీరు చేయగలరు!',
+  fillRemaining: 'మరిన్ని పూరించండి:',
+  timeUp: 'సమయం అయిపోయింది! మీరు ఎలా చేశారో చూద్దాం!',
+  badgeEarned: 'బ్యాడ్జ్ సంపాదించారు!',
+  congratulations: 'అభినందనలు! మీరు బ్యాడ్జ్ సంపాదించారు',
+  streakBonus: 'వరుసగా! అద్భుతం!',
+
+  // Dashboard
+  allProfiles: 'అన్ని ప్రొఫైల్‌లు',
+  profileComparison: 'ప్రొఫైల్ పోలిక',
+  recentActivity: 'ఇటీవలి కార్యకలాపాలు',
+  badgeLeaderboard: 'బ్యాడ్జ్ లీడర్‌బోర్డ్',
+  sessions: 'సెషన్లు',
+  problems: 'సమస్యలు',
+  badges: 'బ్యాడ్జ్‌లు',
+
+  // Sections
+  additionProblems: 'కూడిక సమస్యలు',
+  subtractionProblems: 'వ్యవకలనం సమస్యలు',
+  multiplicationProblems: 'గుణకార సమస్యలు',
+  divisionProblems: 'భాగహార సమస్యలు',
+
+  // Number pad
+  question: 'ప్రశ్న',
+  of: 'లో',
+  skip: 'దాటవేయి',
+  next: 'తదుపరి',
+  back: 'వెనుకకు',
+
+  // Operations (spoken)
+  plus: 'కూడిక',
+  minus: 'తీసివేయి',
+  times: 'గుణించు',
+  dividedBy: 'భాగించు'
+};
+
+/**
  * All translations
  */
 const translations: Record<Language, Translations> = {
@@ -530,7 +736,9 @@ const translations: Record<Language, Translations> = {
   es,
   fr,
   de,
-  zh
+  zh,
+  kn,
+  te
 };
 
 /**
@@ -541,7 +749,9 @@ export const languageNames: Record<Language, string> = {
   es: 'Español',
   fr: 'Français',
   de: 'Deutsch',
-  zh: '中文'
+  zh: '中文',
+  kn: 'ಕನ್ನಡ',
+  te: 'తెలుగు'
 };
 
 /**

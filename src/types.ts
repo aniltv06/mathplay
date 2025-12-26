@@ -198,7 +198,7 @@ export type BadgeCriteria = (profile: UserProfile, session?: Session) => boolean
 /**
  * Supported languages for i18n
  */
-export type Language = 'en' | 'es' | 'fr' | 'de' | 'zh';
+export type Language = 'en' | 'es' | 'fr' | 'de' | 'zh' | 'kn' | 'te';
 
 /**
  * Translation keys for all UI text
