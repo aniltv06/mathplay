@@ -416,14 +416,18 @@ function handleCorrectAnswer(correctAnswer: number): void {
 /**
  * Handle wrong answer
  */
-function handleWrongAnswer(wrongAnswer: number): void {
+function handleWrongAnswer(wrongAnswer?: number): void {
   // Guard: Don't process if game is already over
   if (lives <= 0) {
     return;
   }
 
   playSound('wrong');
-  speak(`${wrongAnswer} ${t('wrong')}`);
+  if (wrongAnswer !== undefined) {
+    speak(`${wrongAnswer} ${t('wrong')}`);
+  } else {
+    speak(t('wrong'));
+  }
 
   // Lose a life
   lives--;
