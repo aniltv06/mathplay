@@ -634,6 +634,11 @@ function speakHangmanProblem(problem: Problem): void {
 let hangmanCurrentAnswer: string = '';
 
 /**
+ * Store keyboard handler reference to prevent duplicate listeners
+ */
+let hangmanKeyboardHandler: ((event: KeyboardEvent) => void) | null = null;
+
+/**
  * Add a number to the answer
  */
 function hangmanPadNumber(num: number): void {
@@ -707,7 +712,13 @@ function hangmanConfirm(): void {
  * Setup keyboard for numberpad
  */
 export function setupHangmanKeyboard(): void {
-  document.addEventListener('keydown', (event: KeyboardEvent) => {
+  // Remove previous listener if it exists
+  if (hangmanKeyboardHandler) {
+    document.removeEventListener('keydown', hangmanKeyboardHandler);
+  }
+
+  // Create new handler
+  hangmanKeyboardHandler = (event: KeyboardEvent) => {
     // Only handle if game is active
     const gameScreen = document.getElementById('hangmanGameScreen');
     if (!gameScreen || gameScreen.style.display === 'none') return;
@@ -731,7 +742,10 @@ export function setupHangmanKeyboard(): void {
     else if (event.key === 'c' || event.key === 'C' || event.key === 'Escape') {
       hangmanPadClear();
     }
-  });
+  };
+
+  // Add new listener
+  document.addEventListener('keydown', hangmanKeyboardHandler);
 }
 
 // Expose functions to window for onclick handlers
