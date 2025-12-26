@@ -1013,6 +1013,109 @@ function closeEditProfile(): void {
   if (modal) modal.style.display = 'none';
 }
 
+// Create Profile Functions
+function openCreateProfileFromDashboard(): void {
+  const modal = document.getElementById('createProfileModal');
+  if (!modal) return;
+
+  // Clear previous values
+  const nameInput = document.getElementById('createProfileName') as HTMLInputElement;
+  const createAvatar = document.getElementById('createAvatar');
+
+  if (nameInput) nameInput.value = '';
+  if (createAvatar) createAvatar.textContent = '😊';
+
+  // Render avatar options
+  renderCreateAvatarOptions('😊');
+
+  modal.style.display = 'block';
+}
+
+function closeCreateProfile(): void {
+  const modal = document.getElementById('createProfileModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function renderCreateAvatarOptions(selectedAvatar: string): void {
+  const container = document.getElementById('createAvatarOptions');
+  if (!container) return;
+
+  const avatars = getAvatarOptions();
+
+  container.innerHTML = avatars.map(avatar => `
+    <button
+      class="avatar-option ${avatar === selectedAvatar ? 'avatar-option-selected' : ''}"
+      onclick="selectCreateAvatar('${avatar}')"
+      type="button"
+    >
+      ${avatar}
+    </button>
+  `).join('');
+}
+
+function selectCreateAvatar(avatar: string): void {
+  const createAvatarEl = document.getElementById('createAvatar');
+  if (createAvatarEl) createAvatarEl.textContent = avatar;
+
+  // Update selected state
+  document.querySelectorAll('#createAvatarOptions .avatar-option').forEach(btn => {
+    btn.classList.remove('avatar-option-selected');
+  });
+
+  const selectedBtn = Array.from(document.querySelectorAll('#createAvatarOptions .avatar-option'))
+    .find(btn => btn.textContent?.trim() === avatar);
+  if (selectedBtn) {
+    selectedBtn.classList.add('avatar-option-selected');
+  }
+}
+
+function saveNewProfile(): void {
+  const nameInput = document.getElementById('createProfileName') as HTMLInputElement;
+  const createAvatarEl = document.getElementById('createAvatar');
+
+  const newName = nameInput?.value.trim();
+  const selectedAvatar = createAvatarEl?.textContent?.trim();
+
+  if (!newName) {
+    alert('Please enter a name! 😊');
+    return;
+  }
+
+  if (profileExists(newName)) {
+    alert(`Profile "${newName}" already exists! Please choose a different name.`);
+    return;
+  }
+
+  // Create the profile
+  childName = newName;
+  sessionStartTime = Date.now();
+  currentProfile = createProfile(newName, selectedAvatar);
+
+  // Close modals
+  closeCreateProfile();
+  closeParentDashboard();
+
+  // Show home page and update UI
+  const homeContainer = document.getElementById('homeContainer');
+  const userWelcome = document.getElementById('userWelcome');
+  const userName = document.getElementById('userName');
+  const userAvatar = document.querySelector('.user-avatar');
+  const homeUserWelcome = document.getElementById('homeUserWelcome');
+
+  if (homeContainer) homeContainer.style.display = 'block';
+  if (userWelcome) userWelcome.style.display = 'inline-flex';
+  if (userName) userName.textContent = childName;
+  if (userAvatar && currentProfile) userAvatar.textContent = currentProfile.avatar || '😊';
+
+  if (homeUserWelcome && currentProfile) {
+    homeUserWelcome.innerHTML = `Welcome, <strong>${currentProfile.avatar} ${childName}</strong>! Choose a game to play.`;
+  }
+
+  updateProfileSwitcher();
+
+  speak('Profile created successfully!');
+}
+
 // Parent Dashboard Functions
 function openParentDashboard(): void {
   const data = getAllProfiles();
@@ -1243,6 +1346,22 @@ document.addEventListener('DOMContentLoaded', function () {
   initializeApp();
 });
 
+function openHomeSettings(): void {
+  const modal = document.getElementById('homeSettingsModal');
+  if (modal) modal.style.display = 'block';
+
+  // Sync language selector with current language
+  const languageSelect = document.getElementById('homeLanguageSelect') as HTMLSelectElement;
+  if (languageSelect) {
+    languageSelect.value = getCurrentLanguage();
+  }
+}
+
+function closeHomeSettings(): void {
+  const modal = document.getElementById('homeSettingsModal');
+  if (modal) modal.style.display = 'none';
+}
+
 function openSettings(): void {
   const modal = document.getElementById('settingsModal');
   if (modal) modal.style.display = 'block';
@@ -1255,6 +1374,7 @@ function closeSettings(): void {
 
 // Close settings modal when clicking outside
 window.addEventListener('click', function (event: MouseEvent) {
+  const homeSettingsModal = document.getElementById('homeSettingsModal');
   const settingsModal = document.getElementById('settingsModal');
   const numberpadModal = document.getElementById('numberpadModal');
   const profileStatsModal = document.getElementById('profileStatsModal');
@@ -1266,6 +1386,11 @@ window.addEventListener('click', function (event: MouseEvent) {
   const exportModal = document.getElementById('exportModal');
   const importModal = document.getElementById('importModal');
   const profileSelectionModal = document.getElementById('profileSelectionModal');
+
+  // Close home settings modal if clicking on backdrop
+  if (event.target === homeSettingsModal) {
+    closeHomeSettings();
+  }
 
   // Close settings modal if clicking on backdrop
   if (event.target === settingsModal) {
@@ -2399,11 +2524,23 @@ function updateAnswerKeyDisplay(worksheetCode?: string): void {
 
 // Language Management Functions
 function changeLanguage(): void {
-  const selectEl = document.getElementById('languageSelect') as HTMLSelectElement;
+  // Try both selectors (home and worksheet settings)
+  const homeSelectEl = document.getElementById('homeLanguageSelect') as HTMLSelectElement;
+  const worksheetSelectEl = document.getElementById('languageSelect') as HTMLSelectElement;
+
+  const selectEl = homeSelectEl || worksheetSelectEl;
   if (!selectEl) return;
 
   const newLang = selectEl.value as Language;
   setLanguage(newLang);
+
+  // Sync both language selectors
+  if (homeSelectEl && homeSelectEl !== selectEl) {
+    homeSelectEl.value = newLang;
+  }
+  if (worksheetSelectEl && worksheetSelectEl !== selectEl) {
+    worksheetSelectEl.value = newLang;
+  }
 
   // Update all UI text with new language
   updateUIText();
@@ -2681,11 +2818,17 @@ function backToHome(): void {
 (window as any).closeEditProfile = closeEditProfile;
 (window as any).selectAvatar = selectAvatar;
 (window as any).saveProfileEdits = saveProfileEdits;
+(window as any).openCreateProfileFromDashboard = openCreateProfileFromDashboard;
+(window as any).closeCreateProfile = closeCreateProfile;
+(window as any).selectCreateAvatar = selectCreateAvatar;
+(window as any).saveNewProfile = saveNewProfile;
 (window as any).openProfileSelection = openProfileSelection;
 (window as any).closeProfileSelection = closeProfileSelection;
 (window as any).setDifficulty = setDifficulty;
 (window as any).startWithDifficulty = startWithDifficulty;
 (window as any).handleVoiceFeedbackChange = handleVoiceFeedbackChange;
+(window as any).openHomeSettings = openHomeSettings;
+(window as any).closeHomeSettings = closeHomeSettings;
 (window as any).openSettings = openSettings;
 (window as any).closeSettings = closeSettings;
 (window as any).openNumberPad = openNumberPad;

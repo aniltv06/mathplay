@@ -984,6 +984,11 @@ body {
     z-index: 1001;
 }
 
+/* Create Profile Modal - Higher z-index to appear above other modals */
+#createProfileModal {
+    z-index: 1001;
+}
+
 .settings-modal-content {
     background: white;
     padding: 30px;

@@ -100,6 +100,17 @@ export function saveHangmanSettings(): void {
 
   closeHangmanSettings();
   speak('Settings saved!');
+
+  // Check if game is in progress and restart with new settings
+  const gameScreen = document.getElementById('hangmanGameScreen');
+  const difficultyScreen = document.getElementById('hangmanDifficultyScreen');
+
+  if (gameScreen && gameScreen.style.display !== 'none') {
+    // Game is in progress - restart with current difficulty
+    startHangmanGame(currentDifficulty);
+  } else if (difficultyScreen && difficultyScreen.style.display !== 'none') {
+    // On difficulty screen - just saved settings, no action needed
+  }
 }
 
 // Difficulty presets (number ranges and problem counts)
@@ -704,6 +715,7 @@ export function setupHangmanKeyboard(): void {
 
     // Number keys
     if (event.key >= '0' && event.key <= '9') {
+      event.preventDefault();
       hangmanPadNumber(parseInt(event.key));
     }
     // Backspace

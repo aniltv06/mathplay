@@ -57,7 +57,7 @@
                     <span id="homeHeaderAvatar">😊</span>
                 </button>
                 <button class="header-icon-btn" onclick="openParentDashboard()" title="Parent Dashboard">👨‍👩‍👧‍👦</button>
-                <button class="header-icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+                <button class="header-icon-btn" onclick="openHomeSettings()" title="Settings">⚙️</button>
             </div>
             <h1 class="home-title">🎯 Math Fun!</h1>
             <div id="homeUserWelcome" class="home-user-welcome"></div>
@@ -491,6 +491,42 @@
         </div>
     </div>
 
+    <!-- Create New Profile Modal -->
+    <div id="createProfileModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content" style="max-width: 500px;">
+            <button class="close-settings" onclick="closeCreateProfile()">✕</button>
+            <div class="settings-title"><span class="emoji">➕</span> Create New Profile</div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="setting-group">
+                    <label for="createProfileName">Name:</label>
+                    <input type="text" id="createProfileName" maxlength="20" placeholder="Enter name..." style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="setting-group">
+                    <label>Choose Avatar:</label>
+                    <div style="text-align: center; margin: 15px 0;">
+                        <div style="font-size: 4em; margin-bottom: 10px;">
+                            <span id="createAvatar">😊</span>
+                        </div>
+                        <div id="createAvatarOptions" class="avatar-options-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group-settings">
+                <button class="btn btn-primary" onclick="saveNewProfile()">
+                    <span class="emoji">🚀</span> Create Profile
+                </button>
+                <button class="btn btn-tertiary" onclick="closeCreateProfile()">
+                    <span class="emoji">❌</span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Parent Dashboard Modal -->
     <div id="parentDashboardModal" class="settings-modal" style="display: none;">
         <div class="settings-modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
@@ -499,10 +535,13 @@
 
             <div id="dashboardSummary" class="dashboard-summary"></div>
 
-            <!-- Edit Current Profile Button -->
-            <div style="text-align: center; margin: 20px 0;">
+            <!-- Profile Actions -->
+            <div style="display: flex; gap: 15px; justify-content: center; margin: 20px 0; flex-wrap: wrap;">
                 <button class="btn btn-secondary" onclick="openEditProfileCurrent()" style="font-size: 1em; padding: 12px 24px;">
                     <span class="emoji">✏️</span> Edit My Profile
+                </button>
+                <button class="btn btn-primary" onclick="openCreateProfileFromDashboard()" style="font-size: 1em; padding: 12px 24px;">
+                    <span class="emoji">➕</span> Create New Profile
                 </button>
             </div>
 
@@ -603,6 +642,52 @@
         </div>
     </div>
 
+    <!-- Home Settings Modal -->
+    <div id="homeSettingsModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content" style="max-width: 600px;">
+            <button class="close-settings" onclick="closeHomeSettings()">✕</button>
+            <div class="settings-title"><span class="emoji">⚙️</span> App Settings</div>
+
+            <!-- Language Selection -->
+            <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                <div class="setting-group">
+                    <label for="homeLanguageSelect">🌐 Language:</label>
+                    <select id="homeLanguageSelect" onchange="changeLanguage()" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; font-family: inherit; width: 100%;">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sync Section -->
+            <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                <div style="font-weight: bold; color: #333; margin-bottom: 12px;">
+                    <span class="emoji">☁️</span> Sync & Backup
+                </div>
+                <p style="font-size: 0.9em; color: #666; margin-bottom: 12px;">
+                    Save or share your profiles using a share code. Works offline - no cloud account needed!
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="openExportModal()" style="font-size: 0.95em; padding: 12px 15px;">
+                        <span class="emoji">📤</span> Export
+                    </button>
+                    <button class="btn btn-secondary" onclick="openImportModal()" style="font-size: 0.95em; padding: 12px 15px;">
+                        <span class="emoji">📥</span> Import
+                    </button>
+                </div>
+            </div>
+
+            <div class="button-group-settings">
+                <button class="btn btn-primary" onclick="closeHomeSettings();">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Worksheet Settings Modal -->
     <div id="settingsModal" class="settings-modal">
         <div class="settings-modal-content">
@@ -690,38 +775,6 @@
                 <p style="font-size: 0.8em; color: #999; margin-top: 8px; margin-left: 30px; font-style: italic;">
                     📱 On iPad/iPhone: Tap a problem or start practice to enable audio.
                 </p>
-            </div>
-
-            <!-- Language Selection -->
-            <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
-                <div class="setting-group">
-                    <label for="languageSelect">🌐 Language:</label>
-                    <select id="languageSelect" onchange="changeLanguage()" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; font-family: inherit; width: 100%;">
-                        <option value="en">English</option>
-                        <option value="es">Español</option>
-                        <option value="fr">Français</option>
-                        <option value="de">Deutsch</option>
-                        <option value="zh">中文</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Sync Section -->
-            <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
-                <div style="font-weight: bold; color: #333; margin-bottom: 12px;">
-                    <span class="emoji">☁️</span> Sync & Backup
-                </div>
-                <p style="font-size: 0.9em; color: #666; margin-bottom: 12px;">
-                    Save or share your profiles using a share code. Works offline - no cloud account needed!
-                </p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <button class="btn btn-secondary" onclick="openExportModal()" style="font-size: 0.95em; padding: 12px 15px;">
-                        <span class="emoji">📤</span> Export
-                    </button>
-                    <button class="btn btn-secondary" onclick="openImportModal()" style="font-size: 0.95em; padding: 12px 15px;">
-                        <span class="emoji">📥</span> Import
-                    </button>
-                </div>
             </div>
 
             <!-- Print Section -->
