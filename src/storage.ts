@@ -4,7 +4,7 @@
  * @email aniltv06@gmail.com
  */
 
-import type { UserProfile, ProfilesData, Session, ProblemSettings, Problem, Badge, BadgeId } from './types';
+import type { UserProfile, ProfilesData, Session, ProblemSettings, Problem, Badge, BadgeId, HangmanSession, HangmanSettings } from './types';
 import { compress, decompress } from 'lz-string';
 
 const STORAGE_KEY = 'mathplay_profiles';
@@ -14,6 +14,7 @@ const STORAGE_KEY = 'mathplay_profiles';
  */
 function initializeBadges(): Badge[] {
   return [
+    // Worksheet badges
     {
       id: 'first-steps',
       name: 'First Steps',
@@ -83,6 +84,35 @@ function initializeBadges(): Badge[] {
       description: 'Maintain 90%+ accuracy over 5 sessions',
       icon: '🎖️',
       earned: false
+    },
+    // Hangman badges
+    {
+      id: 'hangman-survivor',
+      name: 'Hangman Survivor',
+      description: 'Complete a Hangman game without losing all lives',
+      icon: '💚',
+      earned: false
+    },
+    {
+      id: 'hangman-perfect',
+      name: 'Hangman Perfect',
+      description: 'Complete Hangman without losing a single life',
+      icon: '👑',
+      earned: false
+    },
+    {
+      id: 'hangman-speedster',
+      name: 'Quick Thinker',
+      description: 'Score 100+ points in a Hangman game',
+      icon: '⚡',
+      earned: false
+    },
+    {
+      id: 'hangman-champion',
+      name: 'Hangman Champion',
+      description: 'Complete 10 Hangman games',
+      icon: '🏆',
+      earned: false
     }
   ];
 }
@@ -146,16 +176,27 @@ export function createProfile(name: string, avatar?: string): UserProfile {
     createdAt: new Date().toISOString(),
     lastActive: new Date().toISOString(),
     stats: {
+      // Worksheet stats
       totalSessions: 0,
       totalProblems: 0,
       totalCorrect: 0,
       totalWrong: 0,
       bestStreak: 0,
       averagePercentage: 0,
-      timeSpent: 0
+      timeSpent: 0,
+      // Hangman stats
+      hangmanSessions: 0,
+      hangmanProblems: 0,
+      hangmanCorrect: 0,
+      hangmanWrong: 0,
+      hangmanBestStreak: 0,
+      hangmanHighScore: 0,
+      hangmanTimeSpent: 0
     },
     history: [],
+    hangmanHistory: [],
     currentSession: null,
+    currentHangmanSession: null,
     badges: initializeBadges()
   };
 
@@ -333,6 +374,118 @@ export function updateBestStreak(name: string, streak: number): void {
 }
 
 /**
+ * Create a new Hangman session
+ */
+export function createHangmanSession(
+  name: string,
+  difficulty: string,
+  settings: HangmanSettings,
+  problems: Problem[]
+): void {
+  const data = getAllProfiles();
+  const profile = data.profiles[name];
+
+  if (profile) {
+    const session: HangmanSession = {
+      date: new Date().toISOString(),
+      difficulty: difficulty as any,
+      settings,
+      problems,
+      answers: new Array(problems.length).fill(null),
+      score: 0,
+      livesUsed: 0,
+      totalLives: settings.livesCount,
+      maxStreak: 0,
+      timeSpent: 0,
+      completed: false
+    };
+
+    profile.currentHangmanSession = session;
+    updateLastActive(name);
+    saveAllProfiles(data);
+  }
+}
+
+/**
+ * Save Hangman session progress
+ */
+export function saveHangmanProgress(
+  name: string,
+  score: number,
+  livesUsed: number,
+  maxStreak: number
+): void {
+  const data = getAllProfiles();
+  const profile = data.profiles[name];
+
+  if (profile && profile.currentHangmanSession) {
+    profile.currentHangmanSession.score = score;
+    profile.currentHangmanSession.livesUsed = livesUsed;
+    profile.currentHangmanSession.maxStreak = maxStreak;
+    updateLastActive(name);
+    saveAllProfiles(data);
+  }
+}
+
+/**
+ * Complete current Hangman session and save to history
+ */
+export function completeHangmanSession(
+  name: string,
+  timeSpent: number
+): void {
+  const data = getAllProfiles();
+  const profile = data.profiles[name];
+
+  if (profile && profile.currentHangmanSession) {
+    const session = profile.currentHangmanSession;
+    session.completed = true;
+    session.timeSpent = timeSpent;
+
+    // Add to history
+    profile.hangmanHistory.push(session);
+
+    // Update stats
+    profile.stats.hangmanSessions++;
+    profile.stats.hangmanProblems += session.problems.length;
+
+    // Count correct/wrong from answers
+    let correct = 0;
+    let wrong = 0;
+    session.problems.forEach((problem, index) => {
+      const answer = session.answers[index];
+      if (answer !== null) {
+        if (answer === problem.correct) {
+          correct++;
+        } else {
+          wrong++;
+        }
+      }
+    });
+
+    profile.stats.hangmanCorrect += correct;
+    profile.stats.hangmanWrong += wrong;
+    profile.stats.hangmanTimeSpent += timeSpent;
+
+    // Update best streak
+    if (session.maxStreak > profile.stats.hangmanBestStreak) {
+      profile.stats.hangmanBestStreak = session.maxStreak;
+    }
+
+    // Update high score
+    if (session.score > profile.stats.hangmanHighScore) {
+      profile.stats.hangmanHighScore = session.score;
+    }
+
+    // Clear current session
+    profile.currentHangmanSession = null;
+
+    updateLastActive(name);
+    saveAllProfiles(data);
+  }
+}
+
+/**
  * Delete a profile
  */
 export function deleteProfile(name: string): void {
@@ -452,6 +605,26 @@ export function checkAndAwardBadges(name: string): Badge[] {
           const avgAccuracy = recentSessions.reduce((sum, s) => sum + s.percentage, 0) / 5;
           shouldEarn = avgAccuracy >= 90;
         }
+        break;
+
+      // Hangman badges
+      case 'hangman-survivor':
+        const latestHangman = profile.hangmanHistory[profile.hangmanHistory.length - 1];
+        shouldEarn = latestHangman && latestHangman.completed && latestHangman.livesUsed < latestHangman.totalLives;
+        break;
+
+      case 'hangman-perfect':
+        const latestHangmanPerfect = profile.hangmanHistory[profile.hangmanHistory.length - 1];
+        shouldEarn = latestHangmanPerfect && latestHangmanPerfect.completed && latestHangmanPerfect.livesUsed === 0;
+        break;
+
+      case 'hangman-speedster':
+        const latestHangmanSpeed = profile.hangmanHistory[profile.hangmanHistory.length - 1];
+        shouldEarn = latestHangmanSpeed && latestHangmanSpeed.score >= 100;
+        break;
+
+      case 'hangman-champion':
+        shouldEarn = profile.stats.hangmanSessions >= 10;
         break;
     }
 

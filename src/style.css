@@ -2274,3 +2274,654 @@ body {
     border: 2px solid #ff6b6b;
     color: #c92a2a;
 }
+
+/* ======================================
+   HOME PAGE STYLES
+   ====================================== */
+
+.home-container {
+    min-height: 100vh;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.home-header {
+    text-align: center;
+    margin-bottom: 50px;
+    position: relative;
+    width: 100%;
+}
+
+.home-title {
+    font-size: 4em;
+    color: white;
+    margin: 20px 0;
+    text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.home-user-welcome {
+    color: white;
+    font-size: 1.5em;
+    margin-top: 15px;
+}
+
+.game-selection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.game-card {
+    background: white;
+    border-radius: 25px;
+    padding: 50px 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 4px solid transparent;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.game-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.game-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border-color: #667eea;
+}
+
+.game-card:hover::before {
+    opacity: 1;
+}
+
+.game-icon {
+    font-size: 5em;
+    margin-bottom: 25px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.game-card:hover .game-icon {
+    animation: bounce 0.6s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.game-card h2 {
+    font-size: 2em;
+    color: #333;
+    margin: 20px 0;
+}
+
+.game-card p {
+    font-size: 1.1em;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.game-card-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.worksheet-card .game-card-badge {
+    background: linear-gradient(135deg, #e8f8f5 0%, #c3fdd8 100%);
+    color: #2f9e44;
+}
+
+.hangman-card .game-card-badge {
+    background: linear-gradient(135deg, #fff4e6 0%, #ffd8a8 100%);
+    color: #d9480f;
+}
+
+/* ======================================
+   BACK TO HOME BUTTON
+   ====================================== */
+
+.back-to-home-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s;
+    z-index: 100;
+}
+
+.back-to-home-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.back-to-home-btn:active {
+    transform: translateY(0);
+}
+
+/* ======================================
+   HANGMAN GAME STYLES
+   ====================================== */
+
+/* Difficulty Selection */
+.hangman-difficulty-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin: 0 auto;
+    max-width: 900px;
+}
+
+.hangman-difficulty-card {
+    background: white;
+    border: 4px solid transparent;
+    border-radius: 20px;
+    padding: 40px 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.hangman-difficulty-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.hangman-difficulty-card.easy {
+    border-color: #51cf66;
+}
+
+.hangman-difficulty-card.easy:hover {
+    background: linear-gradient(135deg, #f0f9f4 0%, #e8f8f5 100%);
+}
+
+.hangman-difficulty-card.medium {
+    border-color: #667eea;
+}
+
+.hangman-difficulty-card.medium:hover {
+    background: linear-gradient(135deg, #f5f7ff 0%, #e9ecff 100%);
+}
+
+.hangman-difficulty-card.hard {
+    border-color: #ff6b6b;
+}
+
+.hangman-difficulty-card.hard:hover {
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+}
+
+.hangman-difficulty-card h3 {
+    font-size: 2em;
+    color: #333;
+    margin: 20px 0 15px 0;
+}
+
+.hangman-difficulty-card p {
+    font-size: 1.1em;
+    color: #666;
+    line-height: 1.8;
+}
+
+.difficulty-card-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    font-weight: bold;
+    margin-top: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Game Stats Bar */
+.hangman-stats {
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.stat-item {
+    text-align: center;
+    min-width: 100px;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    color: #666;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.timer-warning {
+    color: #ff6b6b;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Main Game Area */
+.hangman-main {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.hangman-display {
+    max-width: 500px;
+    margin: 0 auto 40px;
+    padding: 20px;
+}
+
+.hangman-svg {
+    width: 100%;
+    height: auto;
+}
+
+/* Problem Display */
+.problem-display {
+    text-align: center;
+    margin: 50px 0;
+}
+
+.problem-text {
+    font-size: 3.5em;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.problem-num {
+    color: #667eea;
+}
+
+.problem-op {
+    color: #764ba2;
+}
+
+.problem-equals {
+    color: #333;
+}
+
+.problem-question {
+    color: #ff6b6b;
+}
+
+/* Answer Input */
+.answer-area {
+    display: flex;
+    gap: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.hangman-input {
+    flex: 1;
+    font-size: 2.5em;
+    padding: 20px;
+    border: 4px solid #667eea;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.hangman-input:focus {
+    outline: none;
+    border-color: #764ba2;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn {
+    padding: 20px 40px;
+    font-size: 1.5em;
+    background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(81, 207, 102, 0.3);
+}
+
+.submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(81, 207, 102, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Final Score Screen */
+.final-screen {
+    max-width: 700px;
+    margin: 40px auto;
+    text-align: center;
+    padding: 50px 40px;
+    background: white;
+    border-radius: 25px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.final-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin: 40px 0;
+}
+
+.final-stat {
+    padding: 30px 20px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #eef0ff 100%);
+    border-radius: 20px;
+    border: 3px solid #667eea;
+    transition: all 0.3s;
+}
+
+.final-stat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+}
+
+.final-stat-value {
+    font-size: 3em;
+    font-weight: bold;
+    color: #667eea;
+    margin: 15px 0;
+}
+
+.final-stat-label {
+    font-size: 1.1em;
+    color: #666;
+    font-weight: 600;
+}
+
+.final-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 18px 40px;
+    font-size: 1.3em;
+    border-radius: 15px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #dee2e6 0%, #ced4da 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ======================================
+   RESPONSIVE DESIGN
+   ====================================== */
+
+@media (max-width: 768px) {
+    .home-title {
+        font-size: 3em;
+    }
+
+    .game-selection {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        padding: 0 15px;
+    }
+
+    .game-card {
+        padding: 40px 30px;
+    }
+
+    .game-icon {
+        font-size: 4em;
+    }
+
+    .hangman-difficulty-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .problem-text {
+        font-size: 2.5em;
+        gap: 10px;
+    }
+
+    .hangman-input {
+        font-size: 2em;
+        padding: 15px;
+    }
+
+    .submit-btn {
+        padding: 15px 30px;
+        font-size: 1.2em;
+    }
+
+    .final-stats {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .back-to-home-btn {
+        top: 10px;
+        left: 10px;
+        padding: 10px 18px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-title {
+        font-size: 2.2em;
+    }
+
+    .game-card h2 {
+        font-size: 1.6em;
+    }
+
+    .game-card p {
+        font-size: 1em;
+    }
+
+    .hangman-stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .stat-label {
+        margin: 0;
+    }
+
+    .problem-text {
+        font-size: 2em;
+        flex-wrap: wrap;
+    }
+
+    .answer-area {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .final-actions {
+        flex-direction: column;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+    }
+}
+
+/* ======================================
+   HANGMAN EMBEDDED NUMBERPAD LAYOUT
+   ====================================== */
+
+/* Main game area - side by side layout */
+.hangman-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Hangman display - left side */
+.hangman-display {
+    max-width: 100%;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #eef0ff 100%);
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Numberpad area - right side */
+.hangman-numberpad-area {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Problem display in numberpad */
+.numberpad-problem-display {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Responsive adjustments for Hangman */
+@media (max-width: 968px) {
+    .hangman-main {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .hangman-display {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .hangman-numberpad-area {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .hangman-main {
+        padding: 20px;
+    }
+
+    .numberpad-problem-display {
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .numberpad-problem-display div {
+        font-size: 1.5em \!important;
+    }
+
+    .hangman-numberpad-area {
+        padding: 20px;
+    }
+}

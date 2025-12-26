@@ -48,12 +48,48 @@
     </script>
 </head>
 <body>
-    <div class="progress-bar-container">
-        <div class="progress-bar" id="progressBar"></div>
+    <!-- Home Page Container -->
+    <div id="homeContainer" class="home-container" style="display: none;">
+        <div class="home-header">
+            <div class="header-action-buttons">
+                <button class="header-icon-btn profile-avatar-btn" id="homeProfileAvatarBtn" onclick="toggleProfileSwitcher()" title="Switch Profile" style="display: none;">
+                    <span id="homeHeaderAvatar">😊</span>
+                </button>
+                <button class="header-icon-btn" onclick="openParentDashboard()" title="Parent Dashboard">👨‍👩‍👧‍👦</button>
+                <button class="header-icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+            </div>
+            <h1 class="home-title">🎯 Math Fun!</h1>
+            <div id="homeUserWelcome" class="home-user-welcome"></div>
+        </div>
+
+        <div class="game-selection">
+            <div class="game-card worksheet-card" onclick="selectGame('worksheet')">
+                <div class="game-icon">📝</div>
+                <h2>Math Worksheet</h2>
+                <p>Practice addition, subtraction, multiplication, and division at your own pace</p>
+                <div class="game-card-badge">Classic Mode</div>
+            </div>
+
+            <div class="game-card hangman-card" onclick="selectGame('hangman')">
+                <div class="game-icon">🎮</div>
+                <h2>Math Hangman</h2>
+                <p>Answer quickly to save the hangman! Race against time!</p>
+                <div class="game-card-badge">Timed Challenge</div>
+            </div>
+        </div>
     </div>
-    <div class="streak-counter" id="streakCounter">🔥 Streak: 0</div>
-    <div class="timer-display" id="timerDisplay" style="display: none;">⏱️ <span id="timerText">5:00</span></div>
-    <div class="container">
+
+    <!-- Worksheet Container (existing content) -->
+    <div id="worksheetContainer" class="container">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="streak-counter" id="streakCounter">🔥 Streak: 0</div>
+        <div class="timer-display" id="timerDisplay" style="display: none;">⏱️ <span id="timerText">5:00</span></div>
+
+        <!-- Back to Home Button -->
+        <button class="back-to-home-btn" onclick="backToHome()">← Home</button>
+
         <div class="header">
             <div class="header-action-buttons">
                 <button class="header-icon-btn profile-avatar-btn" id="profileAvatarBtn" onclick="toggleProfileSwitcher()" title="Switch Profile" style="display: none;">
@@ -147,389 +183,6 @@
             </div>
         </div>
 
-        <!-- Profile Stats Modal -->
-        <div id="profileStatsModal" class="settings-modal" style="display: none;">
-            <div class="settings-modal-content">
-                <button class="close-settings" onclick="closeProfileStats()">✕</button>
-                <div class="settings-title"><span class="emoji">📊</span> <span id="statsProfileName"></span>'s Statistics</div>
-
-                <div class="profile-stats-details">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Sessions</div>
-                        <div class="stat-value" id="statTotalSessions">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Total Problems</div>
-                        <div class="stat-value" id="statTotalProblems">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Accuracy</div>
-                        <div class="stat-value" id="statAccuracy">0%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Best Streak</div>
-                        <div class="stat-value" id="statBestStreak">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Time Spent</div>
-                        <div class="stat-value" id="statTimeSpent">0 min</div>
-                    </div>
-                </div>
-
-                <div class="session-history">
-                    <h3>Recent Sessions</h3>
-                    <div id="sessionHistoryList"></div>
-                </div>
-
-                <div class="badges-section">
-                    <h3>Badges <span class="emoji">🏆</span></h3>
-                    <div id="badgesList" class="badges-list"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Edit Profile Modal -->
-        <div id="editProfileModal" class="settings-modal" style="display: none;">
-            <div class="settings-modal-content" style="max-width: 500px;">
-                <button class="close-settings" onclick="closeEditProfile()">✕</button>
-                <div class="settings-title"><span class="emoji">✏️</span> Edit Profile</div>
-
-                <div style="margin-bottom: 20px;">
-                    <div class="setting-group">
-                        <label for="editProfileName">Name:</label>
-                        <input type="text" id="editProfileName" maxlength="20" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <div class="setting-group">
-                        <label>Choose Avatar:</label>
-                        <div style="text-align: center; margin: 15px 0;">
-                            <div style="font-size: 4em; margin-bottom: 10px;">
-                                <span id="currentAvatar">😊</span>
-                            </div>
-                            <div id="avatarOptions" class="avatar-options-grid"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="button-group-settings">
-                    <button class="btn btn-primary" onclick="saveProfileEdits()">
-                        <span class="emoji">💾</span> Save Changes
-                    </button>
-                    <button class="btn btn-tertiary" onclick="closeEditProfile()">
-                        <span class="emoji">❌</span> Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Parent Dashboard Modal -->
-        <div id="parentDashboardModal" class="settings-modal" style="display: none;">
-            <div class="settings-modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
-                <button class="close-settings" onclick="closeParentDashboard()">✕</button>
-                <div class="settings-title"><span class="emoji">👨‍👩‍👧‍👦</span> Parent Dashboard - All Profiles</div>
-
-                <div id="dashboardSummary" class="dashboard-summary"></div>
-
-                <div class="dashboard-section">
-                    <h3>Profile Comparison <span class="emoji">📊</span></h3>
-                    <div id="profileComparison" class="profile-comparison"></div>
-                </div>
-
-                <div class="dashboard-section">
-                    <h3>Recent Activity <span class="emoji">📅</span></h3>
-                    <div id="recentActivity" class="recent-activity"></div>
-                </div>
-
-                <div class="dashboard-section">
-                    <h3>Badge Leaderboard <span class="emoji">🏆</span></h3>
-                    <div id="badgeLeaderboard" class="badge-leaderboard"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Export Profiles Modal -->
-        <div id="exportModal" class="settings-modal" style="display: none;">
-            <div class="settings-modal-content" style="max-width: 600px;">
-                <button class="close-settings" onclick="closeExportModal()">✕</button>
-                <div class="settings-title"><span class="emoji">📤</span> Export Profiles - Share Code</div>
-
-                <div style="margin-bottom: 20px;">
-                    <p style="color: #666; font-size: 0.95em; line-height: 1.5;">
-                        Copy this code to save or share your profiles. You can import it on another device or send it to friends/family.
-                    </p>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label style="font-weight: bold; color: #333; margin-bottom: 8px; display: block;">Share Code:</label>
-                    <textarea
-                        id="exportCodeDisplay"
-                        readonly
-                        style="width: 100%; height: 200px; padding: 15px; border: 2px solid #667eea; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85em; resize: vertical; background: #f5f7ff;"
-                    ></textarea>
-                </div>
-
-                <div class="button-group-settings">
-                    <button class="btn btn-primary" id="copyExportBtn" onclick="copyExportCode()">
-                        <span class="emoji">📋</span> Copy Code
-                    </button>
-                    <button class="btn btn-tertiary" onclick="closeExportModal()">
-                        <span class="emoji">✅</span> Done
-                    </button>
-                </div>
-
-                <div style="margin-top: 20px; padding: 15px; background: #fff4e6; border-left: 4px solid #ffa500; border-radius: 8px;">
-                    <div style="font-weight: bold; color: #333; margin-bottom: 5px;">💡 Tip:</div>
-                    <div style="font-size: 0.9em; color: #666;">
-                        Save this code in a safe place (notes app, email to yourself, etc.) to backup your progress!
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Import Profiles Modal -->
-        <div id="importModal" class="settings-modal" style="display: none;">
-            <div class="settings-modal-content" style="max-width: 600px;">
-                <button class="close-settings" onclick="closeImportModal()">✕</button>
-                <div class="settings-title"><span class="emoji">📥</span> Import Profiles - Share Code</div>
-
-                <div style="margin-bottom: 20px;">
-                    <p style="color: #666; font-size: 0.95em; line-height: 1.5;">
-                        Paste a share code below to import profiles. Profiles will be merged with your existing data.
-                    </p>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label style="font-weight: bold; color: #333; margin-bottom: 8px; display: block;">Share Code:</label>
-                    <textarea
-                        id="importCodeInput"
-                        placeholder="Paste share code here..."
-                        style="width: 100%; height: 200px; padding: 15px; border: 2px solid #667eea; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85em; resize: vertical;"
-                    ></textarea>
-                </div>
-
-                <div id="importResult" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
-
-                <div class="button-group-settings">
-                    <button class="btn btn-primary" onclick="doImport()">
-                        <span class="emoji">📥</span> Import Profiles
-                    </button>
-                    <button class="btn btn-tertiary" onclick="closeImportModal()">
-                        <span class="emoji">❌</span> Cancel
-                    </button>
-                </div>
-
-                <div style="margin-top: 20px; padding: 15px; background: #e8f8f5; border-left: 4px solid #51cf66; border-radius: 8px;">
-                    <div style="font-weight: bold; color: #333; margin-bottom: 5px;">ℹ️ Note:</div>
-                    <div style="font-size: 0.9em; color: #666;">
-                        If a profile name already exists, the imported profile will be renamed (e.g., "John (1)").
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Modal -->
-        <div id="settingsModal" class="settings-modal">
-            <div class="settings-modal-content">
-                <button class="close-settings" onclick="closeSettings()">✕</button>
-                <div class="settings-title"><span class="emoji">⚙️</span> Customize Your Practice</div>
-
-                <!-- Difficulty Selector -->
-                <div class="difficulty-selector">
-                    <h3 style="margin-bottom: 15px; color: #333;">Choose Difficulty</h3>
-                    <div class="difficulty-buttons">
-                        <button class="difficulty-btn" data-difficulty="easy" onclick="setDifficulty('easy')">
-                            <span class="difficulty-icon">🌱</span>
-                            <span class="difficulty-name">Easy</span>
-                            <span class="difficulty-desc">Addition & Subtraction (1-10)</span>
-                        </button>
-                        <button class="difficulty-btn difficulty-btn-active" data-difficulty="medium" onclick="setDifficulty('medium')">
-                            <span class="difficulty-icon">🌟</span>
-                            <span class="difficulty-name">Medium</span>
-                            <span class="difficulty-desc">All operations (1-20)</span>
-                        </button>
-                        <button class="difficulty-btn" data-difficulty="hard" onclick="setDifficulty('hard')">
-                            <span class="difficulty-icon">🚀</span>
-                            <span class="difficulty-name">Hard</span>
-                            <span class="difficulty-desc">All operations (1-100)</span>
-                        </button>
-                    </div>
-                    <p style="font-size: 0.9em; color: #666; margin-top: 10px; text-align: center;">Or customize your own settings below</p>
-                </div>
-
-                <div class="settings-grid">
-                    <div class="setting-group">
-                        <label for="numProblems">Number of Problems:</label>
-                        <input type="number" id="numProblems" min="1" max="20" value="5">
-                    </div>
-
-                    <div class="setting-group">
-                        <label for="maxNum">Max Number:</label>
-                        <input type="number" id="maxNum" min="1" max="20" value="9">
-                    </div>
-
-                    <div class="setting-group">
-                        <label for="minNum">Min Number:</label>
-                        <input type="number" id="minNum" min="0" max="20" value="1">
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 15px;">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="includeAddition" checked>
-                        <label for="includeAddition">Include Addition ➕</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="includeSubtraction" checked>
-                        <label for="includeSubtraction">Include Subtraction ➖</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="includeMultiplication">
-                        <label for="includeMultiplication">Include Multiplication ✖️</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="includeDivision">
-                        <label for="includeDivision">Include Division ➗</label>
-                    </div>
-                </div>
-
-                <!-- Timed Mode -->
-                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="timedMode">
-                        <label for="timedMode">⏱️ Timed Challenge</label>
-                    </div>
-                    <div class="setting-group" style="margin-top: 10px;">
-                        <label for="timeLimit">Time Limit (minutes):</label>
-                        <input type="number" id="timeLimit" min="1" max="30" value="5" style="width: 80px;">
-                    </div>
-                </div>
-
-                <!-- Voice Feedback -->
-                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="voiceFeedback" onchange="handleVoiceFeedbackChange()">
-                        <label for="voiceFeedback">🔊 Voice Feedback (Text-to-Speech)</label>
-                    </div>
-                    <p style="font-size: 0.85em; color: #666; margin-top: 8px; margin-left: 30px;">Hear problems read aloud and get spoken encouragement!</p>
-                    <p style="font-size: 0.8em; color: #999; margin-top: 8px; margin-left: 30px; font-style: italic;">
-                        📱 On iPad/iPhone: Tap a problem or start practice to enable audio.
-                    </p>
-                </div>
-
-                <!-- Language Selection -->
-                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
-                    <div class="setting-group">
-                        <label for="languageSelect">🌐 Language:</label>
-                        <select id="languageSelect" onchange="changeLanguage()" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; font-family: inherit; width: 100%;">
-                            <option value="en">English</option>
-                            <option value="es">Español</option>
-                            <option value="fr">Français</option>
-                            <option value="de">Deutsch</option>
-                            <option value="zh">中文</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Sync Section -->
-                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
-                    <div style="font-weight: bold; color: #333; margin-bottom: 12px;">
-                        <span class="emoji">☁️</span> Sync & Backup
-                    </div>
-                    <p style="font-size: 0.9em; color: #666; margin-bottom: 12px;">
-                        Save or share your profiles using a share code. Works offline - no cloud account needed!
-                    </p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="openExportModal()" style="font-size: 0.95em; padding: 12px 15px;">
-                            <span class="emoji">📤</span> Export
-                        </button>
-                        <button class="btn btn-secondary" onclick="openImportModal()" style="font-size: 0.95em; padding: 12px 15px;">
-                            <span class="emoji">📥</span> Import
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Print Section -->
-                <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
-                    <div style="font-weight: bold; color: #333; margin-bottom: 12px;">
-                        <span class="emoji">🖨️</span> Print Worksheet
-                    </div>
-                    <p style="font-size: 0.9em; color: #666; margin-bottom: 12px;">
-                        Generate problems first, then print a customized worksheet with optional answer key.
-                    </p>
-                    <button class="btn btn-secondary" onclick="openPrintSettings()" style="font-size: 0.95em; padding: 12px 15px; width: 100%;">
-                        <span class="emoji">🖨️</span> Print Worksheet
-                    </button>
-                </div>
-
-                <div class="button-group-settings">
-                    <button class="btn btn-primary" onclick="generateProblems(); closeSettings();">
-                        <span class="emoji">✨</span> Start Practice
-                    </button>
-                    <button class="btn btn-secondary" onclick="changeName(); closeSettings();">
-                        <span class="emoji">👤</span> Switch Profile
-                    </button>
-                    <button class="btn btn-tertiary" onclick="closeSettings();">
-                        <span class="emoji">❌</span> Close
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Print Settings Modal -->
-        <div id="printSettingsModal" class="settings-modal" style="display: none;">
-            <div class="settings-modal-content" style="max-width: 500px;">
-                <button class="close-settings" onclick="closePrintSettings()">✕</button>
-                <div class="settings-title"><span class="emoji">🖨️</span> Print Settings</div>
-
-                <div style="margin-bottom: 20px;">
-                    <div class="setting-group">
-                        <label for="printFont">Font Style:</label>
-                        <select id="printFont" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
-                            <option value="Arial">Arial (Clean & Clear)</option>
-                            <option value="Times New Roman">Times New Roman (Traditional)</option>
-                            <option value="Comic Sans MS" selected>Comic Sans MS (Kid-Friendly)</option>
-                            <option value="Courier New">Courier New (Monospace)</option>
-                            <option value="Georgia">Georgia (Readable)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <div class="setting-group">
-                        <label for="printColumns">Problems Per Row:</label>
-                        <select id="printColumns" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
-                            <option value="3">3 (Spacious)</option>
-                            <option value="4" selected>4 (Balanced)</option>
-                            <option value="5">5 (Compact)</option>
-                            <option value="6">6 (Very Compact)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="printShowAnswers" checked>
-                        <label for="printShowAnswers">Include Answer Key (separate page)</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="printShowName" checked>
-                        <label for="printShowName">Show Student Name Line</label>
-                    </div>
-                </div>
-
-                <div class="button-group-settings">
-                    <button class="btn btn-primary" onclick="doPrint()">
-                        <span class="emoji">🖨️</span> Print Now
-                    </button>
-                    <button class="btn btn-tertiary" onclick="closePrintSettings()">
-                        <span class="emoji">❌</span> Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <div class="instructions">
             <p><span class="emoji">👉</span> Tap on each problem box to open the number pad and enter your answer. You'll see instant feedback as you solve each problem!</p>
         </div>
@@ -594,6 +247,605 @@
             </div>
             <div style="text-align: center; margin-top: 10px; font-size: 0.85em; color: rgba(255, 255, 255, 0.7);">
                 💡 Use keyboard: 0-9, Backspace, Enter
+            </div>
+        </div>
+    </div>
+    <!-- End of Worksheet Container -->
+
+    <!-- Hangman Container -->
+    <div id="hangmanContainer" class="container" style="display: none;">
+        <!-- Back to Home Button -->
+        <button class="back-to-home-btn" onclick="backToHome()">← Home</button>
+
+        <div class="header">
+            <div class="header-action-buttons">
+                <button class="header-icon-btn" onclick="openHangmanSettings()" title="Game Settings">⚙️</button>
+            </div>
+            <div class="header-main">
+                <div class="header-icon">🎮</div>
+                <div class="header-title-section">
+                    <h1 class="app-title">Math Hangman</h1>
+                    <p class="header-subtitle">Answer quickly to save the hangman!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Difficulty Selection Screen -->
+        <div id="hangmanDifficultyScreen" class="difficulty-screen">
+            <h2 style="text-align: center; color: #333; margin-bottom: 30px;">Choose Your Challenge</h2>
+            <div class="hangman-difficulty-grid">
+                <button class="hangman-difficulty-card easy" onclick="startHangmanGame('easy')">
+                    <span class="emoji" style="font-size: 3em;">🌱</span>
+                    <h3>Easy</h3>
+                    <p>Numbers 1-10<br>6 lives<br>10 problems</p>
+                    <div class="difficulty-card-badge">Beginner</div>
+                </button>
+                <button class="hangman-difficulty-card medium" onclick="startHangmanGame('medium')">
+                    <span class="emoji" style="font-size: 3em;">🌟</span>
+                    <h3>Medium</h3>
+                    <p>Numbers 1-20<br>6 lives<br>15 problems</p>
+                    <div class="difficulty-card-badge">Intermediate</div>
+                </button>
+                <button class="hangman-difficulty-card hard" onclick="startHangmanGame('hard')">
+                    <span class="emoji" style="font-size: 3em;">🚀</span>
+                    <h3>Hard</h3>
+                    <p>Numbers 1-100<br>6 lives<br>20 problems</p>
+                    <div class="difficulty-card-badge">Expert</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="hangmanGameScreen" class="game-screen" style="display: none;">
+            <!-- Stats Bar -->
+            <div class="hangman-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Lives:</span>
+                    <span id="hangmanLives" class="stat-value">❤️❤️❤️❤️❤️❤️</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Score:</span>
+                    <span id="hangmanScore" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Streak:</span>
+                    <span id="hangmanStreak" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Time:</span>
+                    <span id="hangmanTimer" class="stat-value">30</span>
+                </div>
+            </div>
+
+            <!-- Main Game Area -->
+            <div class="hangman-main">
+                <!-- Hangman Visual (Left Side) -->
+                <div id="hangmanDisplay" class="hangman-display">
+                    <!-- SVG rendered here by JavaScript -->
+                </div>
+
+                <!-- Numberpad Area (Right Side) -->
+                <div class="hangman-numberpad-area">
+                    <!-- Problem Display -->
+                    <div class="numberpad-problem-display">
+                        <div style="font-size: 1.8em; font-weight: bold; color: #667eea;" id="hangmanNum1">5</div>
+                        <div style="font-size: 1.8em; font-weight: bold; color: #764ba2;" id="hangmanOp">+</div>
+                        <div style="font-size: 1.8em; font-weight: bold; color: #667eea;" id="hangmanNum2">3</div>
+                        <div style="font-size: 1.8em; font-weight: bold; color: #333;">= ?</div>
+                    </div>
+
+                    <!-- Answer Display -->
+                    <div class="numberpad-display" id="hangmanAnswerDisplay">Tap numbers</div>
+
+                    <!-- Number Grid -->
+                    <div class="numberpad-grid">
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(1)">1</button>
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(2)">2</button>
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(3)">3</button>
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(4)">4</button>
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(5)">5</button>
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(6)">6</button>
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(7)">7</button>
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(8)">8</button>
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(9)">9</button>
+                        <button class="numberpad-btn" onclick="hangmanPadClear()" style="background: #ffe0e0; color: #ff6b6b;">C</button>
+                        <button class="numberpad-btn" onclick="hangmanPadNumber(0)">0</button>
+                        <button class="numberpad-btn" onclick="hangmanPadBackspace()" style="background: #fff4e6; color: #ffa500;">←</button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="numberpad-actions">
+                        <button class="numberpad-clear" onclick="hangmanSkip()" style="background: #ffa500;">Skip ⏭️</button>
+                        <button class="numberpad-confirm" onclick="hangmanConfirm()">Submit ✓</button>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 10px; font-size: 0.85em; color: #666;">
+                        💡 Use keyboard: 0-9, Backspace, Enter
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Score Screen -->
+        <div id="hangmanFinalScreen" class="final-screen" style="display: none;">
+            <h2 style="font-size: 2.5em; color: #333; margin-bottom: 30px;">Game Over!</h2>
+            <div class="final-stats">
+                <div class="final-stat">
+                    <span class="emoji" style="font-size: 2em;">🎯</span>
+                    <div class="final-stat-value" id="finalScore">0</div>
+                    <div class="final-stat-label">Final Score</div>
+                </div>
+                <div class="final-stat">
+                    <span class="emoji" style="font-size: 2em;">✅</span>
+                    <div class="final-stat-value" id="finalCorrect">0</div>
+                    <div class="final-stat-label">Correct</div>
+                </div>
+                <div class="final-stat">
+                    <span class="emoji" style="font-size: 2em;">❌</span>
+                    <div class="final-stat-value" id="finalWrong">0</div>
+                    <div class="final-stat-label">Wrong</div>
+                </div>
+                <div class="final-stat">
+                    <span class="emoji" style="font-size: 2em;">🔥</span>
+                    <div class="final-stat-value" id="finalMaxStreak">0</div>
+                    <div class="final-stat-label">Best Streak</div>
+                </div>
+            </div>
+
+            <div class="final-actions">
+                <button class="btn-primary" onclick="showDifficultyScreen()">
+                    🎮 Play Again
+                </button>
+                <button class="btn-secondary" onclick="backToHome()">
+                    🏠 Back to Home
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- End of Hangman Container -->
+
+    <!-- ===================================== -->
+    <!-- SHARED MODALS (Accessible from any screen) -->
+    <!-- ===================================== -->
+
+    <!-- Profile Stats Modal -->
+    <div id="profileStatsModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content">
+            <button class="close-settings" onclick="closeProfileStats()">✕</button>
+            <div class="settings-title"><span class="emoji">📊</span> <span id="statsProfileName"></span>'s Statistics</div>
+
+            <div class="profile-stats-details">
+                <div class="stat-card">
+                    <div class="stat-label">Total Sessions</div>
+                    <div class="stat-value" id="statTotalSessions">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Problems</div>
+                    <div class="stat-value" id="statTotalProblems">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Accuracy</div>
+                    <div class="stat-value" id="statAccuracy">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Best Streak</div>
+                    <div class="stat-value" id="statBestStreak">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Time Spent</div>
+                    <div class="stat-value" id="statTimeSpent">0 min</div>
+                </div>
+            </div>
+
+            <div class="session-history">
+                <h3>Recent Sessions</h3>
+                <div id="sessionHistoryList"></div>
+            </div>
+
+            <div class="badges-section">
+                <h3>Badges <span class="emoji">🏆</span></h3>
+                <div id="badgesList" class="badges-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content" style="max-width: 500px;">
+            <button class="close-settings" onclick="closeEditProfile()">✕</button>
+            <div class="settings-title"><span class="emoji">✏️</span> Edit Profile</div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="setting-group">
+                    <label for="editProfileName">Name:</label>
+                    <input type="text" id="editProfileName" maxlength="20" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="setting-group">
+                    <label>Choose Avatar:</label>
+                    <div style="text-align: center; margin: 15px 0;">
+                        <div style="font-size: 4em; margin-bottom: 10px;">
+                            <span id="currentAvatar">😊</span>
+                        </div>
+                        <div id="avatarOptions" class="avatar-options-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group-settings">
+                <button class="btn btn-primary" onclick="saveProfileEdits()">
+                    <span class="emoji">💾</span> Save Changes
+                </button>
+                <button class="btn btn-tertiary" onclick="closeEditProfile()">
+                    <span class="emoji">❌</span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parent Dashboard Modal -->
+    <div id="parentDashboardModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <button class="close-settings" onclick="closeParentDashboard()">✕</button>
+            <div class="settings-title"><span class="emoji">👨‍👩‍👧‍👦</span> Parent Dashboard - All Profiles</div>
+
+            <div id="dashboardSummary" class="dashboard-summary"></div>
+
+            <div class="dashboard-section">
+                <h3>Profile Comparison <span class="emoji">📊</span></h3>
+                <div id="profileComparison" class="profile-comparison"></div>
+            </div>
+
+            <div class="dashboard-section">
+                <h3>Recent Activity <span class="emoji">📅</span></h3>
+                <div id="recentActivity" class="recent-activity"></div>
+            </div>
+
+            <div class="dashboard-section">
+                <h3>Badge Leaderboard <span class="emoji">🏆</span></h3>
+                <div id="badgeLeaderboard" class="badge-leaderboard"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Profiles Modal -->
+    <div id="exportModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content" style="max-width: 600px;">
+            <button class="close-settings" onclick="closeExportModal()">✕</button>
+            <div class="settings-title"><span class="emoji">📤</span> Export Profiles - Share Code</div>
+
+            <div style="margin-bottom: 20px;">
+                <p style="color: #666; font-size: 0.95em; line-height: 1.5;">
+                    Copy this code to save or share your profiles. You can import it on another device or send it to friends/family.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: bold; color: #333; margin-bottom: 8px; display: block;">Share Code:</label>
+                <textarea
+                    id="exportCodeDisplay"
+                    readonly
+                    style="width: 100%; height: 200px; padding: 15px; border: 2px solid #667eea; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85em; resize: vertical; background: #f5f7ff;"
+                ></textarea>
+            </div>
+
+            <div class="button-group-settings">
+                <button class="btn btn-primary" id="copyExportBtn" onclick="copyExportCode()">
+                    <span class="emoji">📋</span> Copy Code
+                </button>
+                <button class="btn btn-tertiary" onclick="closeExportModal()">
+                    <span class="emoji">✅</span> Done
+                </button>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: #fff4e6; border-left: 4px solid #ffa500; border-radius: 8px;">
+                <div style="font-weight: bold; color: #333; margin-bottom: 5px;">💡 Tip:</div>
+                <div style="font-size: 0.9em; color: #666;">
+                    Save this code in a safe place (notes app, email to yourself, etc.) to backup your progress!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Profiles Modal -->
+    <div id="importModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content" style="max-width: 600px;">
+            <button class="close-settings" onclick="closeImportModal()">✕</button>
+            <div class="settings-title"><span class="emoji">📥</span> Import Profiles - Share Code</div>
+
+            <div style="margin-bottom: 20px;">
+                <p style="color: #666; font-size: 0.95em; line-height: 1.5;">
+                    Paste a share code below to import profiles. Profiles will be merged with your existing data.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: bold; color: #333; margin-bottom: 8px; display: block;">Share Code:</label>
+                <textarea
+                    id="importCodeInput"
+                    placeholder="Paste share code here..."
+                    style="width: 100%; height: 200px; padding: 15px; border: 2px solid #667eea; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85em; resize: vertical;"
+                ></textarea>
+            </div>
+
+            <div id="importResult" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+
+            <div class="button-group-settings">
+                <button class="btn btn-primary" onclick="doImport()">
+                    <span class="emoji">📥</span> Import Profiles
+                </button>
+                <button class="btn btn-tertiary" onclick="closeImportModal()">
+                    <span class="emoji">❌</span> Cancel
+                </button>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: #e8f8f5; border-left: 4px solid #51cf66; border-radius: 8px;">
+                <div style="font-weight: bold; color: #333; margin-bottom: 5px;">ℹ️ Note:</div>
+                <div style="font-size: 0.9em; color: #666;">
+                    If a profile name already exists, the imported profile will be renamed (e.g., "John (1)").
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Worksheet Settings Modal -->
+    <div id="settingsModal" class="settings-modal">
+        <div class="settings-modal-content">
+            <button class="close-settings" onclick="closeSettings()">✕</button>
+            <div class="settings-title"><span class="emoji">⚙️</span> Customize Your Practice</div>
+
+            <!-- Difficulty Selector -->
+            <div class="difficulty-selector">
+                <h3 style="margin-bottom: 15px; color: #333;">Choose Difficulty</h3>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn" data-difficulty="easy" onclick="setDifficulty('easy')">
+                        <span class="difficulty-icon">🌱</span>
+                        <span class="difficulty-name">Easy</span>
+                        <span class="difficulty-desc">Addition & Subtraction (1-10)</span>
+                    </button>
+                    <button class="difficulty-btn difficulty-btn-active" data-difficulty="medium" onclick="setDifficulty('medium')">
+                        <span class="difficulty-icon">🌟</span>
+                        <span class="difficulty-name">Medium</span>
+                        <span class="difficulty-desc">All operations (1-20)</span>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="hard" onclick="setDifficulty('hard')">
+                        <span class="difficulty-icon">🚀</span>
+                        <span class="difficulty-name">Hard</span>
+                        <span class="difficulty-desc">All operations (1-100)</span>
+                    </button>
+                </div>
+                <p style="font-size: 0.9em; color: #666; margin-top: 10px; text-align: center;">Or customize your own settings below</p>
+            </div>
+
+            <div class="settings-grid">
+                <div class="setting-group">
+                    <label for="numProblems">Number of Problems:</label>
+                    <input type="number" id="numProblems" min="1" max="20" value="5">
+                </div>
+
+                <div class="setting-group">
+                    <label for="maxNum">Max Number:</label>
+                    <input type="number" id="maxNum" min="1" max="20" value="9">
+                </div>
+
+                <div class="setting-group">
+                    <label for="minNum">Min Number:</label>
+                    <input type="number" id="minNum" min="0" max="20" value="1">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeAddition" checked>
+                    <label for="includeAddition">Include Addition ➕</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeSubtraction" checked>
+                    <label for="includeSubtraction">Include Subtraction ➖</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeMultiplication">
+                    <label for="includeMultiplication">Include Multiplication ✖️</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeDivision">
+                    <label for="includeDivision">Include Division ➗</label>
+                </div>
+            </div>
+
+            <!-- Timed Mode -->
+            <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="timedMode">
+                    <label for="timedMode">⏱️ Timed Challenge</label>
+                </div>
+                <div class="setting-group" style="margin-top: 10px;">
+                    <label for="timeLimit">Time Limit (minutes):</label>
+                    <input type="number" id="timeLimit" min="1" max="30" value="5" style="width: 80px;">
+                </div>
+            </div>
+
+            <!-- Voice Feedback -->
+            <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="voiceFeedback" onchange="handleVoiceFeedbackChange()">
+                    <label for="voiceFeedback">🔊 Voice Feedback (Text-to-Speech)</label>
+                </div>
+                <p style="font-size: 0.85em; color: #666; margin-top: 8px; margin-left: 30px;">Hear problems read aloud and get spoken encouragement!</p>
+                <p style="font-size: 0.8em; color: #999; margin-top: 8px; margin-left: 30px; font-style: italic;">
+                    📱 On iPad/iPhone: Tap a problem or start practice to enable audio.
+                </p>
+            </div>
+
+            <!-- Language Selection -->
+            <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                <div class="setting-group">
+                    <label for="languageSelect">🌐 Language:</label>
+                    <select id="languageSelect" onchange="changeLanguage()" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; font-family: inherit; width: 100%;">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sync Section -->
+            <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                <div style="font-weight: bold; color: #333; margin-bottom: 12px;">
+                    <span class="emoji">☁️</span> Sync & Backup
+                </div>
+                <p style="font-size: 0.9em; color: #666; margin-bottom: 12px;">
+                    Save or share your profiles using a share code. Works offline - no cloud account needed!
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="openExportModal()" style="font-size: 0.95em; padding: 12px 15px;">
+                        <span class="emoji">📤</span> Export
+                    </button>
+                    <button class="btn btn-secondary" onclick="openImportModal()" style="font-size: 0.95em; padding: 12px 15px;">
+                        <span class="emoji">📥</span> Import
+                    </button>
+                </div>
+            </div>
+
+            <!-- Print Section -->
+            <div style="margin-bottom: 15px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                <div style="font-weight: bold; color: #333; margin-bottom: 12px;">
+                    <span class="emoji">🖨️</span> Print Worksheet
+                </div>
+                <p style="font-size: 0.9em; color: #666; margin-bottom: 12px;">
+                    Generate problems first, then print a customized worksheet with optional answer key.
+                </p>
+                <button class="btn btn-secondary" onclick="openPrintSettings()" style="font-size: 0.95em; padding: 12px 15px; width: 100%;">
+                    <span class="emoji">🖨️</span> Print Worksheet
+                </button>
+            </div>
+
+            <div class="button-group-settings">
+                <button class="btn btn-primary" onclick="generateProblems(); closeSettings();">
+                    <span class="emoji">✨</span> Start Practice
+                </button>
+                <button class="btn btn-secondary" onclick="changeName(); closeSettings();">
+                    <span class="emoji">👤</span> Switch Profile
+                </button>
+                <button class="btn btn-tertiary" onclick="closeSettings();">
+                    <span class="emoji">❌</span> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Settings Modal -->
+    <div id="printSettingsModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content" style="max-width: 500px;">
+            <button class="close-settings" onclick="closePrintSettings()">✕</button>
+            <div class="settings-title"><span class="emoji">🖨️</span> Print Settings</div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="setting-group">
+                    <label for="printFont">Font Style:</label>
+                    <select id="printFont" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
+                        <option value="Arial">Arial (Clean & Clear)</option>
+                        <option value="Times New Roman">Times New Roman (Traditional)</option>
+                        <option value="Comic Sans MS" selected>Comic Sans MS (Kid-Friendly)</option>
+                        <option value="Courier New">Courier New (Monospace)</option>
+                        <option value="Georgia">Georgia (Readable)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="setting-group">
+                    <label for="printColumns">Problems Per Row:</label>
+                    <select id="printColumns" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100%;">
+                        <option value="3">3 (Spacious)</option>
+                        <option value="4" selected>4 (Balanced)</option>
+                        <option value="5">5 (Compact)</option>
+                        <option value="6">6 (Very Compact)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="printShowAnswers" checked>
+                    <label for="printShowAnswers">Include Answer Key (separate page)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="printShowName" checked>
+                    <label for="printShowName">Show Student Name Line</label>
+                </div>
+            </div>
+
+            <div class="button-group-settings">
+                <button class="btn btn-primary" onclick="doPrint()">
+                    <span class="emoji">🖨️</span> Print Now
+                </button>
+                <button class="btn btn-tertiary" onclick="closePrintSettings()">
+                    <span class="emoji">❌</span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hangman Settings Modal -->
+    <div id="hangmanSettingsModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content">
+            <button class="close-settings" onclick="closeHangmanSettings()">✕</button>
+            <div class="settings-title"><span class="emoji">🎮</span> Hangman Game Settings</div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #333; margin-bottom: 12px;">Problem Types</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="hangmanAddition" checked>
+                    <label for="hangmanAddition">Addition ➕</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="hangmanSubtraction" checked>
+                    <label for="hangmanSubtraction">Subtraction ➖</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="hangmanMultiplication" checked>
+                    <label for="hangmanMultiplication">Multiplication ✖️</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="hangmanDivision" checked>
+                    <label for="hangmanDivision">Division ➗</label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="setting-group">
+                    <label for="hangmanLives">Number of Lives:</label>
+                    <input type="number" id="hangmanLives" min="3" max="10" value="6" style="padding: 10px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em; width: 100px;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; padding: 15px; background: #f5f7ff; border-radius: 8px;">
+                <h3 style="color: #333; margin-bottom: 12px;">Bonus Features</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="hangmanTimeBonus" checked>
+                    <label for="hangmanTimeBonus">⏱️ Time Bonus</label>
+                </div>
+                <p style="font-size: 0.85em; color: #666; margin: 5px 0 15px 30px;">Extra points for quick answers (20+ seconds remaining)</p>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="hangmanStreakBonus" checked>
+                    <label for="hangmanStreakBonus">🔥 Streak Bonus</label>
+                </div>
+                <p style="font-size: 0.85em; color: #666; margin: 5px 0 0 30px;">Extra points for consecutive correct answers (3+ streak)</p>
+            </div>
+
+            <div class="button-group-settings">
+                <button class="btn btn-primary" onclick="saveHangmanSettings()">
+                    <span class="emoji">💾</span> Save Settings
+                </button>
+                <button class="btn btn-tertiary" onclick="closeHangmanSettings()">
+                    <span class="emoji">❌</span> Cancel
+                </button>
             </div>
         </div>
     </div>

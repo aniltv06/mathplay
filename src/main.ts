@@ -52,6 +52,9 @@ import {
 } from './i18n';
 import type { Language } from './types';
 
+// Import Hangman game
+import { initHangman, setupHangmanKeyboard } from './hangman';
+
 // Difficulty Presets
 const DIFFICULTY_PRESETS: DifficultyPreset[] = [
   {
@@ -166,7 +169,7 @@ function initAudioContext(): void {
 }
 
 // Sound effects using Web Audio API
-function playSound(type: SoundType): void {
+export function playSound(type: SoundType): void {
   try {
     // Initialize or resume AudioContext
     initAudioContext();
@@ -205,7 +208,7 @@ function playSound(type: SoundType): void {
 let currentUtterance: SpeechSynthesisUtterance | null = null;
 
 // Text-to-Speech voice feedback
-function speak(text: string): void {
+export function speak(text: string): void {
   if (!voiceFeedbackEnabled) {
     console.log('Voice feedback disabled');
     return;
@@ -587,21 +590,17 @@ function createNewProfile(): void {
   currentProfile = createProfile(name);
 
   const profilePanel = document.getElementById('profilePanel');
+  const homeContainer = document.getElementById('homeContainer');
   const userWelcome = document.getElementById('userWelcome');
   const userName = document.getElementById('userName');
   const userAvatar = document.querySelector('.user-avatar');
-  const greetingText = document.getElementById('greetingText');
 
+  // Hide profile panel, show home page
   if (profilePanel) profilePanel.style.display = 'none';
+  if (homeContainer) homeContainer.style.display = 'block';
   if (userWelcome) userWelcome.style.display = 'inline-flex';
   if (userName) userName.textContent = childName;
   if (userAvatar && currentProfile) userAvatar.textContent = currentProfile.avatar || '😊';
-  if (greetingText) {
-    greetingText.textContent = `Let's practice some math! 🌟`;
-  }
-
-  // Start fresh
-  generateProblems();
 
   // Update profile switcher
   updateProfileSwitcher();
@@ -612,31 +611,22 @@ function selectProfile(name: string): void {
   sessionStartTime = Date.now();
   currentProfile = getProfile(name);
 
-  // Reset streak before restoring or starting new session
+  // Reset streak
   correctStreak = 0;
   updateStreakDisplay();
 
-  // Check if there's a current session to restore
-  if (currentProfile?.currentSession && !currentProfile.currentSession.completed) {
-    restoreSession(currentProfile.currentSession);
-  } else {
-    // Start fresh
-    generateProblems();
-  }
-
   const profilePanel = document.getElementById('profilePanel');
+  const homeContainer = document.getElementById('homeContainer');
   const userWelcome = document.getElementById('userWelcome');
   const userName = document.getElementById('userName');
   const userAvatar = document.querySelector('.user-avatar');
-  const greetingText = document.getElementById('greetingText');
 
+  // Hide profile panel, show home page
   if (profilePanel) profilePanel.style.display = 'none';
+  if (homeContainer) homeContainer.style.display = 'block';
   if (userWelcome) userWelcome.style.display = 'inline-flex';
   if (userName) userName.textContent = childName;
   if (userAvatar && currentProfile) userAvatar.textContent = currentProfile.avatar || '😊';
-  if (greetingText) {
-    greetingText.textContent = `Welcome back! Let's practice! 🌟`;
-  }
 
   // Update profile switcher
   updateProfileSwitcher();
@@ -2456,6 +2446,62 @@ function doImport(): void {
 }
 
 
+// Game Navigation Functions
+type GameType = 'worksheet' | 'hangman';
+let currentGame: GameType | null = null;
+
+/**
+ * Select which game to play
+ */
+function selectGame(game: GameType): void {
+  if (!childName) {
+    alert('Please select a profile first!');
+    return;
+  }
+
+  currentGame = game;
+
+  const homeContainer = document.getElementById('homeContainer');
+  const worksheetContainer = document.getElementById('worksheetContainer');
+  const hangmanContainer = document.getElementById('hangmanContainer');
+
+  if (homeContainer) homeContainer.style.display = 'none';
+
+  if (game === 'worksheet') {
+    if (worksheetContainer) worksheetContainer.style.display = 'block';
+    if (hangmanContainer) hangmanContainer.style.display = 'none';
+
+    // Show worksheet interface
+    const greetingText = document.getElementById('greetingText');
+    if (greetingText) {
+      greetingText.textContent = `Let's practice math, ${childName}!`;
+    }
+  } else if (game === 'hangman') {
+    if (worksheetContainer) worksheetContainer.style.display = 'none';
+    if (hangmanContainer) hangmanContainer.style.display = 'block';
+
+    // Initialize Hangman game
+    initHangman(childName);
+    setupHangmanKeyboard();
+  }
+}
+
+/**
+ * Return to home page
+ */
+function backToHome(): void {
+  const homeContainer = document.getElementById('homeContainer');
+  const worksheetContainer = document.getElementById('worksheetContainer');
+  const hangmanContainer = document.getElementById('hangmanContainer');
+
+  if (homeContainer) homeContainer.style.display = 'block';
+  if (worksheetContainer) worksheetContainer.style.display = 'none';
+  if (hangmanContainer) hangmanContainer.style.display = 'none';
+
+  currentGame = null;
+}
+
+
 // Expose functions to window for inline onclick handlers (Vite ES modules fix)
 (window as any).startWithName = startWithName;
 (window as any).createNewProfile = createNewProfile;
@@ -2498,3 +2544,5 @@ function doImport(): void {
 (window as any).openImportModal = openImportModal;
 (window as any).closeImportModal = closeImportModal;
 (window as any).doImport = doImport;
+(window as any).selectGame = selectGame;
+(window as any).backToHome = backToHome;

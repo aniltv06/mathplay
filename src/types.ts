@@ -79,6 +79,7 @@ export interface Session {
  * Statistics for a user profile
  */
 export interface ProfileStats {
+  // Worksheet stats
   totalSessions: number;
   totalProblems: number;
   totalCorrect: number;
@@ -86,6 +87,42 @@ export interface ProfileStats {
   bestStreak: number;
   averagePercentage: number;
   timeSpent: number;
+
+  // Hangman stats
+  hangmanSessions: number;
+  hangmanProblems: number;
+  hangmanCorrect: number;
+  hangmanWrong: number;
+  hangmanBestStreak: number;
+  hangmanHighScore: number;
+  hangmanTimeSpent: number;
+}
+
+/**
+ * Hangman game session
+ */
+export interface HangmanSession {
+  date: string;
+  difficulty: DifficultyLevel;
+  settings: HangmanSettings;
+  problems: Problem[];
+  answers: (number | null)[];
+  score: number;
+  livesUsed: number;
+  totalLives: number;
+  maxStreak: number;
+  timeSpent: number;
+  completed: boolean;
+}
+
+/**
+ * Hangman game settings
+ */
+export interface HangmanSettings {
+  problemTypes: ('addition' | 'subtraction' | 'multiplication' | 'division')[];
+  livesCount: number;
+  timeBonus: boolean;
+  streakBonus: boolean;
 }
 
 /**
@@ -98,7 +135,9 @@ export interface UserProfile {
   lastActive: string;
   stats: ProfileStats;
   history: Session[];
+  hangmanHistory: HangmanSession[];
   currentSession: Session | null;
+  currentHangmanSession: HangmanSession | null;
   badges: Badge[];
 }
 
@@ -133,7 +172,11 @@ export type BadgeId =
   | 'math-wizard'
   | 'persistent'
   | 'time-master'
-  | 'accuracy-master';
+  | 'accuracy-master'
+  | 'hangman-survivor'
+  | 'hangman-perfect'
+  | 'hangman-speedster'
+  | 'hangman-champion';
 
 /**
  * Achievement badge
