@@ -979,6 +979,11 @@ body {
     animation: fadeIn 0.3s;
 }
 
+/* Edit Profile Modal - Higher z-index to appear above other modals */
+#editProfileModal {
+    z-index: 1001;
+}
+
 .settings-modal-content {
     background: white;
     padding: 30px;
@@ -2161,6 +2166,48 @@ body {
     color: #667eea;
     margin-bottom: 10px;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.current-profile-badge {
+    background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+    color: white;
+    font-size: 0.65em;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(81, 207, 102, 0.3);
+}
+
+.switch-profile-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.switch-profile-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #5568d3 0%, #6438a0 100%);
+}
+
+.switch-profile-btn:active {
+    transform: translateY(0);
 }
 
 .comparison-stats {
@@ -2875,6 +2922,71 @@ body {
     border-radius: 20px;
     padding: 25px;
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Game Over Card */
+.hangman-game-over-card {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.game-over-content {
+    text-align: center;
+    color: white;
+}
+
+.game-over-icon {
+    font-size: 5em;
+    margin-bottom: 20px;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.game-over-title {
+    font-size: 3em;
+    font-weight: bold;
+    margin: 0 0 15px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.game-over-message {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.game-over-restart-btn {
+    background: white;
+    color: #ff6b6b;
+    border: none;
+    border-radius: 15px;
+    padding: 18px 40px;
+    font-size: 1.3em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.game-over-restart-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: #f8f9fa;
+}
+
+.game-over-restart-btn:active {
+    transform: translateY(-1px);
 }
 
 /* Problem display in numberpad */

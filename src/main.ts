@@ -724,8 +724,18 @@ function updateProfileSwitcher(): void {
 
 // Toggle profile switcher menu
 function toggleProfileSwitcher(): void {
-  const menu = document.getElementById('profileSwitcherMenu');
-  const list = document.getElementById('profileSwitcherList');
+  // Try both worksheet and hangman menus
+  const worksheetMenu = document.getElementById('profileSwitcherMenu');
+  const worksheetList = document.getElementById('profileSwitcherList');
+  const hangmanMenu = document.getElementById('hangmanProfileSwitcherMenu');
+  const hangmanList = document.getElementById('hangmanProfileSwitcherList');
+
+  // Determine which menu to show based on which container is visible
+  const hangmanContainer = document.getElementById('hangmanContainer');
+  const isHangman = hangmanContainer && hangmanContainer.style.display === 'block';
+
+  const menu = isHangman ? hangmanMenu : worksheetMenu;
+  const list = isHangman ? hangmanList : worksheetList;
 
   if (!menu || !list) return;
 
@@ -765,9 +775,11 @@ function toggleProfileSwitcher(): void {
 
 // Switch to a different profile
 function switchToProfile(name: string): void {
-  // Close the menu
-  const menu = document.getElementById('profileSwitcherMenu');
-  if (menu) menu.style.display = 'none';
+  // Close both menus
+  const worksheetMenu = document.getElementById('profileSwitcherMenu');
+  const hangmanMenu = document.getElementById('hangmanProfileSwitcherMenu');
+  if (worksheetMenu) worksheetMenu.style.display = 'none';
+  if (hangmanMenu) hangmanMenu.style.display = 'none';
 
   // Switch to the profile
   selectProfile(name);
@@ -917,6 +929,13 @@ function openEditProfile(name: string): void {
   renderAvatarOptions(profile.avatar || '😊');
 
   modal.style.display = 'block';
+}
+
+// Open edit profile modal for current user
+function openEditProfileCurrent(): void {
+  if (childName) {
+    openEditProfile(childName);
+  }
 }
 
 function renderAvatarOptions(selectedAvatar: string): void {
@@ -1090,7 +1109,11 @@ function openParentDashboard(): void {
 
       return `
         <div class="comparison-card">
-          <div class="comparison-header"><span style="font-size: 1.5em; margin-right: 8px;">${profile.avatar || '😊'}</span>${profile.name}${profile.currentSession ? ' 🎮' : ''}</div>
+          <div class="comparison-header">
+            <span style="font-size: 1.5em; margin-right: 8px;">${profile.avatar || '😊'}</span>
+            ${profile.name}${profile.currentSession ? ' 🎮' : ''}
+            ${profile.name === childName ? ' <span class="current-profile-badge">Current</span>' : ''}
+          </div>
           <div class="comparison-stats">
             <div class="comparison-stat">
               <span>Sessions:</span> <strong>${profile.stats.totalSessions}${profile.currentSession ? ' (+ current)' : ''}</strong>
@@ -1108,6 +1131,11 @@ function openParentDashboard(): void {
               <span>Badges:</span> <strong>${earnedBadges}</strong>
             </div>
           </div>
+          ${profile.name !== childName ? `
+            <button class="switch-profile-btn" onclick="switchProfileFromDashboard('${profile.name}')">
+              Switch to ${profile.name}
+            </button>
+          ` : ''}
         </div>
       `;
     }).join('');
@@ -1176,6 +1204,20 @@ function openParentDashboard(): void {
 function closeParentDashboard(): void {
   const modal = document.getElementById('parentDashboardModal');
   if (modal) modal.style.display = 'none';
+}
+
+/**
+ * Switch profile from parent dashboard and return to home
+ */
+function switchProfileFromDashboard(name: string): void {
+  // Switch to the selected profile
+  selectProfile(name);
+
+  // Close the parent dashboard
+  closeParentDashboard();
+
+  // Show feedback
+  speak(`Switched to ${name}'s profile`);
 }
 
 // Allow Enter key to submit name
@@ -1275,6 +1317,16 @@ window.addEventListener('click', function (event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!profileSwitcherMenu.contains(target) && !profileAvatarBtn?.contains(target)) {
       profileSwitcherMenu.style.display = 'none';
+    }
+  }
+
+  // Close hangman profile switcher menu if clicking outside
+  const hangmanProfileSwitcherMenu = document.getElementById('hangmanProfileSwitcherMenu');
+  const hangmanProfileAvatarBtn = document.getElementById('hangmanProfileAvatarBtn');
+  if (hangmanProfileSwitcherMenu && hangmanProfileSwitcherMenu.style.display === 'block') {
+    const target = event.target as HTMLElement;
+    if (!hangmanProfileSwitcherMenu.contains(target) && !hangmanProfileAvatarBtn?.contains(target)) {
+      hangmanProfileSwitcherMenu.style.display = 'none';
     }
   }
 });
@@ -2408,6 +2460,16 @@ function initializeApp(): void {
 
   // Update UI with loaded language
   updateUIText();
+
+  // Check if there's a last active profile
+  const lastActive = getLastActiveProfile();
+  if (lastActive) {
+    // Auto-select the last active profile
+    selectProfile(lastActive.name);
+  } else {
+    // No profile selected - show profile selection modal
+    showProfileSelectionUI();
+  }
 }
 
 
@@ -2552,9 +2614,35 @@ function selectGame(game: GameType): void {
     if (greetingText) {
       greetingText.textContent = `Let's practice math, ${childName}!`;
     }
+
+    // Render the quick-start card if no problems exist
+    renderProblems();
   } else if (game === 'hangman') {
     if (worksheetContainer) worksheetContainer.style.display = 'none';
     if (hangmanContainer) hangmanContainer.style.display = 'block';
+
+    // Show user info in Hangman header
+    const hangmanUserWelcome = document.getElementById('hangmanUserWelcome');
+    const hangmanUserName = document.getElementById('hangmanUserName');
+    const hangmanUserAvatar = document.getElementById('hangmanUserAvatar');
+
+    if (hangmanUserWelcome) hangmanUserWelcome.style.display = 'inline-flex';
+    if (hangmanUserName) hangmanUserName.textContent = childName;
+    if (hangmanUserAvatar && currentProfile) {
+      hangmanUserAvatar.textContent = currentProfile.avatar || '😊';
+    }
+
+    // Update hangman profile avatar button
+    const hangmanProfileAvatarBtn = document.getElementById('hangmanProfileAvatarBtn');
+    const hangmanHeaderAvatar = document.getElementById('hangmanHeaderAvatar');
+    const profileNames = getProfileNames();
+
+    if (hangmanProfileAvatarBtn && profileNames.length > 1) {
+      hangmanProfileAvatarBtn.style.display = 'flex';
+      if (hangmanHeaderAvatar && currentProfile) {
+        hangmanHeaderAvatar.textContent = currentProfile.avatar || '😊';
+      }
+    }
 
     // Initialize Hangman game
     initHangman(childName);
@@ -2589,6 +2677,7 @@ function backToHome(): void {
 (window as any).closeProfileStats = closeProfileStats;
 (window as any).confirmDeleteProfile = confirmDeleteProfile;
 (window as any).openEditProfile = openEditProfile;
+(window as any).openEditProfileCurrent = openEditProfileCurrent;
 (window as any).closeEditProfile = closeEditProfile;
 (window as any).selectAvatar = selectAvatar;
 (window as any).saveProfileEdits = saveProfileEdits;
@@ -2615,6 +2704,7 @@ function backToHome(): void {
 (window as any).doPrint = doPrint;
 (window as any).openParentDashboard = openParentDashboard;
 (window as any).closeParentDashboard = closeParentDashboard;
+(window as any).switchProfileFromDashboard = switchProfileFromDashboard;
 (window as any).changeLanguage = changeLanguage;
 (window as any).openExportModal = openExportModal;
 (window as any).closeExportModal = closeExportModal;

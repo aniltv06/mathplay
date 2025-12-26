@@ -24,6 +24,7 @@
     <link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96x96.png">
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Math Fun">
 
@@ -80,7 +81,7 @@
     </div>
 
     <!-- Worksheet Container (existing content) -->
-    <div id="worksheetContainer" class="container">
+    <div id="worksheetContainer" class="container" style="display: none;">
         <div class="progress-bar-container">
             <div class="progress-bar" id="progressBar"></div>
         </div>
@@ -234,12 +235,30 @@
 
         <div class="header">
             <div class="header-action-buttons">
+                <button class="header-icon-btn profile-avatar-btn" id="hangmanProfileAvatarBtn" onclick="toggleProfileSwitcher()" title="Switch Profile" style="display: none;">
+                    <span id="hangmanHeaderAvatar">😊</span>
+                </button>
+                <button class="header-icon-btn" onclick="openParentDashboard()" title="Parent Dashboard">👨‍👩‍👧‍👦</button>
                 <button class="header-icon-btn" onclick="openHangmanSettings()" title="Game Settings">⚙️</button>
             </div>
+
+            <!-- Profile Switcher Menu -->
+            <div class="profile-switcher-menu" id="hangmanProfileSwitcherMenu" style="display: none;">
+                <div class="profile-switcher-header">Switch Profile</div>
+                <div class="profile-switcher-list" id="hangmanProfileSwitcherList"></div>
+            </div>
+
             <div class="header-main">
                 <div class="header-icon">🎮</div>
                 <div class="header-title-section">
                     <h1 class="app-title">Math Hangman</h1>
+                    <div class="user-welcome" id="hangmanUserWelcome" style="display: none;">
+                        <div class="user-avatar" id="hangmanUserAvatar">👋</div>
+                        <div class="user-info">
+                            <div class="user-greeting">Hello,</div>
+                            <div class="user-name" id="hangmanUserName"></div>
+                        </div>
+                    </div>
                     <p class="header-subtitle">Answer quickly to save the hangman!</p>
                 </div>
             </div>
@@ -336,6 +355,18 @@
 
                     <div style="text-align: center; margin-top: 10px; font-size: 0.85em; color: #666;">
                         💡 Use keyboard: 0-9, Backspace, Enter
+                    </div>
+                </div>
+
+                <!-- Game Over Card (Hidden by default) -->
+                <div id="hangmanGameOverCard" class="hangman-game-over-card" style="display: none;">
+                    <div class="game-over-content">
+                        <div class="game-over-icon">💀</div>
+                        <h2 class="game-over-title">GAME OVER</h2>
+                        <p class="game-over-message">Better luck next time!</p>
+                        <button class="game-over-restart-btn" onclick="showDifficultyScreen()">
+                            🔄 Start Again
+                        </button>
                     </div>
                 </div>
             </div>
@@ -467,6 +498,13 @@
             <div class="settings-title"><span class="emoji">👨‍👩‍👧‍👦</span> Parent Dashboard - All Profiles</div>
 
             <div id="dashboardSummary" class="dashboard-summary"></div>
+
+            <!-- Edit Current Profile Button -->
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn btn-secondary" onclick="openEditProfileCurrent()" style="font-size: 1em; padding: 12px 24px;">
+                    <span class="emoji">✏️</span> Edit My Profile
+                </button>
+            </div>
 
             <div class="dashboard-section">
                 <h3>Profile Comparison <span class="emoji">📊</span></h3>
@@ -702,9 +740,6 @@
             <div class="button-group-settings">
                 <button class="btn btn-primary" onclick="generateProblems(); closeSettings();">
                     <span class="emoji">✨</span> Start Practice
-                </button>
-                <button class="btn btn-secondary" onclick="changeName(); closeSettings();">
-                    <span class="emoji">👤</span> Switch Profile
                 </button>
                 <button class="btn btn-tertiary" onclick="closeSettings();">
                     <span class="emoji">❌</span> Close

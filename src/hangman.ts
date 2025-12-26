@@ -140,6 +140,10 @@ function showDifficultyScreen(): void {
   if (difficultyScreen) difficultyScreen.style.display = 'block';
   if (gameScreen) gameScreen.style.display = 'none';
   if (finalScreen) finalScreen.style.display = 'none';
+
+  // Hide game over card when returning to difficulty selection
+  const gameOverCard = document.getElementById('hangmanGameOverCard');
+  if (gameOverCard) gameOverCard.style.display = 'none';
 }
 
 /**
@@ -264,9 +268,22 @@ function startQuestion(): void {
     return;
   }
 
+  // Check if game is already over (lives <= 0)
+  if (lives <= 0) {
+    endGame();
+    return;
+  }
+
+  // Stop any existing timer before starting a new one
+  stopQuestionTimer();
+
   // Show the numberpad area (in case it was hidden)
   const numberpadArea = document.getElementById('hangmanNumberpadArea');
   if (numberpadArea) numberpadArea.style.display = 'block';
+
+  // Hide the game over card (in case it was shown)
+  const gameOverCard = document.getElementById('hangmanGameOverCard');
+  if (gameOverCard) gameOverCard.style.display = 'none';
 
   const problem = hangmanProblems[currentProblemIndex];
 
@@ -388,6 +405,11 @@ function handleCorrectAnswer(): void {
  * Handle wrong answer
  */
 function handleWrongAnswer(): void {
+  // Guard: Don't process if game is already over
+  if (lives <= 0) {
+    return;
+  }
+
   playSound('wrong');
 
   // Lose a life
@@ -428,6 +450,22 @@ function endGame(): void {
   // Hide the numberpad area
   const numberpadArea = document.getElementById('hangmanNumberpadArea');
   if (numberpadArea) numberpadArea.style.display = 'none';
+
+  // Update Game Over message based on how the game ended
+  const gameOverMessage = document.querySelector('.game-over-message');
+  if (gameOverMessage) {
+    if (lives <= 0) {
+      // Lost all lives
+      gameOverMessage.textContent = 'Better luck next time!';
+    } else {
+      // Completed all questions
+      gameOverMessage.textContent = 'Great job! You finished all questions!';
+    }
+  }
+
+  // Show the game over card
+  const gameOverCard = document.getElementById('hangmanGameOverCard');
+  if (gameOverCard) gameOverCard.style.display = 'flex';
 
   // Clear the answer input
   hangmanCurrentAnswer = '';
@@ -481,8 +519,12 @@ function updateLivesDisplay(): void {
   const livesEl = document.getElementById('hangmanLives');
   if (!livesEl) return;
 
-  const hearts = '❤️'.repeat(lives);
-  const emptyHearts = '🖤'.repeat(currentSettings.livesCount - lives);
+  // Ensure lives never goes negative for display purposes
+  const displayLives = Math.max(0, lives);
+  const emptyLives = Math.max(0, currentSettings.livesCount - displayLives);
+
+  const hearts = '❤️'.repeat(displayLives);
+  const emptyHearts = '🖤'.repeat(emptyLives);
   livesEl.textContent = hearts + emptyHearts;
 }
 
