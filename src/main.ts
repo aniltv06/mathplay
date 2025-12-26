@@ -589,21 +589,82 @@ function createNewProfile(): void {
   sessionStartTime = Date.now();
   currentProfile = createProfile(name);
 
-  const profilePanel = document.getElementById('profilePanel');
   const homeContainer = document.getElementById('homeContainer');
   const userWelcome = document.getElementById('userWelcome');
   const userName = document.getElementById('userName');
   const userAvatar = document.querySelector('.user-avatar');
+  const homeUserWelcome = document.getElementById('homeUserWelcome');
 
-  // Hide profile panel, show home page
-  if (profilePanel) profilePanel.style.display = 'none';
+  // Close profile selection modal
+  closeProfileSelection();
+
+  // Show home page
   if (homeContainer) homeContainer.style.display = 'block';
   if (userWelcome) userWelcome.style.display = 'inline-flex';
   if (userName) userName.textContent = childName;
   if (userAvatar && currentProfile) userAvatar.textContent = currentProfile.avatar || '😊';
 
+  // Update home page welcome message
+  if (homeUserWelcome && currentProfile) {
+    homeUserWelcome.innerHTML = `Welcome, <strong>${currentProfile.avatar} ${childName}</strong>! Choose a game to play.`;
+  }
+
   // Update profile switcher
   updateProfileSwitcher();
+}
+
+/**
+ * Open profile selection modal
+ */
+function openProfileSelection(): void {
+  const modal = document.getElementById('profileSelectionModal');
+  const messageEl = document.getElementById('profileSelectionMessage');
+  const profileNames = getProfileNames();
+
+  if (!modal) return;
+
+  // Show appropriate welcome message
+  if (messageEl) {
+    let messageHTML = '';
+    if (profileNames.length === 0) {
+      messageHTML = `
+        <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #fff4e6 0%, #ffd8a8 100%); border-radius: 12px; margin-bottom: 20px; border: 2px solid #ffa500;">
+          <div style="font-size: 2em; margin-bottom: 10px;">👋</div>
+          <div style="font-size: 1.2em; font-weight: bold; color: #333; margin-bottom: 8px;">Welcome to Math Fun!</div>
+          <div style="color: #666; font-size: 0.95em;">Create your first profile below to get started</div>
+        </div>
+      `;
+    } else {
+      messageHTML = `
+        <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #e8f0fe 0%, #d4e7ff 100%); border-radius: 12px; margin-bottom: 20px; border: 2px solid #667eea;">
+          <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 5px;">Select a Profile to Continue</div>
+          <div style="color: #666; font-size: 0.9em;">Choose your profile below or create a new one</div>
+        </div>
+      `;
+    }
+    messageEl.innerHTML = messageHTML;
+  }
+
+  // Load profiles
+  loadProfiles();
+
+  // Show modal
+  modal.style.display = 'block';
+}
+
+/**
+ * Close profile selection modal
+ */
+function closeProfileSelection(): void {
+  const modal = document.getElementById('profileSelectionModal');
+  if (modal) modal.style.display = 'none';
+}
+
+/**
+ * Show profile selection UI when no profile is selected
+ */
+function showProfileSelectionUI(): void {
+  openProfileSelection();
 }
 
 function selectProfile(name: string): void {
@@ -615,18 +676,25 @@ function selectProfile(name: string): void {
   correctStreak = 0;
   updateStreakDisplay();
 
-  const profilePanel = document.getElementById('profilePanel');
   const homeContainer = document.getElementById('homeContainer');
   const userWelcome = document.getElementById('userWelcome');
   const userName = document.getElementById('userName');
   const userAvatar = document.querySelector('.user-avatar');
+  const homeUserWelcome = document.getElementById('homeUserWelcome');
 
-  // Hide profile panel, show home page
-  if (profilePanel) profilePanel.style.display = 'none';
+  // Close profile selection modal
+  closeProfileSelection();
+
+  // Show home page
   if (homeContainer) homeContainer.style.display = 'block';
   if (userWelcome) userWelcome.style.display = 'inline-flex';
   if (userName) userName.textContent = childName;
   if (userAvatar && currentProfile) userAvatar.textContent = currentProfile.avatar || '😊';
+
+  // Update home page welcome message
+  if (homeUserWelcome && currentProfile) {
+    homeUserWelcome.innerHTML = `Welcome back, <strong>${currentProfile.avatar} ${childName}</strong>! Choose a game to play.`;
+  }
 
   // Update profile switcher
   updateProfileSwitcher();
@@ -1155,6 +1223,7 @@ window.addEventListener('click', function (event: MouseEvent) {
   const profileAvatarBtn = document.getElementById('profileAvatarBtn');
   const exportModal = document.getElementById('exportModal');
   const importModal = document.getElementById('importModal');
+  const profileSelectionModal = document.getElementById('profileSelectionModal');
 
   // Close settings modal if clicking on backdrop
   if (event.target === settingsModal) {
@@ -1194,6 +1263,11 @@ window.addEventListener('click', function (event: MouseEvent) {
   // Close import modal if clicking on backdrop
   if (event.target === importModal) {
     closeImportModal();
+  }
+
+  // Close profile selection modal if clicking on backdrop
+  if (event.target === profileSelectionModal) {
+    closeProfileSelection();
   }
 
   // Close profile switcher menu if clicking outside
@@ -1648,6 +1722,7 @@ document.addEventListener('keydown', function (event: KeyboardEvent) {
     closeEditProfile();
     closeExportModal();
     closeImportModal();
+    closeProfileSelection();
   }
 });
 
@@ -2455,7 +2530,8 @@ let currentGame: GameType | null = null;
  */
 function selectGame(game: GameType): void {
   if (!childName) {
-    alert('Please select a profile first!');
+    // Show profile selection UI instead of alert
+    showProfileSelectionUI();
     return;
   }
 
@@ -2516,6 +2592,8 @@ function backToHome(): void {
 (window as any).closeEditProfile = closeEditProfile;
 (window as any).selectAvatar = selectAvatar;
 (window as any).saveProfileEdits = saveProfileEdits;
+(window as any).openProfileSelection = openProfileSelection;
+(window as any).closeProfileSelection = closeProfileSelection;
 (window as any).setDifficulty = setDifficulty;
 (window as any).startWithDifficulty = startWithDifficulty;
 (window as any).handleVoiceFeedbackChange = handleVoiceFeedbackChange;

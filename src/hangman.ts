@@ -385,7 +385,7 @@ function handleCorrectAnswer(): void {
  */
 function handleWrongAnswer(): void {
   playSound('wrong');
-  speak('Try again!');
+  speak('Oops! Moving to next question.');
 
   // Lose a life
   lives--;
@@ -399,13 +399,17 @@ function handleWrongAnswer(): void {
   // Check if game over
   if (lives <= 0) {
     endGame();
-  } else {
-    // Move to next question
-    currentProblemIndex++;
-    setTimeout(() => {
-      startQuestion();
-    }, 1500);
+    return; // Don't proceed further
   }
+
+  // Move to next question
+  currentProblemIndex++;
+  setTimeout(() => {
+    // Double-check game hasn't ended before starting next question
+    if (lives > 0 && currentProblemIndex < hangmanProblems.length) {
+      startQuestion();
+    }
+  }, 1500);
 }
 
 /**

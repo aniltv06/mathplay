@@ -158,31 +158,6 @@
             </div>
         </div>
 
-        <!-- Profile Management Panel -->
-        <div id="profilePanel" class="settings-panel">
-            <!-- Header with Title and Parent Dashboard Button -->
-            <div class="panel-header">
-                <div class="settings-title"><span class="emoji">👥</span> Select Your Profile</div>
-                <button class="btn-parent-dashboard" onclick="openParentDashboard()">
-                    <span class="emoji">👨‍👩‍👧‍👦</span> Parent Dashboard
-                </button>
-            </div>
-
-            <!-- Profile List -->
-            <div id="profileList" class="profile-list"></div>
-
-            <!-- New Profile Form -->
-            <div class="new-profile-section">
-                <div class="new-profile-header">
-                    <span class="emoji">➕</span> Create New Profile
-                </div>
-                <div class="new-profile-form">
-                    <input type="text" id="newProfileName" placeholder="Enter name..." maxlength="20" class="profile-name-input">
-                    <button class="btn btn-generate" onclick="createNewProfile()">Create 🚀</button>
-                </div>
-            </div>
-        </div>
-
         <div class="instructions">
             <p><span class="emoji">👉</span> Tap on each problem box to open the number pad and enter your answer. You'll see instant feedback as you solve each problem!</p>
         </div>
@@ -845,6 +820,38 @@
                 </button>
                 <button class="btn btn-tertiary" onclick="closeHangmanSettings()">
                     <span class="emoji">❌</span> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Selection Modal -->
+    <div id="profileSelectionModal" class="settings-modal" style="display: none;">
+        <div class="settings-modal-content">
+            <button class="close-settings" onclick="closeProfileSelection()">✕</button>
+
+            <!-- Welcome Message (dynamic) -->
+            <div id="profileSelectionMessage"></div>
+
+            <div class="settings-title"><span class="emoji">👥</span> Select Your Profile</div>
+
+            <!-- Profile List -->
+            <div id="profileList" class="profile-list"></div>
+
+            <!-- New Profile Form -->
+            <div class="new-profile-section">
+                <div class="new-profile-header">
+                    <span class="emoji">➕</span> Create New Profile
+                </div>
+                <div class="new-profile-form">
+                    <input type="text" id="newProfileName" placeholder="Enter name..." maxlength="20" class="profile-name-input">
+                    <button class="btn btn-generate" onclick="createNewProfile()">Create 🚀</button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="openParentDashboard()">
+                    <span class="emoji">👨‍👩‍👧‍👦</span> Parent Dashboard
                 </button>
             </div>
         </div>
