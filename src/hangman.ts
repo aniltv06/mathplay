@@ -264,6 +264,10 @@ function startQuestion(): void {
     return;
   }
 
+  // Show the numberpad area (in case it was hidden)
+  const numberpadArea = document.getElementById('hangmanNumberpadArea');
+  if (numberpadArea) numberpadArea.style.display = 'block';
+
   const problem = hangmanProblems[currentProblemIndex];
 
   // Update problem display
@@ -385,7 +389,6 @@ function handleCorrectAnswer(): void {
  */
 function handleWrongAnswer(): void {
   playSound('wrong');
-  speak('Oops! Moving to next question.');
 
   // Lose a life
   lives--;
@@ -398,9 +401,13 @@ function handleWrongAnswer(): void {
 
   // Check if game over
   if (lives <= 0) {
+    speak('Game over!');
     endGame();
     return; // Don't proceed further
   }
+
+  // If not game over, speak and move to next question
+  speak('Oops! Moving to next question.');
 
   // Move to next question
   currentProblemIndex++;
@@ -417,6 +424,14 @@ function handleWrongAnswer(): void {
  */
 function endGame(): void {
   stopQuestionTimer();
+
+  // Hide the numberpad area
+  const numberpadArea = document.getElementById('hangmanNumberpadArea');
+  if (numberpadArea) numberpadArea.style.display = 'none';
+
+  // Clear the answer input
+  hangmanCurrentAnswer = '';
+  updateHangmanAnswerDisplay();
 
   const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
 
