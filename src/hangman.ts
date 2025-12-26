@@ -10,6 +10,7 @@
 import type { Problem, HangmanSettings, DifficultyLevel } from './types';
 import { createHangmanSession, saveHangmanProgress, completeHangmanSession, checkAndAwardBadges } from './storage';
 import { playSound, speak } from './main';
+import { t } from './i18n';
 
 // Game state
 let hangmanProblems: Problem[] = [];
@@ -366,18 +367,18 @@ export function submitHangmanAnswer(): void {
   stopQuestionTimer();
 
   if (userAnswer === problem.correct) {
-    handleCorrectAnswer();
+    handleCorrectAnswer(problem.correct);
   } else {
-    handleWrongAnswer();
+    handleWrongAnswer(userAnswer);
   }
 }
 
 /**
  * Handle correct answer
  */
-function handleCorrectAnswer(): void {
+function handleCorrectAnswer(correctAnswer: number): void {
   playSound('correct');
-  speak('Great job!');
+  speak(`${correctAnswer} ${t('correct')}`);
 
   // Update streak
   streak++;
@@ -409,19 +410,20 @@ function handleCorrectAnswer(): void {
   currentProblemIndex++;
   setTimeout(() => {
     startQuestion();
-  }, 1000);
+  }, 2000);
 }
 
 /**
  * Handle wrong answer
  */
-function handleWrongAnswer(): void {
+function handleWrongAnswer(wrongAnswer: number): void {
   // Guard: Don't process if game is already over
   if (lives <= 0) {
     return;
   }
 
   playSound('wrong');
+  speak(`${wrongAnswer} ${t('wrong')}`);
 
   // Lose a life
   lives--;
@@ -438,9 +440,6 @@ function handleWrongAnswer(): void {
     endGame();
     return; // Don't proceed further
   }
-
-  // If not game over, speak and move to next question
-  speak('Oops! Moving to next question.');
 
   // Move to next question
   currentProblemIndex++;
@@ -694,9 +693,9 @@ function hangmanConfirm(): void {
   stopQuestionTimer();
 
   if (userAnswer === problem.correct) {
-    handleCorrectAnswer();
+    handleCorrectAnswer(problem.correct);
   } else {
-    handleWrongAnswer();
+    handleWrongAnswer(userAnswer);
   }
 
   // Clear answer for next question

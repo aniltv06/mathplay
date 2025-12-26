@@ -248,8 +248,20 @@ function actuallySpeak(text: string): void {
   // Create new utterance
   currentUtterance = new SpeechSynthesisUtterance(text);
 
-  // Set basic properties
-  currentUtterance.lang = 'en-US';
+  // Map language codes to speech synthesis lang codes
+  const langMap: { [key: string]: string } = {
+    'en': 'en-US',
+    'es': 'es-ES',
+    'fr': 'fr-FR',
+    'de': 'de-DE',
+    'zh': 'zh-CN',
+    'kn': 'kn-IN',  // Kannada (India)
+    'te': 'te-IN'   // Telugu (India)
+  };
+
+  // Set basic properties with dynamic language
+  const currentLang = getCurrentLanguage();
+  currentUtterance.lang = langMap[currentLang] || 'en-US';
   currentUtterance.rate = 0.9;
   currentUtterance.pitch = 1.1;
   currentUtterance.volume = 1.0;
@@ -276,16 +288,20 @@ function actuallySpeak(text: string): void {
     console.log('=== TTS Debug: Available voices:', voices.length);
 
     if (voices.length > 0) {
-      // Try to find an English voice
-      const englishVoice = voices.find(voice =>
-        voice.lang.startsWith('en')
+      // Get the target language code
+      const currentLang = getCurrentLanguage();
+      const langPrefix = langMap[currentLang]?.split('-')[0] || 'en';
+
+      // Try to find a voice for the current language
+      const matchingVoice = voices.find(voice =>
+        voice.lang.startsWith(langPrefix)
       );
 
-      if (englishVoice) {
-        currentUtterance!.voice = englishVoice;
-        console.log('=== TTS Debug: Using voice:', englishVoice.name, '| Lang:', englishVoice.lang);
+      if (matchingVoice) {
+        currentUtterance!.voice = matchingVoice;
+        console.log('=== TTS Debug: Using voice:', matchingVoice.name, '| Lang:', matchingVoice.lang);
       } else {
-        console.log('=== TTS Debug: No English voice found, using default');
+        console.log(`=== TTS Debug: No ${currentLang} voice found, using default`);
       }
     } else {
       console.log('=== TTS Debug: No voices available!');
@@ -1684,7 +1700,7 @@ function validateAnswer(index: number, silent: boolean = false): ValidationResul
     // Correct answer
     if (!silent) {
       playSound('correct');
-      speak(t('greatJob'));
+      speak(`${problem.correct} ${t('correct')}`);
 
       const modal = document.getElementById('numberpadModal');
       if (modal && modal.style.display === 'block') {
@@ -1724,7 +1740,7 @@ function validateAnswer(index: number, silent: boolean = false): ValidationResul
     // Wrong answer
     if (!silent) {
       playSound('wrong');
-      speak(t('tryAgain'));
+      speak(`${userAnswer} ${t('wrong')}`);
     }
 
     input.style.borderColor = '#ff6b6b';
