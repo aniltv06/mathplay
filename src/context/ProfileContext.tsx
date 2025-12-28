@@ -8,6 +8,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { ProfileStats, Badge, WorksheetSession, HangmanSession } from '../types';
 
+export interface WorksheetMastery {
+  '+': { practiced: number; mastered: boolean; accuracy: number; bestTime: number };
+  '-': { practiced: number; mastered: boolean; accuracy: number; bestTime: number };
+  '×': { practiced: number; mastered: boolean; accuracy: number; bestTime: number };
+  '÷': { practiced: number; mastered: boolean; accuracy: number; bestTime: number };
+}
+
 export interface Profile {
   id: string;
   name: string;
@@ -21,6 +28,11 @@ export interface Profile {
   currentHangmanSession: HangmanSession | null;
   badges: Badge[];
   multiplicationProgress?: any; // Track multiplication table mastery
+  worksheetMastery?: WorksheetMastery; // Track mastery per operation
+  coins?: number; // Reward coins
+  stars?: number; // Star rating
+  dailyChallenges?: any[]; // Daily challenge progress
+  unlockedItems?: string[]; // Purchased items
 }
 
 interface ProfileContextType {
@@ -108,6 +120,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       currentWorksheetSession: null,
       currentHangmanSession: null,
       badges: [],
+      worksheetMastery: {
+        '+': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity },
+        '-': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity },
+        '×': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity },
+        '÷': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity }
+      },
+      coins: 0,
+      stars: 0,
+      dailyChallenges: [],
+      unlockedItems: []
     };
     setProfiles((prev) => [...prev, newProfile]);
     return newProfile;
