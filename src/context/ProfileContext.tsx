@@ -20,6 +20,7 @@ export interface Profile {
   currentWorksheetSession: WorksheetSession | null;
   currentHangmanSession: HangmanSession | null;
   badges: Badge[];
+  multiplicationProgress?: any; // Track multiplication table mastery
 }
 
 interface ProfileContextType {

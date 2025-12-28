@@ -11,7 +11,7 @@ import { ProfileSelector } from './components/ProfileSelector';
 import { HomePage } from './pages/HomePage';
 import { MathChallengePage } from './pages/MathChallengePage';
 import { MathWorksheetPage } from './pages/MathWorksheetPage';
-import { MultiplicationLearningPage } from './pages/MultiplicationLearningPage';
+import { MultiplicationLearningPageEnhanced } from './pages/MultiplicationLearningPageEnhanced';
 import { ParentDashboardPage } from './pages/ParentDashboardPage';
 
 export type Page = 'home' | 'math-challenge' | 'math-worksheet' | 'multiplication-learning' | 'parent-dashboard';
@@ -78,7 +78,7 @@ export default function App() {
                   />
                 )}
                 {currentPage === 'multiplication-learning' && (
-                  <MultiplicationLearningPage
+                  <MultiplicationLearningPageEnhanced
                     onBack={() => navigateTo('home')}
                     profileId={selectedProfile}
                   />
