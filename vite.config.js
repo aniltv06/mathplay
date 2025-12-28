@@ -1,17 +1,19 @@
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   // GitHub Pages uses /mathplay/ base path, Vercel uses /
   base: process.env.GITHUB_PAGES ? '/mathplay/' : '/',
   plugins: [
+    react(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png', 'icons/*.svg', 'icons/*.ico'],
       manifest: {
-        name: 'Math Fun Worksheet',
-        short_name: 'Math Fun',
-        description: 'Interactive math worksheet for kids - practice addition, subtraction, multiplication, and division',
+        name: 'Math Learning Hub - Fun Practice for Kids',
+        short_name: 'Math Hub',
+        description: 'Interactive math practice for kids - Master addition, subtraction, multiplication, and division with fun games and worksheets',
         theme_color: '#667eea',
         background_color: '#ffffff',
         display: 'standalone',

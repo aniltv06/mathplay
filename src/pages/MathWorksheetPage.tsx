@@ -1,0 +1,205 @@
+/**
+ * @author Anil Kumar Thatha Venkatachalapathy
+ * @email aniltv06@gmail.com
+ */
+
+/**
+ * Math Worksheet Page
+ * Interactive worksheet for practicing math problems
+ */
+
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Settings } from 'lucide-react';
+import { motion } from 'motion/react';
+import type { Difficulty, Problem, ProblemSettings, WorksheetSession } from '../types';
+import { DifficultySelector } from '../components/DifficultySelector';
+import { WorksheetSettingsPanel } from '../components/WorksheetSettingsPanel';
+import { WorksheetView } from '../components/WorksheetView';
+import { WorksheetResults } from '../components/WorksheetResults';
+import { useProfiles } from '../context/ProfileContext';
+import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { checkAndAwardBadges } from '../utils/badges';
+import { BadgeNotification } from '../components/BadgeComponents';
+
+interface Props {
+  onBack: () => void;
+  profileId: string;
+}
+
+type PageState = 'difficulty' | 'worksheet' | 'results';
+
+// Difficulty presets
+const DIFFICULTY_PRESETS: Record<Difficulty, ProblemSettings> = {
+  easy: {
+    numProblems: 5,
+    maxNum: 10,
+    minNum: 1,
+    includeAddition: true,
+    includeSubtraction: true,
+    includeMultiplication: false,
+    includeDivision: false,
+    difficulty: 'easy',
+  },
+  medium: {
+    numProblems: 10,
+    maxNum: 20,
+    minNum: 1,
+    includeAddition: true,
+    includeSubtraction: true,
+    includeMultiplication: true,
+    includeDivision: true,
+    difficulty: 'medium',
+  },
+  hard: {
+    numProblems: 15,
+    maxNum: 100,
+    minNum: 1,
+    includeAddition: true,
+    includeSubtraction: true,
+    includeMultiplication: true,
+    includeDivision: true,
+    difficulty: 'hard',
+  },
+  custom: {
+    numProblems: 10,
+    maxNum: 20,
+    minNum: 1,
+    includeAddition: true,
+    includeSubtraction: true,
+    includeMultiplication: true,
+    includeDivision: true,
+    difficulty: 'custom',
+  },
+};
+
+export function MathWorksheetPage({ onBack, profileId }: Props) {
+  const { saveWorksheetSession, getProfile } = useProfiles();
+  const { speak } = useVoiceFeedback();
+  const [pageState, setPageState] = useState<PageState>('difficulty');
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState<ProblemSettings>(DIFFICULTY_PRESETS.easy);
+  const [hasCustomSettings, setHasCustomSettings] = useState(false);
+  const [session, setSession] = useState<WorksheetSession | null>(null);
+  const [newBadge, setNewBadge] = useState<any>(null);
+
+  const handleDifficultySelect = (diff: Difficulty) => {
+    setDifficulty(diff);
+    // Only use preset if no custom settings have been saved
+    if (!hasCustomSettings) {
+      setSettings(DIFFICULTY_PRESETS[diff]);
+    }
+    setPageState('worksheet');
+  };
+
+  const handleSettingsSave = (newSettings: ProblemSettings) => {
+    setSettings(newSettings);
+    setHasCustomSettings(true);
+    setShowSettings(false);
+
+    // Automatically start worksheet with custom settings
+    setPageState('worksheet');
+  };
+
+  const handleWorksheetComplete = (completedSession: WorksheetSession) => {
+    setSession(completedSession);
+
+    // Save to profile
+    saveWorksheetSession(profileId, completedSession);
+
+    // Check for new badges
+    const profile = getProfile(profileId);
+    if (profile) {
+      const newBadges = checkAndAwardBadges(profile);
+      if (newBadges.length > 0) {
+        const badgeToShow = profile.badges.find(b => b.id === newBadges[0]);
+        if (badgeToShow) {
+          setNewBadge(badgeToShow);
+        }
+      }
+    }
+
+    speak('Worksheet complete!');
+    setPageState('results');
+  };
+
+  const handleTryAgain = () => {
+    setSession(null);
+    setHasCustomSettings(false); // Reset custom settings flag
+    setPageState('difficulty');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-400 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-white/10 rounded-full blur-xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 w-36 h-36 bg-white/10 rounded-full blur-xl animate-pulse delay-500"></div>
+      </div>
+
+      {/* Back button */}
+      <button
+        onClick={onBack}
+        className="absolute top-6 left-6 z-50 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-white"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        Home
+      </button>
+
+      {/* Settings button */}
+      {(pageState === 'difficulty' || pageState === 'results') && (
+        <button
+          onClick={() => setShowSettings(true)}
+          className="absolute top-6 right-6 z-10 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all p-3 rounded-full shadow-lg"
+        >
+          <Settings className="w-6 h-6 text-white" />
+        </button>
+      )}
+
+      {/* Settings Panel */}
+      {showSettings && (
+        <WorksheetSettingsPanel
+          settings={settings}
+          onSave={handleSettingsSave}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {/* Page States */}
+      <div className="relative z-1">
+        {pageState === 'difficulty' && (
+          <DifficultySelector
+            onSelect={handleDifficultySelect}
+            hasCustomSettings={hasCustomSettings}
+          />
+        )}
+
+        {pageState === 'worksheet' && (
+          <WorksheetView
+            settings={settings}
+            profileId={profileId}
+            onComplete={handleWorksheetComplete}
+          />
+        )}
+
+        {pageState === 'results' && session && (
+          <WorksheetResults
+            session={session}
+            onTryAgain={handleTryAgain}
+            onBack={onBack}
+            profileId={profileId}
+          />
+        )}
+      </div>
+
+      {/* Badge Notification */}
+      {newBadge && (
+        <BadgeNotification
+          badge={newBadge}
+          onClose={() => setNewBadge(null)}
+        />
+      )}
+    </div>
+  );
+}
