@@ -71,9 +71,18 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        setProfiles(parsed);
+        // Validate that parsed data is an array
+        if (Array.isArray(parsed)) {
+          setProfiles(parsed);
+        } else {
+          console.warn('Invalid profiles data format, clearing storage');
+          localStorage.removeItem(STORAGE_KEY);
+          setProfiles([]);
+        }
       } catch (error) {
         console.error('Failed to parse profiles:', error);
+        localStorage.removeItem(STORAGE_KEY);
+        setProfiles([]);
       }
     }
   }, []);

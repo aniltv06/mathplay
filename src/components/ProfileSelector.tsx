@@ -39,6 +39,9 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
     message: string;
   }>({ type: 'idle', message: '' });
 
+  // Safety check: ensure profiles is always an array
+  const safeProfiles = Array.isArray(profiles) ? profiles : [];
+
   const handleCreateProfile = (e: React.FormEvent) => {
     e.preventDefault();
     if (newName.trim()) {
@@ -151,14 +154,14 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
             Math Learning Hub 🎓
           </h1>
           <p className="text-2xl text-white/90">
-            {profiles.length === 0 ? 'Create a profile to get started!' : 'Select your profile'}
+            {safeProfiles.length === 0 ? 'Create a profile to get started!' : 'Select your profile'}
           </p>
         </motion.div>
 
         {/* Profiles Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           <AnimatePresence>
-            {profiles.map((profile, index) => (
+            {safeProfiles.map((profile, index) => (
               <motion.button
                 key={profile.id}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -375,9 +378,9 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
         </AnimatePresence>
 
         {/* Edit Profile Modal */}
-        {editingProfile && profiles.find(p => p.id === editingProfile) && (
+        {editingProfile && safeProfiles.find(p => p.id === editingProfile) && (
           <EditProfileModal
-            profile={profiles.find(p => p.id === editingProfile)!}
+            profile={safeProfiles.find(p => p.id === editingProfile)!}
             isOpen={true}
             onClose={() => setEditingProfile(null)}
           />
