@@ -102,9 +102,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   // Save profiles to localStorage whenever they change
   useEffect(() => {
-    if (profiles.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
-    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
   }, [profiles]);
 
   const addProfile = (name: string, avatar: string): Profile => {

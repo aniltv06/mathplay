@@ -90,40 +90,40 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
   };
 
   const renderStandardLayout = () => {
-    const problemsPerPage = 6; // 2 columns x 3 rows
-    const pages = [];
+    const problemsPerRow = 2;
+    const rowsPerPage = 9; // Increased from 3 to fit more on a page
+    const problemsPerPage = problemsPerRow * rowsPerPage;
 
-    for (let i = 0; i < problems.length; i += problemsPerPage) {
-      const pageProblems = problems.slice(i, i + problemsPerPage);
-      const isLastPage = i + problemsPerPage >= problems.length;
+    const rows = [];
+    for (let i = 0; i < problems.length; i += problemsPerRow) {
+      const rowProblems = problems.slice(i, i + problemsPerRow);
+      const rowIndex = Math.floor(i / problemsPerRow);
+      const shouldBreakAfter = (rowIndex + 1) % rowsPerPage === 0 && i + problemsPerRow < problems.length;
 
-      pages.push(
-        <div
-          key={`page-${i}`}
-          className={`print-page ${!isLastPage ? 'page-break-after' : ''}`}
-        >
-          <div className="grid grid-cols-2 gap-6 mb-12">
-            {pageProblems.map((problem, index) => {
-              const globalIndex = i + index;
-              return (
+      rows.push(
+        <tr key={`row-${i}`} className={shouldBreakAfter ? 'page-break-after-row' : ''}>
+          {rowProblems.map((problem, colIndex) => {
+            const globalIndex = i + colIndex;
+            return (
+              <td key={globalIndex} style={{ width: '50%', padding: '8px', verticalAlign: 'top' }}>
                 <div
-                  key={globalIndex}
-                  className={`border-2 rounded-lg p-4 print-problem ${
+                  className={`border-2 rounded-lg p-4 ${
                     theme === 'colorful' ? 'border-purple-300 bg-white' :
                     theme === 'kid-friendly' ? 'border-yellow-400 bg-white' :
                     'border-gray-300 bg-gray-50'
                   }`}
+                  style={{ pageBreakInside: 'avoid' }}
                 >
                   <div className="flex items-start gap-3">
-                    <span className="text-lg font-bold text-gray-600 min-w-[2rem]">
+                    <span className="text-lg font-bold text-gray-600" style={{ minWidth: '2rem' }}>
                       {globalIndex + 1}.
                     </span>
-                    <div className="flex-1">
+                    <div style={{ flex: 1 }}>
                       <div className={`${getFontSizeClass()} ${getFontFamilyClass()} text-gray-800 mb-2`}>
                         {problem.num1} {problem.operation} {problem.num2} = _____
                       </div>
                       {includeWorkSpace && !showAnswers && (
-                        <div className="mt-3 border-t border-dashed border-gray-300 pt-3 min-h-[40px]">
+                        <div className="mt-3 border-t border-dashed border-gray-300 pt-3" style={{ minHeight: '40px' }}>
                           <p className="text-xs text-gray-400">Show your work:</p>
                         </div>
                       )}
@@ -135,37 +135,47 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              </td>
+            );
+          })}
+          {/* Fill empty cells if odd number of problems in last row */}
+          {rowProblems.length < problemsPerRow && (
+            <td style={{ width: '50%', padding: '8px' }}></td>
+          )}
+        </tr>
       );
     }
 
-    return <>{pages}</>;
+    return (
+      <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0' }}>
+        <tbody>{rows}</tbody>
+      </table>
+    );
   };
 
   const renderVerticalLayout = () => {
-    const problemsPerPage = 12; // 4 columns x 3 rows
-    const pages = [];
+    const problemsPerRow = 4;
+    const rowsPerPage = 9; // 4 columns x 9 rows = 36 per page
 
-    for (let i = 0; i < problems.length; i += problemsPerPage) {
-      const pageProblems = problems.slice(i, i + problemsPerPage);
-      const isLastPage = i + problemsPerPage >= problems.length;
+    const rows = [];
+    for (let i = 0; i < problems.length; i += problemsPerRow) {
+      const rowProblems = problems.slice(i, i + problemsPerRow);
+      const rowIndex = Math.floor(i / problemsPerRow);
+      const shouldBreakAfter = (rowIndex + 1) % rowsPerPage === 0 && i + problemsPerRow < problems.length;
 
-      pages.push(
-        <div key={`page-${i}`} className={!isLastPage ? 'page-break-after' : ''}>
-          <div className="grid grid-cols-4 gap-6 mb-12">
-            {pageProblems.map((problem, index) => {
-              const globalIndex = i + index;
-              return (
+      rows.push(
+        <tr key={`row-${i}`} className={shouldBreakAfter ? 'page-break-after-row' : ''}>
+          {rowProblems.map((problem, colIndex) => {
+            const globalIndex = i + colIndex;
+            return (
+              <td key={globalIndex} style={{ width: '25%', padding: '8px', verticalAlign: 'top' }}>
                 <div
-                  key={globalIndex}
-                  className={`border-2 rounded-lg p-4 print-problem ${
+                  className={`border-2 rounded-lg p-4 ${
                     theme === 'colorful' ? 'border-blue-300 bg-white' :
                     theme === 'kid-friendly' ? 'border-orange-400 bg-white' :
                     'border-gray-300 bg-white'
                   }`}
+                  style={{ pageBreakInside: 'avoid' }}
                 >
                   <div className="text-center">
                     <div className="text-sm font-bold text-gray-600 mb-3">#{globalIndex + 1}</div>
@@ -184,83 +194,103 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
                       </div>
                     </div>
                     {includeWorkSpace && !showAnswers && (
-                      <div className="border-t border-dashed border-gray-300 pt-2 min-h-[30px]">
+                      <div className="border-t border-dashed border-gray-300 pt-2" style={{ minHeight: '30px' }}>
                         <p className="text-xs text-gray-400">Work</p>
                       </div>
                     )}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              </td>
+            );
+          })}
+          {/* Fill empty cells */}
+          {Array.from({ length: problemsPerRow - rowProblems.length }).map((_, idx) => (
+            <td key={`empty-${idx}`} style={{ width: '25%', padding: '8px' }}></td>
+          ))}
+        </tr>
       );
     }
 
-    return <>{pages}</>;
+    return (
+      <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0' }}>
+        <tbody>{rows}</tbody>
+      </table>
+    );
   };
 
   const renderTwoColumnLayout = () => {
-    const problemsPerPage = 14; // 2 columns x 7 rows
-    const pages = [];
+    const problemsPerRow = 2;
+    const rowsPerPage = 20; // Compact layout: 2 columns x 20 rows = 40 per page
 
-    for (let i = 0; i < problems.length; i += problemsPerPage) {
-      const pageProblems = problems.slice(i, i + problemsPerPage);
-      const isLastPage = i + problemsPerPage >= problems.length;
+    const rows = [];
+    for (let i = 0; i < problems.length; i += problemsPerRow) {
+      const rowProblems = problems.slice(i, i + problemsPerRow);
+      const rowIndex = Math.floor(i / problemsPerRow);
+      const shouldBreakAfter = (rowIndex + 1) % rowsPerPage === 0 && i + problemsPerRow < problems.length;
 
-      pages.push(
-        <div key={`page-${i}`} className={!isLastPage ? 'page-break-after' : ''}>
-          <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-12">
-            {pageProblems.map((problem, index) => {
-              const globalIndex = i + index;
-              return (
-                <div key={globalIndex} className="flex items-start gap-3 py-2 border-b border-gray-300 print-problem">
-                  <span className="text-lg font-bold text-gray-600 min-w-[2.5rem]">
+      rows.push(
+        <tr key={`row-${i}`} className={shouldBreakAfter ? 'page-break-after-row' : ''}>
+          {rowProblems.map((problem, colIndex) => {
+            const globalIndex = i + colIndex;
+            return (
+              <td key={globalIndex} style={{ width: '50%', padding: '4px 12px', verticalAlign: 'top' }}>
+                <div className="flex items-start gap-3 py-2 border-b border-gray-300" style={{ pageBreakInside: 'avoid' }}>
+                  <span className="text-lg font-bold text-gray-600" style={{ minWidth: '2.5rem' }}>
                     {globalIndex + 1}.
                   </span>
-                  <div className="flex-1">
+                  <div style={{ flex: 1 }}>
                     <div className="text-xl font-mono">
                       {problem.num1} {problem.operation} {problem.num2} = {
                         showAnswers ? (
                           <span className="text-green-600 font-bold">{problem.correct}</span>
                         ) : (
-                          <span className="inline-block border-b-2 border-gray-800 min-w-[60px] ml-2"></span>
+                          <span className="inline-block border-b-2 border-gray-800" style={{ minWidth: '60px', marginLeft: '8px' }}></span>
                         )
                       }
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              </td>
+            );
+          })}
+          {/* Fill empty cells */}
+          {rowProblems.length < problemsPerRow && (
+            <td style={{ width: '50%', padding: '4px 12px' }}></td>
+          )}
+        </tr>
       );
     }
 
-    return <>{pages}</>;
+    return (
+      <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0' }}>
+        <tbody>{rows}</tbody>
+      </table>
+    );
   };
 
   const renderFlashcardsLayout = () => {
-    const problemsPerPage = 12; // 4 columns x 3 rows
-    const pages = [];
+    const problemsPerRow = 4;
+    const rowsPerPage = 9; // 4 columns x 9 rows = 36 per page
 
-    for (let i = 0; i < problems.length; i += problemsPerPage) {
-      const pageProblems = problems.slice(i, i + problemsPerPage);
-      const isLastPage = i + problemsPerPage >= problems.length;
+    const rows = [];
+    for (let i = 0; i < problems.length; i += problemsPerRow) {
+      const rowProblems = problems.slice(i, i + problemsPerRow);
+      const rowIndex = Math.floor(i / problemsPerRow);
+      const shouldBreakAfter = (rowIndex + 1) % rowsPerPage === 0 && i + problemsPerRow < problems.length;
 
-      pages.push(
-        <div key={`page-${i}`} className={!isLastPage ? 'page-break-after' : ''}>
-          <div className="grid grid-cols-4 gap-4 mb-12">
-            {pageProblems.map((problem, index) => {
-              const globalIndex = i + index;
-              return (
+      rows.push(
+        <tr key={`row-${i}`} className={shouldBreakAfter ? 'page-break-after-row' : ''}>
+          {rowProblems.map((problem, colIndex) => {
+            const globalIndex = i + colIndex;
+            return (
+              <td key={globalIndex} style={{ width: '25%', padding: '8px', verticalAlign: 'top' }}>
                 <div
-                  key={globalIndex}
-                  className={`border-4 rounded-2xl p-4 text-center print-problem ${
+                  className={`border-4 rounded-2xl p-4 text-center ${
                     theme === 'colorful' ? 'border-purple-400 bg-gradient-to-br from-purple-100 to-pink-100' :
                     theme === 'kid-friendly' ? 'border-yellow-500 bg-yellow-100' :
                     'border-gray-400 bg-white'
                   }`}
+                  style={{ pageBreakInside: 'avoid' }}
                 >
                   <div className="text-xs font-bold text-gray-500 mb-2">#{globalIndex + 1}</div>
                   <div className="text-3xl font-bold text-gray-800 mb-2">
@@ -280,19 +310,26 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
                     )}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              </td>
+            );
+          })}
+          {/* Fill empty cells */}
+          {Array.from({ length: problemsPerRow - rowProblems.length }).map((_, idx) => (
+            <td key={`empty-${idx}`} style={{ width: '25%', padding: '8px' }}></td>
+          ))}
+        </tr>
       );
     }
 
-    return <>{pages}</>;
+    return (
+      <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0' }}>
+        <tbody>{rows}</tbody>
+      </table>
+    );
   };
 
   const renderWordProblemsLayout = () => {
-    const problemsPerPage = 3; // 3 word problems per page
-    const pages = [];
+    const problemsPerPage = 6; // 6 word problems per page
 
     const storyTemplates: Record<string, (n1: number, n2: number) => string> = {
       '+': (n1, n2) => `You have ${n1} apples. Your friend gives you ${n2} more apples. How many apples do you have now?`,
@@ -301,57 +338,56 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
       '÷': (n1, n2) => `You have ${n1} cookies to share equally among ${n2} friends. How many cookies does each friend get?`
     };
 
-    for (let i = 0; i < problems.length; i += problemsPerPage) {
-      const pageProblems = problems.slice(i, i + problemsPerPage);
-      const isLastPage = i + problemsPerPage >= problems.length;
+    const rows = [];
+    for (let i = 0; i < problems.length; i++) {
+      const problem = problems[i];
+      const story = storyTemplates[problem.operation](problem.num1, problem.num2);
+      const shouldBreakAfter = (i + 1) % problemsPerPage === 0 && i + 1 < problems.length;
 
-      pages.push(
-        <div key={`page-${i}`} className={!isLastPage ? 'page-break-after' : ''}>
-          <div className="space-y-6 mb-12">
-            {pageProblems.map((problem, index) => {
-              const globalIndex = i + index;
-              const story = storyTemplates[problem.operation](problem.num1, problem.num2);
-
-              return (
-                <div
-                  key={globalIndex}
-                  className={`border-2 rounded-lg p-6 print-problem ${
-                    theme === 'colorful' ? 'border-blue-300 bg-blue-50' :
-                    theme === 'kid-friendly' ? 'border-green-400 bg-green-50' :
-                    'border-gray-300 bg-white'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="text-xl font-bold text-gray-600 min-w-[2.5rem]">
-                      {globalIndex + 1}.
-                    </span>
-                    <div className="flex-1">
-                      <p className="text-lg text-gray-800 mb-4 leading-relaxed">{story}</p>
-                      <div className="flex items-center gap-4">
-                        <span className="text-lg font-semibold text-gray-700">Answer:</span>
-                        {showAnswers ? (
-                          <span className="text-xl font-bold text-green-600">{problem.correct}</span>
-                        ) : (
-                          <span className="inline-block border-b-2 border-gray-800 min-w-[80px]"></span>
-                        )}
-                      </div>
-                      {includeWorkSpace && !showAnswers && (
-                        <div className="mt-4 border-t border-dashed border-gray-300 pt-3">
-                          <p className="text-sm text-gray-500 mb-2">Show your work:</p>
-                          <div className="min-h-[60px]"></div>
-                        </div>
-                      )}
-                    </div>
+      rows.push(
+        <tr key={`row-${i}`} className={shouldBreakAfter ? 'page-break-after-row' : ''}>
+          <td style={{ padding: '12px 0', verticalAlign: 'top' }}>
+            <div
+              className={`border-2 rounded-lg p-6 ${
+                theme === 'colorful' ? 'border-blue-300 bg-blue-50' :
+                theme === 'kid-friendly' ? 'border-green-400 bg-green-50' :
+                'border-gray-300 bg-white'
+              }`}
+              style={{ pageBreakInside: 'avoid' }}
+            >
+              <div className="flex items-start gap-3">
+                <span className="text-xl font-bold text-gray-600" style={{ minWidth: '2.5rem' }}>
+                  {i + 1}.
+                </span>
+                <div style={{ flex: 1 }}>
+                  <p className="text-lg text-gray-800 mb-4 leading-relaxed">{story}</p>
+                  <div className="flex items-center gap-4">
+                    <span className="text-lg font-semibold text-gray-700">Answer:</span>
+                    {showAnswers ? (
+                      <span className="text-xl font-bold text-green-600">{problem.correct}</span>
+                    ) : (
+                      <span className="inline-block border-b-2 border-gray-800" style={{ minWidth: '80px' }}></span>
+                    )}
                   </div>
+                  {includeWorkSpace && !showAnswers && (
+                    <div className="mt-4 border-t border-dashed border-gray-300 pt-3">
+                      <p className="text-sm text-gray-500 mb-2">Show your work:</p>
+                      <div style={{ minHeight: '60px' }}></div>
+                    </div>
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              </div>
+            </div>
+          </td>
+        </tr>
       );
     }
 
-    return <>{pages}</>;
+    return (
+      <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0' }}>
+        <tbody>{rows}</tbody>
+      </table>
+    );
   };
 
   const renderLayout = () => {
@@ -727,31 +763,44 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
           .no-print {
             display: none !important;
           }
-          .page-break {
-            page-break-before: always;
-            break-before: page;
-          }
-          .page-break-after {
+
+          /* Table row page breaks */
+          .page-break-after-row {
             page-break-after: always !important;
             break-after: page !important;
-            display: block !important;
           }
-          .print-page {
-            page-break-inside: avoid;
-            break-inside: avoid;
+
+          /* Prevent breaks inside table cells and problem containers */
+          td {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
           }
-          .print-problem {
-            page-break-inside: avoid;
-            break-inside: avoid;
+
+          table {
+            page-break-inside: auto !important;
           }
+
+          tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          /* Legacy page break class for answer key */
+          .page-break {
+            page-break-before: always !important;
+            break-before: page !important;
+          }
+
           body {
             print-color-adjust: exact;
             -webkit-print-color-adjust: exact;
           }
+
           @page {
             margin: 1cm;
             size: auto;
           }
+
           /* Ensure the main container doesn't constrain pagination */
           .print-content {
             max-width: 100% !important;

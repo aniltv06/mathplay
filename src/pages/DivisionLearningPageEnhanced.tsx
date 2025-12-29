@@ -1,13 +1,13 @@
 /**
- * Factorial Learning Page - Enhanced
- * Interactive factorial number learning with visual multiplication
+ * Division Learning Page - Enhanced
+ * Interactive division learning with visual grouping
  * @author Anil Kumar Thatha Venkatachalapathy
  * @email aniltv06@gmail.com
  */
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Hash, CheckCircle, XCircle, Trophy } from 'lucide-react';
+import { ArrowLeft, Divide, CheckCircle, XCircle, Trophy, Volume2, VolumeX } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
 import { useI18n } from '../i18n/I18nContext';
@@ -20,13 +20,14 @@ interface Props {
 type Mode = 'learn' | 'practice' | 'challenge';
 type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 
-interface FactorialProblem {
-  number: number;
-  answer: number;
-  steps: string[];
+interface DivisionProblem {
+  dividend: number;
+  divisor: number;
+  quotient: number;
+  remainder: number;
 }
 
-export function FactorialLearningPage({ onBack, profileId }: Props) {
+export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
   const { getProfile, updateProfile } = useProfiles();
   const { speak } = useVoiceFeedback();
   const { t } = useI18n();
@@ -34,65 +35,43 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
 
   const [mode, setMode] = useState<Mode>('learn');
   const [difficulty, setDifficulty] = useState<DifficultyLevel>('beginner');
-  const [currentProblem, setCurrentProblem] = useState<FactorialProblem | null>(null);
+  const [currentProblem, setCurrentProblem] = useState<DivisionProblem | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [score, setScore] = useState(0);
   const [attempts, setAttempts] = useState(0);
-  const [showSteps, setShowSteps] = useState(true);
+  const [showVisual, setShowVisual] = useState(true);
   const [streak, setStreak] = useState(0);
 
-  // Calculate factorial
-  const calculateFactorial = (n: number): { answer: number; steps: string[] } => {
-    if (n === 0 || n === 1) {
-      return { answer: 1, steps: [`${n}! = 1`] };
-    }
-
-    const steps: string[] = [];
-    let result = 1;
-    const factors: number[] = [];
-
-    for (let i = n; i >= 1; i--) {
-      factors.push(i);
-      result *= i;
-    }
-
-    steps.push(`${n}! = ${factors.join(' × ')}`);
-
-    // Show intermediate calculations for smaller numbers
-    if (n <= 6) {
-      let intermediate = factors[0];
-      for (let i = 1; i < factors.length; i++) {
-        intermediate *= factors[i];
-        steps.push(`${factors.slice(0, i + 1).join(' × ')} = ${intermediate}`);
-      }
-    } else {
-      steps.push(`${n}! = ${result}`);
-    }
-
-    return { answer: result, steps };
-  };
-
-  // Generate factorial problem based on difficulty
-  const generateProblem = (): FactorialProblem => {
-    let number: number;
+  // Generate division problem based on difficulty
+  const generateProblem = (): DivisionProblem => {
+    let dividend: number, divisor: number, quotient: number, remainder: number;
 
     switch (difficulty) {
       case 'beginner':
-        number = Math.floor(Math.random() * 5) + 1; // 1-5
-        break;
-      case 'intermediate':
-        number = Math.floor(Math.random() * 5) + 4; // 4-8
-        break;
-      case 'advanced':
-        number = Math.floor(Math.random() * 5) + 7; // 7-11
-        break;
-      default:
-        number = 3;
-    }
+        divisor = Math.floor(Math.random() * 9) + 2; // 2-10
+        quotient = Math.floor(Math.random() * 5) + 1; // 1-5
+        dividend = divisor * quotient;
+        remainder = 0;
+        return { dividend, divisor, quotient, remainder };
 
-    const { answer, steps } = calculateFactorial(number);
-    return { number, answer, steps };
+      case 'intermediate':
+        divisor = Math.floor(Math.random() * 9) + 2; // 2-10
+        quotient = Math.floor(Math.random() * 10) + 1; // 1-10
+        remainder = Math.floor(Math.random() * (divisor - 1)); // 0 to divisor-1
+        dividend = (divisor * quotient) + remainder;
+        return { dividend, divisor, quotient, remainder };
+
+      case 'advanced':
+        divisor = Math.floor(Math.random() * 10) + 5; // 5-14
+        quotient = Math.floor(Math.random() * 15) + 5; // 5-19
+        remainder = Math.floor(Math.random() * divisor);
+        dividend = (divisor * quotient) + remainder;
+        return { dividend, divisor, quotient, remainder };
+
+      default:
+        return { dividend: 10, divisor: 2, quotient: 5, remainder: 0 };
+    }
   };
 
   // Initialize first problem
@@ -106,7 +85,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
     if (!currentProblem || userAnswer === '') return;
 
     const answer = parseInt(userAnswer);
-    const isCorrect = answer === currentProblem.answer;
+    const isCorrect = answer === currentProblem.quotient;
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     setAttempts(prev => prev + 1);
@@ -114,8 +93,9 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
     if (isCorrect) {
       setScore(prev => prev + 1);
       setStreak(prev => prev + 1);
-      speak(`Correct! ${currentProblem.number} factorial equals ${currentProblem.answer}`);
+      speak(`Correct! ${currentProblem.dividend} divided by ${currentProblem.divisor} equals ${currentProblem.quotient}`);
 
+      // Update profile stats
       if (profile) {
         updateProfile(profileId, {
           stats: {
@@ -126,6 +106,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
         });
       }
 
+      // Next problem after delay
       setTimeout(() => {
         setCurrentProblem(generateProblem());
         setUserAnswer('');
@@ -133,7 +114,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
       }, 1500);
     } else {
       setStreak(0);
-      speak(`Not quite. ${currentProblem.number} factorial equals ${currentProblem.answer}`);
+      speak(`Not quite. ${currentProblem.dividend} divided by ${currentProblem.divisor} equals ${currentProblem.quotient}`);
 
       if (profile) {
         updateProfile(profileId, {
@@ -157,28 +138,50 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
     }
   };
 
-  // Render visual steps
-  const renderSteps = () => {
-    if (!currentProblem || !showSteps) return null;
+  // Render visual representation of division (grouping)
+  const renderVisualDivision = () => {
+    if (!currentProblem || !showVisual) return null;
+
+    const { dividend, divisor, quotient } = currentProblem;
+    const groups = [];
+
+    // Create groups of objects
+    for (let i = 0; i < divisor && i < 10; i++) {
+      const items = [];
+      for (let j = 0; j < quotient && j < 10; j++) {
+        items.push(
+          <div
+            key={`${i}-${j}`}
+            className="w-6 h-6 bg-blue-500 rounded-full"
+          />
+        );
+      }
+      groups.push(
+        <div key={i} className="flex flex-col items-center gap-2">
+          <div className="flex flex-wrap gap-1 justify-center max-w-[120px]">
+            {items}
+          </div>
+          <div className="text-xs text-gray-600">Group {i + 1}</div>
+        </div>
+      );
+    }
 
     return (
-      <div className="bg-purple-50 rounded-xl p-6 mb-6">
-        <h3 className="text-lg font-bold text-purple-800 mb-4 text-center">
-          Step-by-Step Calculation
+      <div className="bg-blue-50 rounded-xl p-6 mb-6">
+        <h3 className="text-lg font-bold text-blue-800 mb-4 text-center">
+          Visual Representation
         </h3>
-        <div className="space-y-2">
-          {currentProblem.steps.map((step, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-lg p-3 text-center font-mono text-lg text-gray-800"
-            >
-              {step}
-            </motion.div>
-          ))}
+        <p className="text-center text-gray-700 mb-4">
+          {dividend} objects divided into {divisor} equal groups
+        </p>
+        <div className="flex flex-wrap gap-4 justify-center">
+          {groups}
         </div>
+        {quotient <= 10 && divisor <= 10 && (
+          <p className="text-center text-blue-700 mt-4 font-semibold">
+            Each group has {quotient} object{quotient !== 1 ? 's' : ''}
+          </p>
+        )}
       </div>
     );
   };
@@ -188,7 +191,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
   // Learn Mode
   if (mode === 'learn') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-400 to-blue-400 relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
           <div className="absolute bottom-20 right-10 w-40 h-40 bg-white/10 rounded-full blur-xl animate-pulse delay-1000"></div>
@@ -209,108 +212,93 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
             className="max-w-4xl w-full bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl"
           >
             <div className="text-center mb-8">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
-                <Hash className="w-10 h-10 text-white" />
+              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center">
+                <Divide className="w-10 h-10 text-white" />
               </div>
-              <h1 className="text-4xl font-bold text-indigo-600 mb-2">Learn Factorials</h1>
-              <p className="text-gray-600">Discover the power of factorial numbers</p>
+              <h1 className="text-4xl font-bold text-teal-600 mb-2">Learn Division</h1>
+              <p className="text-gray-600">Master division with interactive lessons</p>
             </div>
 
             <div className="space-y-6">
-              {/* What is a Factorial */}
-              <div className="bg-indigo-50 rounded-xl p-6">
-                <h2 className="text-2xl font-bold text-indigo-700 mb-3">What is a Factorial?</h2>
-                <p className="text-gray-700 leading-relaxed mb-3">
-                  A factorial (written as n!) is the product of all positive integers from 1 to n.
-                  It's a way to count how many different ways you can arrange things!
+              {/* What is Division */}
+              <div className="bg-teal-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-teal-700 mb-3">What is Division?</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  Division is splitting a number into equal groups. It's the opposite of multiplication!
+                  When we divide 12 ÷ 3, we're asking: "If we split 12 objects into 3 equal groups,
+                  how many are in each group?"
                 </p>
-                <div className="bg-white rounded-lg p-4 font-mono text-lg text-center">
-                  5! = 5 × 4 × 3 × 2 × 1 = 120
-                </div>
               </div>
 
               {/* Example */}
-              <div className="bg-purple-50 rounded-xl p-6">
-                <h2 className="text-2xl font-bold text-purple-700 mb-4">Example: 4!</h2>
-                <div className="space-y-3">
-                  <div className="bg-white rounded-lg p-3 font-mono text-center">
-                    4! = 4 × 3 × 2 × 1
-                  </div>
-                  <div className="bg-white rounded-lg p-3 font-mono text-center">
-                    = 12 × 2 × 1
-                  </div>
-                  <div className="bg-white rounded-lg p-3 font-mono text-center">
-                    = 24 × 1
-                  </div>
-                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg p-3 font-bold text-xl text-center">
-                    4! = 24
-                  </div>
-                </div>
-              </div>
-
-              {/* Special Cases */}
-              <div className="bg-pink-50 rounded-xl p-6">
-                <h2 className="text-2xl font-bold text-pink-700 mb-3">Special Cases</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white rounded-lg p-4 text-center">
-                    <p className="font-bold text-pink-700 mb-2">0!</p>
-                    <p className="text-3xl">= 1</p>
-                    <p className="text-sm text-gray-600 mt-2">By definition</p>
-                  </div>
-                  <div className="bg-white rounded-lg p-4 text-center">
-                    <p className="font-bold text-pink-700 mb-2">1!</p>
-                    <p className="text-3xl">= 1</p>
-                    <p className="text-sm text-gray-600 mt-2">Only one way to arrange 1 item</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Real World Example */}
-              <div className="bg-amber-50 rounded-xl p-6">
-                <h2 className="text-2xl font-bold text-amber-700 mb-3">Real-World Application</h2>
-                <p className="text-gray-700 mb-3">
-                  Imagine you have 3 books. How many different ways can you arrange them on a shelf?
-                </p>
-                <div className="bg-white rounded-lg p-4 mb-3">
-                  <p className="text-center font-mono text-lg">
-                    3! = 3 × 2 × 1 = <span className="font-bold text-amber-600">6 ways</span>
-                  </p>
-                </div>
-                <p className="text-sm text-gray-600">
-                  The first position has 3 choices, the second has 2 remaining choices, and the last has 1 choice.
-                </p>
-              </div>
-
-              {/* Factorial Growth */}
-              <div className="bg-indigo-50 rounded-xl p-6">
-                <h2 className="text-2xl font-bold text-indigo-700 mb-3">Factorial Growth</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {[
-                    { n: 1, fact: 1 },
-                    { n: 2, fact: 2 },
-                    { n: 3, fact: 6 },
-                    { n: 4, fact: 24 },
-                    { n: 5, fact: 120 },
-                    { n: 6, fact: 720 },
-                    { n: 7, fact: 5040 },
-                    { n: 8, fact: 40320 },
-                  ].map(({ n, fact }) => (
-                    <div key={n} className="bg-white rounded-lg p-3 text-center">
-                      <p className="font-bold text-indigo-600">{n}!</p>
-                      <p className="text-lg">{fact.toLocaleString()}</p>
+              <div className="bg-blue-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-blue-700 mb-4">Example: 15 ÷ 3</h2>
+                <div className="flex flex-wrap gap-4 justify-center mb-4">
+                  {[1, 2, 3].map(group => (
+                    <div key={group} className="flex flex-col items-center gap-2">
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map(item => (
+                          <div key={item} className="w-8 h-8 bg-blue-500 rounded-full" />
+                        ))}
+                      </div>
+                      <p className="text-sm text-blue-700 font-semibold">Group {group}</p>
                     </div>
                   ))}
                 </div>
-                <p className="text-sm text-gray-600 mt-3 text-center">
-                  Notice how quickly factorials grow!
+                <p className="text-center text-blue-800 font-bold text-xl">
+                  15 ÷ 3 = 5 (Each group has 5 objects)
                 </p>
+              </div>
+
+              {/* Division & Multiplication Relationship */}
+              <div className="bg-purple-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-purple-700 mb-3">
+                  Division & Multiplication Connection
+                </h2>
+                <p className="text-gray-700 mb-3">
+                  Division and multiplication are opposites:
+                </p>
+                <div className="flex items-center justify-center gap-4 text-lg">
+                  <span className="bg-white px-4 py-2 rounded-lg font-mono">3 × 5 = 15</span>
+                  <span className="text-purple-600">↔️</span>
+                  <span className="bg-white px-4 py-2 rounded-lg font-mono">15 ÷ 3 = 5</span>
+                </div>
+              </div>
+
+              {/* Division Terms */}
+              <div className="bg-amber-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-amber-700 mb-3">Division Terms</h2>
+                <div className="flex items-center justify-center gap-4 text-xl mb-4">
+                  <span className="text-gray-700">20</span>
+                  <span className="text-amber-600 font-bold">÷</span>
+                  <span className="text-gray-700">4</span>
+                  <span className="text-amber-600 font-bold">=</span>
+                  <span className="text-gray-700">5</span>
+                </div>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="bg-white rounded-lg p-3">
+                    <p className="font-bold text-amber-700">Dividend</p>
+                    <p className="text-gray-600 text-sm">Number being divided</p>
+                    <p className="text-2xl">20</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3">
+                    <p className="font-bold text-amber-700">Divisor</p>
+                    <p className="text-gray-600 text-sm">Number of groups</p>
+                    <p className="text-2xl">4</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3">
+                    <p className="font-bold text-amber-700">Quotient</p>
+                    <p className="text-gray-600 text-sm">Answer (per group)</p>
+                    <p className="text-2xl">5</p>
+                  </div>
+                </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex gap-4 justify-center pt-4">
                 <button
                   onClick={() => setMode('practice')}
-                  className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
+                  className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
                 >
                   Start Practice
                 </button>
@@ -330,7 +318,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
 
   // Practice/Challenge Mode
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-400 to-blue-400 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-40 h-40 bg-white/10 rounded-full blur-xl animate-pulse delay-1000"></div>
@@ -352,7 +340,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
               <div className="flex items-center gap-6">
                 <div>
                   <p className="text-sm text-gray-600">Score</p>
-                  <p className="text-2xl font-bold text-indigo-600">{score}/{attempts}</p>
+                  <p className="text-2xl font-bold text-teal-600">{score}/{attempts}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Streak</p>
@@ -360,17 +348,17 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Accuracy</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-2xl font-bold text-blue-600">
                     {attempts > 0 ? Math.round((score / attempts) * 100) : 0}%
                   </p>
                 </div>
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setShowSteps(!showSteps)}
-                  className="bg-purple-100 hover:bg-purple-200 text-purple-700 px-4 py-2 rounded-lg transition-all"
+                  onClick={() => setShowVisual(!showVisual)}
+                  className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg transition-all"
                 >
-                  {showSteps ? '👁️ Hide Steps' : '👁️ Show Steps'}
+                  {showVisual ? '👁️ Hide Visual' : '👁️ Show Visual'}
                 </button>
                 <button
                   onClick={() => setMode('learn')}
@@ -387,7 +375,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
             <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold text-indigo-600 mb-2">
+              <h2 className="text-3xl font-bold text-teal-600 mb-2">
                 {mode === 'practice' ? 'Practice Mode' : 'Challenge Mode'}
               </h2>
               <div className="flex gap-2 justify-center">
@@ -397,7 +385,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
                     onClick={() => setDifficulty(level as DifficultyLevel)}
                     className={`px-4 py-2 rounded-lg transition-all ${
                       difficulty === level
-                        ? 'bg-indigo-500 text-white'
+                        ? 'bg-teal-500 text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
@@ -409,11 +397,11 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
 
             {currentProblem && (
               <>
-                {renderSteps()}
+                {renderVisualDivision()}
 
                 <div className="text-center mb-8">
                   <div className="text-6xl font-bold text-gray-800 mb-6">
-                    {currentProblem.number}! = ?
+                    {currentProblem.dividend} ÷ {currentProblem.divisor} = ?
                   </div>
 
                   <input
@@ -421,7 +409,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="text-4xl text-center font-bold border-4 border-indigo-300 rounded-xl px-6 py-4 w-64 focus:border-indigo-500 focus:outline-none"
+                    className="text-4xl text-center font-bold border-4 border-teal-300 rounded-xl px-6 py-4 w-64 focus:border-teal-500 focus:outline-none"
                     placeholder="?"
                     autoFocus
                   />
@@ -447,7 +435,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
                           <>
                             <XCircle className="w-6 h-6" />
                             <span className="text-xl font-bold">
-                              Try again! The answer is {currentProblem.answer}
+                              Try again! The answer is {currentProblem.quotient}
                             </span>
                           </>
                         )}
@@ -459,18 +447,18 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
                     <button
                       onClick={handleSubmit}
                       disabled={userAnswer === ''}
-                      className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-12 py-4 rounded-xl text-xl font-bold shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white px-12 py-4 rounded-xl text-xl font-bold shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Check Answer
                     </button>
                   </div>
                 </div>
 
-                {/* Fun Fact */}
-                {difficulty !== 'beginner' && currentProblem.answer > 1000 && (
+                {/* Hint Section */}
+                {difficulty !== 'beginner' && currentProblem.remainder > 0 && (
                   <div className="bg-amber-50 rounded-xl p-4 text-center">
                     <p className="text-amber-700">
-                      💡 Fun Fact: {currentProblem.number}! = {currentProblem.answer.toLocaleString()}
+                      💡 Hint: This division has a remainder of {currentProblem.remainder}
                     </p>
                   </div>
                 )}

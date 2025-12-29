@@ -48,7 +48,10 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
       const profile = addProfile(newName.trim(), selectedAvatar);
       setNewName('');
       setShowCreateForm(false);
-      onSelectProfile(profile.id);
+      // Small delay to ensure profile is saved before navigating
+      setTimeout(() => {
+        onSelectProfile(profile.id);
+      }, 50);
     }
   };
 
@@ -162,7 +165,7 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           <AnimatePresence>
             {safeProfiles.map((profile, index) => (
-              <motion.button
+              <motion.div
                 key={profile.id}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -171,7 +174,7 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => onSelectProfile(profile.id)}
-                className="bg-white rounded-3xl p-6 shadow-2xl hover:shadow-3xl transition-all relative group"
+                className="bg-white rounded-3xl p-6 shadow-2xl hover:shadow-3xl transition-all relative group cursor-pointer"
               >
                 {/* Action buttons */}
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
@@ -220,7 +223,7 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
                     %
                   </p>
                 </div>
-              </motion.button>
+              </motion.div>
             ))}
           </AnimatePresence>
 

@@ -4,8 +4,9 @@
  */
 
 import { motion } from 'motion/react';
-import { Grid3x3, LogOut, User, Trophy, Edit, Printer, Shapes, Divide, Hash, TrendingUp } from 'lucide-react';
+import { Grid3x3, LogOut, User, Trophy, Edit, Printer, Shapes, Divide, Hash, TrendingUp, Percent, Clock, DollarSign, Target } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
+import { useProgress } from '../context/ProgressContext';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useI18n } from '../i18n/I18nContext';
 import { EditProfileModal } from '../components/EditProfileModal';
@@ -15,11 +16,11 @@ import { formatName } from '../utils/formatters';
 
 // Custom emoji icon components
 const GamepadIcon = ({ className }: { className?: string }) => (
-  <span className="text-3xl leading-none" role="img" aria-label="gamepad">🎮</span>
+  <span className="text-4xl" role="img" aria-label="gamepad">🎮</span>
 );
 
 const WorksheetIcon = ({ className }: { className?: string }) => (
-  <span className="text-3xl leading-none" role="img" aria-label="worksheet">📚</span>
+  <span className="text-4xl" role="img" aria-label="worksheet">📚</span>
 );
 
 interface Props {
@@ -28,47 +29,117 @@ interface Props {
   profileId: string;
 }
 
-interface Tile {
-  id: Page;
-  title: string;
-  description: string;
-  icon: any;
-  color: string;
-  gradient: string;
-}
-
 export function HomePage({ onNavigate, onLogout, profileId }: Props) {
   const { getProfile } = useProfiles();
+  const { getProfileProgress, startActivity } = useProgress();
   const { t } = useI18n();
   const profile = getProfile(profileId);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const profileProgress = getProfileProgress(profileId);
 
-  const tiles: Tile[] = [
-    {
-      id: 'math-worksheet',
-      title: t.mathWorksheet,
-      description: t.mathWorksheetDesc,
-      icon: WorksheetIcon,
-      color: 'text-cyan-600',
-      gradient: 'from-sky-400 to-blue-500',
-    },
-    {
-      id: 'math-challenge',
-      title: t.mathChallenge,
-      description: t.mathChallengeDesc,
-      icon: GamepadIcon,
-      color: 'text-purple-600',
-      gradient: 'from-purple-400 to-pink-500',
-    },
-    {
-      id: 'multiplication-learning',
-      title: t.multiplicationLearning,
-      description: t.multiplicationLearningDesc,
-      icon: Grid3x3,
-      color: 'text-green-600',
-      gradient: 'from-green-400 to-emerald-500',
-    },
-  ];
+  const handleNavigation = (page: Page) => {
+    startActivity(profileId, page);
+    onNavigate(page);
+  };
+
+  const getActivityCompletion = (activityId: string): number => {
+    return profileProgress?.activities[activityId]?.completionPercentage || 0;
+  };
+
+  const isActivityStarted = (activityId: string): boolean => {
+    return !!profileProgress?.activities[activityId];
+  };
+
+  // Category section component
+  const CategorySection = ({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) => (
+    <div className="mb-12">
+      <motion.h2
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="text-3xl font-bold text-white mb-6 drop-shadow-lg flex items-center gap-3"
+      >
+        <span className="text-4xl">{emoji}</span>
+        {title}
+      </motion.h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {children}
+      </div>
+    </div>
+  );
+
+  // Activity card component with progress
+  const ActivityCard = ({
+    page,
+    title,
+    description,
+    icon: Icon,
+    gradient,
+    color,
+    delay,
+    isComingSoon = false
+  }: {
+    page: Page;
+    title: string;
+    description: string;
+    icon: any;
+    gradient: string;
+    color: string;
+    delay: number;
+    isComingSoon?: boolean;
+  }) => {
+    const completion = getActivityCompletion(page);
+    const started = isActivityStarted(page);
+
+    return (
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay }}
+        whileHover={{ scale: 1.05, y: -5 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => handleNavigation(page)}
+        className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group relative overflow-hidden"
+      >
+        {/* Progress Bar */}
+        {started && completion > 0 && (
+          <div className="absolute top-0 left-0 right-0 h-2 bg-gray-200">
+            <div
+              className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500"
+              style={{ width: `${completion}%` }}
+            />
+          </div>
+        )}
+
+        {/* Coming Soon Badge */}
+        {isComingSoon && (
+          <div className="absolute top-4 right-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+            SOON
+          </div>
+        )}
+
+        <div className={`w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+          <Icon className="w-8 h-8 text-white" />
+        </div>
+        <h3 className={`text-2xl mb-2 ${color} font-bold`}>
+          {title}
+        </h3>
+        <p className="text-gray-600">{description}</p>
+
+        {/* Status indicator */}
+        {started && completion === 100 && (
+          <div className="mt-4 flex items-center gap-2 text-green-600">
+            <Trophy className="w-5 h-5" />
+            <span className="text-sm font-semibold">Completed!</span>
+          </div>
+        )}
+        {started && completion > 0 && completion < 100 && (
+          <div className="mt-4 text-blue-600 text-sm font-semibold">
+            {completion}% Complete
+          </div>
+        )}
+      </motion.button>
+    );
+  };
 
   if (!profile) return null;
 
@@ -134,7 +205,7 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               <Trophy className="w-6 h-6 text-yellow-500" />
               Your Progress
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="bg-gradient-to-br from-purple-100 to-pink-100 p-4 rounded-xl">
                 <div className="text-sm text-gray-600 mb-1">{t.gamesPlayed}</div>
                 <div className="text-3xl text-purple-600">{profile.stats.totalSessions + profile.stats.hangmanSessions}</div>
@@ -156,185 +227,168 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
                   %
                 </div>
               </div>
+              <div className="bg-gradient-to-br from-indigo-100 to-purple-100 p-4 rounded-xl">
+                <div className="text-sm text-gray-600 mb-1">Activities Started</div>
+                <div className="text-3xl text-indigo-600">{profileProgress?.activitiesStarted || 0}</div>
+              </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Activity Tiles */}
+        {/* Activity Tiles - Organized by Category */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="max-w-6xl mx-auto"
         >
-          <h2 className="text-3xl text-white mb-6 drop-shadow-lg">Learning Activities</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Math Worksheet Card */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate('math-worksheet')}
-              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
-            >
-              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <WorksheetIcon className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl mb-2 text-cyan-600">
-                {t.mathWorksheet}
-              </h3>
-              <p className="text-gray-600">{t.mathWorksheetDesc}</p>
-            </motion.button>
+          {/* Category: Core Math Skills */}
+          <CategorySection title="Core Math Skills" emoji="🔢">
+            <ActivityCard
+              page="math-worksheet"
+              title={t.mathWorksheet}
+              description={t.mathWorksheetDesc}
+              icon={WorksheetIcon}
+              gradient="from-blue-400 to-cyan-500"
+              color="text-cyan-600"
+              delay={0.3}
+            />
+            <ActivityCard
+              page="math-challenge"
+              title={t.mathChallenge}
+              description={t.mathChallengeDesc}
+              icon={GamepadIcon}
+              gradient="from-purple-400 to-pink-500"
+              color="text-purple-600"
+              delay={0.4}
+            />
+            <ActivityCard
+              page="multiplication-learning"
+              title={t.multiplicationLearning}
+              description={t.multiplicationLearningDesc}
+              icon={Grid3x3}
+              gradient="from-green-400 to-emerald-500"
+              color="text-green-600"
+              delay={0.5}
+            />
+            <ActivityCard
+              page="division-learning"
+              title="Learn Division"
+              description="Master division with interactive lessons and games"
+              icon={Divide}
+              gradient="from-teal-400 to-cyan-500"
+              color="text-teal-600"
+              delay={0.6}
+            />
+            <ActivityCard
+              page="fractions-decimals"
+              title="Fractions & Decimals"
+              description="Learn fractions, decimals, and percentages"
+              icon={Percent}
+              gradient="from-blue-400 to-indigo-500"
+              color="text-blue-600"
+              delay={0.7}
+              isComingSoon
+            />
+            <ActivityCard
+              page="estimation-rounding"
+              title="Estimation & Rounding"
+              description="Develop number sense with estimation"
+              icon={Target}
+              gradient="from-amber-400 to-orange-500"
+              color="text-amber-600"
+              delay={0.8}
+              isComingSoon
+            />
+          </CategorySection>
 
-            {/* Math Hangman Card */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate('math-challenge')}
-              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
-            >
-              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <GamepadIcon className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl mb-2 text-purple-600">
-                {t.mathChallenge}
-              </h3>
-              <p className="text-gray-600">{t.mathChallengeDesc}</p>
-            </motion.button>
+          {/* Category: Real-World Math */}
+          <CategorySection title="Real-World Math" emoji="🌍">
+            <ActivityCard
+              page="time-calendar"
+              title="Time & Calendar"
+              description="Master telling time and reading calendars"
+              icon={Clock}
+              gradient="from-orange-400 to-red-500"
+              color="text-orange-600"
+              delay={0.9}
+              isComingSoon
+            />
+            <ActivityCard
+              page="money-shopping"
+              title="Money & Shopping"
+              description="Learn money, counting, and smart shopping"
+              icon={DollarSign}
+              gradient="from-green-400 to-emerald-500"
+              color="text-green-600"
+              delay={1.0}
+              isComingSoon
+            />
+          </CategorySection>
 
-            {/* Multiplication Learning Card */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate('multiplication-learning')}
-              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
-            >
-              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Grid3x3 className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl mb-2 text-green-600">
-                {t.multiplicationLearning}
-              </h3>
-              <p className="text-gray-600">{t.multiplicationLearningDesc}</p>
-            </motion.button>
+          {/* Category: Geometry & Patterns */}
+          <CategorySection title="Geometry & Patterns" emoji="🎨">
+            <ActivityCard
+              page="shapes-learning"
+              title="Shapes Learning"
+              description="Explore shapes through games and adventures"
+              icon={Shapes}
+              gradient="from-yellow-400 to-amber-500"
+              color="text-yellow-600"
+              delay={1.1}
+              isComingSoon
+            />
+          </CategorySection>
 
-            {/* Print Worksheets Card */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate('print-worksheet')}
-              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
-            >
-              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Printer className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl mb-2 text-orange-600">
-                Print Worksheets
-              </h3>
-              <p className="text-gray-600">Generate and print custom math worksheets</p>
-            </motion.button>
+          {/* Category: Advanced Concepts */}
+          <CategorySection title="Advanced Concepts" emoji="🚀">
+            <ActivityCard
+              page="factorial-learning"
+              title="Factorial Numbers"
+              description="Explore factorials and number patterns"
+              icon={Hash}
+              gradient="from-indigo-400 to-purple-500"
+              color="text-indigo-600"
+              delay={1.2}
+              isComingSoon
+            />
+            <ActivityCard
+              page="fibonacci-learning"
+              title="Fibonacci Series"
+              description="Discover the magical Fibonacci sequence"
+              icon={TrendingUp}
+              gradient="from-rose-400 to-pink-500"
+              color="text-rose-600"
+              delay={1.3}
+              isComingSoon
+            />
+          </CategorySection>
 
-            {/* Shapes Learning Card */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.7 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate('shapes-learning')}
-              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
-            >
-              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Shapes className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl mb-2 text-yellow-600">
-                Shapes Learning
-              </h3>
-              <p className="text-gray-600">Explore shapes through games and adventures</p>
-            </motion.button>
-
-            {/* Division Learning Card */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.8 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate('division-learning')}
-              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
-            >
-              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Divide className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl mb-2 text-teal-600">
-                Learn Division
-              </h3>
-              <p className="text-gray-600">Master division with interactive lessons and games</p>
-            </motion.button>
-
-            {/* Factorial Learning Card */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.9 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate('factorial-learning')}
-              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
-            >
-              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Hash className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl mb-2 text-indigo-600">
-                Factorial Numbers
-              </h3>
-              <p className="text-gray-600">Explore factorials and number patterns</p>
-            </motion.button>
-
-            {/* Fibonacci Learning Card */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.0 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate('fibonacci-learning')}
-              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
-            >
-              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <TrendingUp className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl mb-2 text-rose-600">
-                Fibonacci Series
-              </h3>
-              <p className="text-gray-600">Discover the magical Fibonacci sequence</p>
-            </motion.button>
-
+          {/* Category: Tools */}
+          <CategorySection title="Tools & Resources" emoji="🛠️">
+            <ActivityCard
+              page="print-worksheet"
+              title="Print Worksheets"
+              description="Generate and print custom math worksheets"
+              icon={Printer}
+              gradient="from-orange-400 to-red-500"
+              color="text-orange-600"
+              delay={1.4}
+            />
             {/* Coming Soon Tile */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.1 }}
+              transition={{ delay: 1.5 }}
               className="bg-white/50 backdrop-blur-sm border-4 border-dashed border-white/70 rounded-3xl p-8 shadow-xl flex flex-col items-center justify-center"
             >
               <div className="text-6xl mb-4">✨</div>
-              <h3 className="text-2xl text-white mb-2">More Coming Soon!</h3>
+              <h3 className="text-2xl text-white mb-2 drop-shadow">More Coming Soon!</h3>
               <p className="text-white/80 text-center">
                 New learning activities are on the way
               </p>
             </motion.div>
-          </div>
+          </CategorySection>
         </motion.div>
       </div>
 
