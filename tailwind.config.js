@@ -20,6 +20,15 @@ export default {
     'to-orange-500',
     'bg-gradient-to-br',
     'bg-gradient-to-r',
+    // Coin gradient colors
+    'to-amber-700',
+    'from-slate-500',
+    'to-slate-700',
+    'from-slate-600',
+    'to-slate-800',
+    'from-gray-400',
+    'to-gray-600',
+    'to-yellow-600',
   ],
   theme: {
     extend: {
