@@ -11,7 +11,15 @@ export default {
     'to-pink-500',
     'from-green-400',
     'to-emerald-500',
+    'from-orange-400',
+    'from-orange-500',
+    'from-orange-600',
+    'to-red-500',
+    'to-red-600',
+    'from-amber-400',
+    'to-orange-500',
     'bg-gradient-to-br',
+    'bg-gradient-to-r',
   ],
   theme: {
     extend: {
