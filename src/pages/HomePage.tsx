@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'motion/react';
-import { Grid3x3, LogOut, User, Trophy, Edit, Printer } from 'lucide-react';
+import { Grid3x3, LogOut, User, Trophy, Edit, Printer, Shapes, Divide, Hash, TrendingUp } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useI18n } from '../i18n/I18nContext';
@@ -245,11 +245,87 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               <p className="text-gray-600">Generate and print custom math worksheets</p>
             </motion.button>
 
+            {/* Shapes Learning Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.7 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onNavigate('shapes-learning')}
+              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
+            >
+              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Shapes className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl mb-2 text-yellow-600">
+                Shapes Learning
+              </h3>
+              <p className="text-gray-600">Explore shapes through games and adventures</p>
+            </motion.button>
+
+            {/* Division Learning Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onNavigate('division-learning')}
+              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
+            >
+              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Divide className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl mb-2 text-teal-600">
+                Learn Division
+              </h3>
+              <p className="text-gray-600">Master division with interactive lessons and games</p>
+            </motion.button>
+
+            {/* Factorial Learning Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.9 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onNavigate('factorial-learning')}
+              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
+            >
+              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Hash className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl mb-2 text-indigo-600">
+                Factorial Numbers
+              </h3>
+              <p className="text-gray-600">Explore factorials and number patterns</p>
+            </motion.button>
+
+            {/* Fibonacci Learning Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.0 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onNavigate('fibonacci-learning')}
+              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
+            >
+              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <TrendingUp className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl mb-2 text-rose-600">
+                Fibonacci Series
+              </h3>
+              <p className="text-gray-600">Discover the magical Fibonacci sequence</p>
+            </motion.button>
+
             {/* Coming Soon Tile */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.7 }}
+              transition={{ delay: 1.1 }}
               className="bg-white/50 backdrop-blur-sm border-4 border-dashed border-white/70 rounded-3xl p-8 shadow-xl flex flex-col items-center justify-center"
             >
               <div className="text-6xl mb-4">✨</div>

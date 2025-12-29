@@ -179,25 +179,15 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
       <div className="relative z-10">
         {viewState === 'difficulty' && (
           <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-8"
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={onBack}
+              className="absolute top-6 left-6 inline-flex items-center gap-2 text-white hover:text-white/80"
             >
-              <button
-                onClick={onBack}
-                className="inline-flex items-center gap-2 text-white hover:text-white/80 mb-4"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                Back to Home
-              </button>
-              <h1 className="text-5xl text-white mb-4 drop-shadow-lg font-bold">
-                Print Worksheets 🖨️
-              </h1>
-              <p className="text-xl text-white/90">
-                Generate printable math worksheets for practice
-              </p>
-            </motion.div>
+              <ArrowLeft className="w-5 h-5" />
+              Back to Home
+            </motion.button>
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -208,6 +198,8 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
               <DifficultySelector
                 onSelect={handleDifficultySelect}
                 hasCustomSettings={false}
+                title="Print Worksheets 🖨️"
+                description="Generate printable math worksheets for practice"
               />
             </motion.div>
 
@@ -216,7 +208,7 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
               onClick={() => setShowSettings(true)}
-              className="mt-6 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl transition-all"
+              className="mt-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl transition-all"
             >
               Customize Settings
             </motion.button>
@@ -225,31 +217,236 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
 
         {viewState === 'preview' && problems.length > 0 && (
           <div className="relative">
-            {/* Preview Controls */}
+            {/* Enhanced Preview Controls */}
             <div className="no-print sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b-2 border-gray-200 p-4 shadow-lg">
-              <div className="max-w-6xl mx-auto flex items-center justify-between">
-                <button
-                  onClick={onBack}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl flex items-center gap-2 transition-all"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                  Back to Home
-                </button>
+              <div className="max-w-6xl mx-auto space-y-4">
+                {/* Top Row: Back and Action Buttons */}
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={onBack}
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl flex items-center gap-2 transition-all"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                    Back to Home
+                  </button>
 
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowSettings(true)}
-                    className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-xl transition-all"
-                  >
-                    Change Settings
-                  </button>
-                  <button
-                    onClick={handleRegenerateProblems}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-all"
-                  >
-                    <Shuffle className="w-5 h-5" />
-                    New Problems
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleRegenerateProblems}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-all"
+                    >
+                      <Shuffle className="w-5 h-5" />
+                      New Problems
+                    </button>
+                    <button
+                      onClick={() => window.print()}
+                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-all"
+                    >
+                      <Printer className="w-5 h-5" />
+                      Print
+                    </button>
+                  </div>
+                </div>
+
+                {/* Controls Row */}
+                <div className="flex flex-wrap items-center gap-4 bg-gray-50 p-4 rounded-xl">
+                  {/* Number of Problems */}
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-semibold text-gray-700">Problems:</label>
+                    <select
+                      value={settings.numProblems}
+                      onChange={(e) => {
+                        const newSettings = { ...settings, numProblems: Number(e.target.value) };
+                        setSettings(newSettings);
+                        const newProblems = generateProblems(newSettings);
+                        setProblems(newProblems);
+                      }}
+                      className="px-3 py-2 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none bg-white"
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={15}>15</option>
+                      <option value={20}>20</option>
+                      <option value={25}>25</option>
+                      <option value={30}>30</option>
+                      <option value={40}>40</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </div>
+
+                  {/* Operations */}
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-semibold text-gray-700">Operations:</label>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          // Prevent disabling if it's the only operation selected
+                          const totalSelected = [settings.includeAddition, settings.includeSubtraction, settings.includeMultiplication, settings.includeDivision].filter(Boolean).length;
+                          if (totalSelected === 1 && settings.includeAddition) return;
+
+                          const newSettings = { ...settings, includeAddition: !settings.includeAddition };
+                          setSettings(newSettings);
+                          const newProblems = generateProblems(newSettings);
+                          setProblems(newProblems);
+                        }}
+                        className={`w-10 h-10 rounded-lg font-bold text-xl transition-all ${
+                          settings.includeAddition
+                            ? 'bg-green-500 text-white shadow-lg'
+                            : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                        }`}
+                        title="Addition"
+                      >
+                        +
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Prevent disabling if it's the only operation selected
+                          const totalSelected = [settings.includeAddition, settings.includeSubtraction, settings.includeMultiplication, settings.includeDivision].filter(Boolean).length;
+                          if (totalSelected === 1 && settings.includeSubtraction) return;
+
+                          const newSettings = { ...settings, includeSubtraction: !settings.includeSubtraction };
+                          setSettings(newSettings);
+                          const newProblems = generateProblems(newSettings);
+                          setProblems(newProblems);
+                        }}
+                        className={`w-10 h-10 rounded-lg font-bold text-xl transition-all ${
+                          settings.includeSubtraction
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                        }`}
+                        title="Subtraction"
+                      >
+                        −
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Prevent disabling if it's the only operation selected
+                          const totalSelected = [settings.includeAddition, settings.includeSubtraction, settings.includeMultiplication, settings.includeDivision].filter(Boolean).length;
+                          if (totalSelected === 1 && settings.includeMultiplication) return;
+
+                          const newSettings = { ...settings, includeMultiplication: !settings.includeMultiplication };
+                          setSettings(newSettings);
+                          const newProblems = generateProblems(newSettings);
+                          setProblems(newProblems);
+                        }}
+                        className={`w-10 h-10 rounded-lg font-bold text-xl transition-all ${
+                          settings.includeMultiplication
+                            ? 'bg-purple-500 text-white shadow-lg'
+                            : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                        }`}
+                        title="Multiplication"
+                      >
+                        ×
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Prevent disabling if it's the only operation selected
+                          const totalSelected = [settings.includeAddition, settings.includeSubtraction, settings.includeMultiplication, settings.includeDivision].filter(Boolean).length;
+                          if (totalSelected === 1 && settings.includeDivision) return;
+
+                          const newSettings = { ...settings, includeDivision: !settings.includeDivision };
+                          setSettings(newSettings);
+                          const newProblems = generateProblems(newSettings);
+                          setProblems(newProblems);
+                        }}
+                        className={`w-10 h-10 rounded-lg font-bold text-xl transition-all ${
+                          settings.includeDivision
+                            ? 'bg-orange-500 text-white shadow-lg'
+                            : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                        }`}
+                        title="Division"
+                      >
+                        ÷
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Number Range */}
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-semibold text-gray-700">Range:</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="999"
+                      value={settings.minNum}
+                      onChange={(e) => {
+                        const newSettings = { ...settings, minNum: Number(e.target.value) };
+                        setSettings(newSettings);
+                        const newProblems = generateProblems(newSettings);
+                        setProblems(newProblems);
+                      }}
+                      className="w-16 px-2 py-2 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none bg-white text-center"
+                      placeholder="Min"
+                    />
+                    <span className="text-gray-500">to</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="999"
+                      value={settings.maxNum}
+                      onChange={(e) => {
+                        const newSettings = { ...settings, maxNum: Number(e.target.value) };
+                        setSettings(newSettings);
+                        const newProblems = generateProblems(newSettings);
+                        setProblems(newProblems);
+                      }}
+                      className="w-16 px-2 py-2 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none bg-white text-center"
+                      placeholder="Max"
+                    />
+                  </div>
+
+                  {/* Quick Presets */}
+                  <div className="flex items-center gap-2 ml-auto">
+                    <label className="text-sm font-semibold text-gray-700">Quick:</label>
+                    <button
+                      onClick={() => {
+                        const preset = DIFFICULTY_PRESETS.easy;
+                        setSettings(preset);
+                        const newProblems = generateProblems(preset);
+                        setProblems(newProblems);
+                        setDifficulty('easy');
+                      }}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        difficulty === 'easy'
+                          ? 'bg-green-500 text-white shadow-lg'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-300'
+                      }`}
+                    >
+                      Easy
+                    </button>
+                    <button
+                      onClick={() => {
+                        const preset = DIFFICULTY_PRESETS.medium;
+                        setSettings(preset);
+                        const newProblems = generateProblems(preset);
+                        setProblems(newProblems);
+                        setDifficulty('medium');
+                      }}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        difficulty === 'medium'
+                          ? 'bg-orange-500 text-white shadow-lg'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-300'
+                      }`}
+                    >
+                      Medium
+                    </button>
+                    <button
+                      onClick={() => {
+                        const preset = DIFFICULTY_PRESETS.hard;
+                        setSettings(preset);
+                        const newProblems = generateProblems(preset);
+                        setProblems(newProblems);
+                        setDifficulty('hard');
+                      }}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        difficulty === 'hard'
+                          ? 'bg-red-500 text-white shadow-lg'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-300'
+                      }`}
+                    >
+                      Hard
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -260,6 +457,11 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
               settings={settings}
               profileName={formatName(profile.name)}
               onClose={onBack}
+              onSettingsChange={(newSettings) => {
+                setSettings(newSettings);
+                const newProblems = generateProblems(newSettings);
+                setProblems(newProblems);
+              }}
             />
           </div>
         )}

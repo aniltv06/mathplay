@@ -10,9 +10,11 @@ import type { Difficulty } from '../types';
 interface Props {
   onSelect: (difficulty: Difficulty) => void;
   hasCustomSettings?: boolean;
+  title?: string;
+  description?: string;
 }
 
-export function DifficultySelector({ onSelect, hasCustomSettings }: Props) {
+export function DifficultySelector({ onSelect, hasCustomSettings, title = 'Math Hangman! 🎯', description = 'Choose your difficulty level to begin' }: Props) {
   const difficulties = [
     {
       level: 'easy' as Difficulty,
@@ -48,10 +50,10 @@ export function DifficultySelector({ onSelect, hasCustomSettings }: Props) {
         className="text-center mb-12"
       >
         <h1 className="text-6xl mb-4 text-white drop-shadow-lg">
-          Math Hangman! 🎯
+          {title}
         </h1>
         <p className="text-xl text-white/90">
-          Choose your difficulty level to begin
+          {description}
         </p>
         {hasCustomSettings && (
           <div className="mt-4 bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-2xl inline-flex items-center gap-2">

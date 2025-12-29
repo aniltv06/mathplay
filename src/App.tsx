@@ -14,8 +14,12 @@ import { MathWorksheetPageEnhanced } from './pages/MathWorksheetPageEnhanced';
 import { MultiplicationLearningPageEnhanced } from './pages/MultiplicationLearningPageEnhanced';
 import { ParentDashboardPage } from './pages/ParentDashboardPage';
 import { PrintWorksheetPage } from './pages/PrintWorksheetPage';
+import { ShapesLearningPage } from './pages/ShapesLearningPage';
+import { DivisionLearningPage } from './pages/DivisionLearningPage';
+import { FactorialLearningPage } from './pages/FactorialLearningPage';
+import { FibonacciLearningPage } from './pages/FibonacciLearningPage';
 
-export type Page = 'home' | 'math-challenge' | 'math-worksheet' | 'multiplication-learning' | 'parent-dashboard' | 'print-worksheet';
+export type Page = 'home' | 'math-challenge' | 'math-worksheet' | 'multiplication-learning' | 'parent-dashboard' | 'print-worksheet' | 'shapes-learning' | 'division-learning' | 'factorial-learning' | 'fibonacci-learning';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -86,6 +90,30 @@ export default function App() {
                 )}
                 {currentPage === 'print-worksheet' && (
                   <PrintWorksheetPage
+                    onBack={() => navigateTo('home')}
+                    profileId={selectedProfile}
+                  />
+                )}
+                {currentPage === 'shapes-learning' && (
+                  <ShapesLearningPage
+                    onBack={() => navigateTo('home')}
+                    profileId={selectedProfile}
+                  />
+                )}
+                {currentPage === 'division-learning' && (
+                  <DivisionLearningPage
+                    onBack={() => navigateTo('home')}
+                    profileId={selectedProfile}
+                  />
+                )}
+                {currentPage === 'factorial-learning' && (
+                  <FactorialLearningPage
+                    onBack={() => navigateTo('home')}
+                    profileId={selectedProfile}
+                  />
+                )}
+                {currentPage === 'fibonacci-learning' && (
+                  <FibonacciLearningPage
                     onBack={() => navigateTo('home')}
                     profileId={selectedProfile}
                   />

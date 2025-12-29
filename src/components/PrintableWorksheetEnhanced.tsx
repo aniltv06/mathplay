@@ -15,22 +15,24 @@ interface Props {
   settings: ProblemSettings;
   profileName: string;
   onClose: () => void;
+  onSettingsChange?: (newSettings: ProblemSettings) => void;
 }
 
 type LayoutType = 'standard' | 'vertical' | 'two-column' | 'flashcards' | 'word-problems';
 type ThemeType = 'clean' | 'colorful' | 'minimal' | 'kid-friendly';
 
-export function PrintableWorksheetEnhanced({ problems, settings, profileName, onClose }: Props) {
+export function PrintableWorksheetEnhanced({ problems, settings, profileName, onClose, onSettingsChange }: Props) {
   const [showAnswers, setShowAnswers] = useState(false);
   const [layout, setLayout] = useState<LayoutType>('standard');
   const [theme, setTheme] = useState<ThemeType>('clean');
   const [showSettings, setShowSettings] = useState(false);
-  const [includeWorkSpace, setIncludeWorkSpace] = useState(true);
-  const [includeInstructions, setIncludeInstructions] = useState(true);
+  const [includeWorkSpace, setIncludeWorkSpace] = useState(false);
   const [includeScoreSection, setIncludeScoreSection] = useState(true);
   const [customTitle, setCustomTitle] = useState('Math Worksheet');
   const [schoolName, setSchoolName] = useState('');
   const [teacherName, setTeacherName] = useState('');
+  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [fontFamily, setFontFamily] = useState<'sans' | 'serif' | 'mono'>('sans');
 
   const handlePrint = () => {
     window.print();
@@ -65,186 +67,292 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
     }
   };
 
-  const renderStandardLayout = () => (
-    <div className="grid grid-cols-2 gap-6 mb-12">
-      {problems.map((problem, index) => (
+  const getFontSizeClass = () => {
+    switch (fontSize) {
+      case 'small':
+        return 'text-xl'; // for problems
+      case 'large':
+        return 'text-3xl'; // for problems
+      default:
+        return 'text-2xl'; // medium
+    }
+  };
+
+  const getFontFamilyClass = () => {
+    switch (fontFamily) {
+      case 'serif':
+        return 'font-serif';
+      case 'mono':
+        return 'font-mono';
+      default:
+        return 'font-sans';
+    }
+  };
+
+  const renderStandardLayout = () => {
+    const problemsPerPage = 6; // 2 columns x 3 rows
+    const pages = [];
+
+    for (let i = 0; i < problems.length; i += problemsPerPage) {
+      const pageProblems = problems.slice(i, i + problemsPerPage);
+      const isLastPage = i + problemsPerPage >= problems.length;
+
+      pages.push(
         <div
-          key={index}
-          className={`border-2 rounded-lg p-4 print-problem ${
-            theme === 'colorful' ? 'border-purple-300 bg-white' :
-            theme === 'kid-friendly' ? 'border-yellow-400 bg-white' :
-            'border-gray-300 bg-gray-50'
-          } ${(index + 1) % 6 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''}`}
+          key={`page-${i}`}
+          className={`print-page ${!isLastPage ? 'page-break-after' : ''}`}
         >
-          <div className="flex items-start gap-3">
-            <span className="text-lg font-bold text-gray-600 min-w-[2rem]">
-              {index + 1}.
-            </span>
-            <div className="flex-1">
-              <div className="text-2xl font-mono text-gray-800 mb-2">
-                {problem.num1} {problem.operation} {problem.num2} = _____
-              </div>
-              {includeWorkSpace && !showAnswers && (
-                <div className="mt-3 border-t border-dashed border-gray-300 pt-3 min-h-[40px]">
-                  <p className="text-xs text-gray-400">Show your work:</p>
-                </div>
-              )}
-              {showAnswers && (
-                <div className="text-lg text-green-600 font-bold">
-                  Answer: {problem.correct}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const renderVerticalLayout = () => (
-    <div className="grid grid-cols-4 gap-6 mb-12">
-      {problems.map((problem, index) => (
-        <div
-          key={index}
-          className={`border-2 rounded-lg p-4 print-problem ${
-            theme === 'colorful' ? 'border-blue-300 bg-white' :
-            theme === 'kid-friendly' ? 'border-orange-400 bg-white' :
-            'border-gray-300 bg-white'
-          } ${(index + 1) % 12 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''}`}
-        >
-          <div className="text-center">
-            <div className="text-sm font-bold text-gray-600 mb-3">#{index + 1}</div>
-            <div className="text-right space-y-1 font-mono text-xl mb-3">
-              <div className="text-gray-800">{problem.num1}</div>
-              <div className="flex items-center justify-end gap-2">
-                <span className="text-purple-600 font-bold">{problem.operation}</span>
-                <span className="text-gray-800">{problem.num2}</span>
-              </div>
-              <div className="border-t-2 border-gray-800 pt-1">
-                {showAnswers ? (
-                  <span className="text-green-600 font-bold">{problem.correct}</span>
-                ) : (
-                  <span className="text-transparent">___</span>
-                )}
-              </div>
-            </div>
-            {includeWorkSpace && !showAnswers && (
-              <div className="border-t border-dashed border-gray-300 pt-2 min-h-[30px]">
-                <p className="text-xs text-gray-400">Work</p>
-              </div>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const renderTwoColumnLayout = () => (
-    <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-12">
-      {problems.map((problem, index) => (
-        <div key={index} className={`flex items-start gap-3 py-2 border-b border-gray-300 print-problem ${
-          (index + 1) % 14 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''
-        }`}>
-          <span className="text-lg font-bold text-gray-600 min-w-[2.5rem]">
-            {index + 1}.
-          </span>
-          <div className="flex-1">
-            <div className="text-xl font-mono">
-              {problem.num1} {problem.operation} {problem.num2} = {
-                showAnswers ? (
-                  <span className="text-green-600 font-bold">{problem.correct}</span>
-                ) : (
-                  <span className="inline-block border-b-2 border-gray-800 min-w-[60px] ml-2"></span>
-                )
-              }
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const renderFlashcardsLayout = () => (
-    <div className="grid grid-cols-4 gap-4 mb-12">
-      {problems.map((problem, index) => (
-        <div
-          key={index}
-          className={`border-4 rounded-2xl p-4 text-center print-problem ${
-            theme === 'colorful' ? 'border-purple-400 bg-gradient-to-br from-purple-100 to-pink-100' :
-            theme === 'kid-friendly' ? 'border-yellow-500 bg-yellow-100' :
-            'border-gray-400 bg-white'
-          } ${(index + 1) % 12 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''}`}
-        >
-          <div className="text-xs font-bold text-gray-500 mb-2">#{index + 1}</div>
-          <div className="text-3xl font-bold text-gray-800 mb-2">
-            {problem.num1}
-          </div>
-          <div className="text-2xl font-bold text-purple-600 mb-2">
-            {problem.operation}
-          </div>
-          <div className="text-3xl font-bold text-gray-800 mb-3">
-            {problem.num2}
-          </div>
-          <div className="text-2xl font-bold text-gray-800">
-            {showAnswers ? (
-              <span className="text-green-600">{problem.correct}</span>
-            ) : (
-              '?'
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const renderWordProblemsLayout = () => (
-    <div className="space-y-6 mb-12">
-      {problems.map((problem, index) => {
-        const storyTemplates: Record<string, (n1: number, n2: number) => string> = {
-          '+': (n1, n2) => `You have ${n1} apples. Your friend gives you ${n2} more apples. How many apples do you have now?`,
-          '-': (n1, n2) => `You have ${n1} candies. You give ${n2} candies to your friend. How many candies do you have left?`,
-          '×': (n1, n2) => `There are ${n1} boxes. Each box has ${n2} toys. How many toys are there in total?`,
-          '÷': (n1, n2) => `You have ${n1} cookies to share equally among ${n2} friends. How many cookies does each friend get?`
-        };
-
-        const story = storyTemplates[problem.operation](problem.num1, problem.num2);
-
-        return (
-          <div
-            key={index}
-            className={`border-2 rounded-lg p-6 print-problem ${
-              theme === 'colorful' ? 'border-blue-300 bg-blue-50' :
-              theme === 'kid-friendly' ? 'border-green-400 bg-green-50' :
-              'border-gray-300 bg-white'
-            } ${(index + 1) % 3 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''}`}
-          >
-            <div className="flex items-start gap-3">
-              <span className="text-xl font-bold text-gray-600 min-w-[2.5rem]">
-                {index + 1}.
-              </span>
-              <div className="flex-1">
-                <p className="text-lg text-gray-800 mb-4 leading-relaxed">{story}</p>
-                <div className="flex items-center gap-4">
-                  <span className="text-lg font-semibold text-gray-700">Answer:</span>
-                  {showAnswers ? (
-                    <span className="text-xl font-bold text-green-600">{problem.correct}</span>
-                  ) : (
-                    <span className="inline-block border-b-2 border-gray-800 min-w-[80px]"></span>
-                  )}
-                </div>
-                {includeWorkSpace && !showAnswers && (
-                  <div className="mt-4 border-t border-dashed border-gray-300 pt-3">
-                    <p className="text-sm text-gray-500 mb-2">Show your work:</p>
-                    <div className="min-h-[60px]"></div>
+          <div className="grid grid-cols-2 gap-6 mb-12">
+            {pageProblems.map((problem, index) => {
+              const globalIndex = i + index;
+              return (
+                <div
+                  key={globalIndex}
+                  className={`border-2 rounded-lg p-4 print-problem ${
+                    theme === 'colorful' ? 'border-purple-300 bg-white' :
+                    theme === 'kid-friendly' ? 'border-yellow-400 bg-white' :
+                    'border-gray-300 bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg font-bold text-gray-600 min-w-[2rem]">
+                      {globalIndex + 1}.
+                    </span>
+                    <div className="flex-1">
+                      <div className={`${getFontSizeClass()} ${getFontFamilyClass()} text-gray-800 mb-2`}>
+                        {problem.num1} {problem.operation} {problem.num2} = _____
+                      </div>
+                      {includeWorkSpace && !showAnswers && (
+                        <div className="mt-3 border-t border-dashed border-gray-300 pt-3 min-h-[40px]">
+                          <p className="text-xs text-gray-400">Show your work:</p>
+                        </div>
+                      )}
+                      {showAnswers && (
+                        <div className="text-lg text-green-600 font-bold">
+                          Answer: {problem.correct}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
-    </div>
-  );
+        </div>
+      );
+    }
+
+    return <>{pages}</>;
+  };
+
+  const renderVerticalLayout = () => {
+    const problemsPerPage = 12; // 4 columns x 3 rows
+    const pages = [];
+
+    for (let i = 0; i < problems.length; i += problemsPerPage) {
+      const pageProblems = problems.slice(i, i + problemsPerPage);
+      const isLastPage = i + problemsPerPage >= problems.length;
+
+      pages.push(
+        <div key={`page-${i}`} className={!isLastPage ? 'page-break-after' : ''}>
+          <div className="grid grid-cols-4 gap-6 mb-12">
+            {pageProblems.map((problem, index) => {
+              const globalIndex = i + index;
+              return (
+                <div
+                  key={globalIndex}
+                  className={`border-2 rounded-lg p-4 print-problem ${
+                    theme === 'colorful' ? 'border-blue-300 bg-white' :
+                    theme === 'kid-friendly' ? 'border-orange-400 bg-white' :
+                    'border-gray-300 bg-white'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-sm font-bold text-gray-600 mb-3">#{globalIndex + 1}</div>
+                    <div className="text-right space-y-1 font-mono text-xl mb-3">
+                      <div className="text-gray-800">{problem.num1}</div>
+                      <div className="flex items-center justify-end gap-2">
+                        <span className="text-purple-600 font-bold">{problem.operation}</span>
+                        <span className="text-gray-800">{problem.num2}</span>
+                      </div>
+                      <div className="border-t-2 border-gray-800 pt-1">
+                        {showAnswers ? (
+                          <span className="text-green-600 font-bold">{problem.correct}</span>
+                        ) : (
+                          <span className="text-transparent">___</span>
+                        )}
+                      </div>
+                    </div>
+                    {includeWorkSpace && !showAnswers && (
+                      <div className="border-t border-dashed border-gray-300 pt-2 min-h-[30px]">
+                        <p className="text-xs text-gray-400">Work</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    return <>{pages}</>;
+  };
+
+  const renderTwoColumnLayout = () => {
+    const problemsPerPage = 14; // 2 columns x 7 rows
+    const pages = [];
+
+    for (let i = 0; i < problems.length; i += problemsPerPage) {
+      const pageProblems = problems.slice(i, i + problemsPerPage);
+      const isLastPage = i + problemsPerPage >= problems.length;
+
+      pages.push(
+        <div key={`page-${i}`} className={!isLastPage ? 'page-break-after' : ''}>
+          <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-12">
+            {pageProblems.map((problem, index) => {
+              const globalIndex = i + index;
+              return (
+                <div key={globalIndex} className="flex items-start gap-3 py-2 border-b border-gray-300 print-problem">
+                  <span className="text-lg font-bold text-gray-600 min-w-[2.5rem]">
+                    {globalIndex + 1}.
+                  </span>
+                  <div className="flex-1">
+                    <div className="text-xl font-mono">
+                      {problem.num1} {problem.operation} {problem.num2} = {
+                        showAnswers ? (
+                          <span className="text-green-600 font-bold">{problem.correct}</span>
+                        ) : (
+                          <span className="inline-block border-b-2 border-gray-800 min-w-[60px] ml-2"></span>
+                        )
+                      }
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    return <>{pages}</>;
+  };
+
+  const renderFlashcardsLayout = () => {
+    const problemsPerPage = 12; // 4 columns x 3 rows
+    const pages = [];
+
+    for (let i = 0; i < problems.length; i += problemsPerPage) {
+      const pageProblems = problems.slice(i, i + problemsPerPage);
+      const isLastPage = i + problemsPerPage >= problems.length;
+
+      pages.push(
+        <div key={`page-${i}`} className={!isLastPage ? 'page-break-after' : ''}>
+          <div className="grid grid-cols-4 gap-4 mb-12">
+            {pageProblems.map((problem, index) => {
+              const globalIndex = i + index;
+              return (
+                <div
+                  key={globalIndex}
+                  className={`border-4 rounded-2xl p-4 text-center print-problem ${
+                    theme === 'colorful' ? 'border-purple-400 bg-gradient-to-br from-purple-100 to-pink-100' :
+                    theme === 'kid-friendly' ? 'border-yellow-500 bg-yellow-100' :
+                    'border-gray-400 bg-white'
+                  }`}
+                >
+                  <div className="text-xs font-bold text-gray-500 mb-2">#{globalIndex + 1}</div>
+                  <div className="text-3xl font-bold text-gray-800 mb-2">
+                    {problem.num1}
+                  </div>
+                  <div className="text-2xl font-bold text-purple-600 mb-2">
+                    {problem.operation}
+                  </div>
+                  <div className="text-3xl font-bold text-gray-800 mb-3">
+                    {problem.num2}
+                  </div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    {showAnswers ? (
+                      <span className="text-green-600">{problem.correct}</span>
+                    ) : (
+                      '?'
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    return <>{pages}</>;
+  };
+
+  const renderWordProblemsLayout = () => {
+    const problemsPerPage = 3; // 3 word problems per page
+    const pages = [];
+
+    const storyTemplates: Record<string, (n1: number, n2: number) => string> = {
+      '+': (n1, n2) => `You have ${n1} apples. Your friend gives you ${n2} more apples. How many apples do you have now?`,
+      '-': (n1, n2) => `You have ${n1} candies. You give ${n2} candies to your friend. How many candies do you have left?`,
+      '×': (n1, n2) => `There are ${n1} boxes. Each box has ${n2} toys. How many toys are there in total?`,
+      '÷': (n1, n2) => `You have ${n1} cookies to share equally among ${n2} friends. How many cookies does each friend get?`
+    };
+
+    for (let i = 0; i < problems.length; i += problemsPerPage) {
+      const pageProblems = problems.slice(i, i + problemsPerPage);
+      const isLastPage = i + problemsPerPage >= problems.length;
+
+      pages.push(
+        <div key={`page-${i}`} className={!isLastPage ? 'page-break-after' : ''}>
+          <div className="space-y-6 mb-12">
+            {pageProblems.map((problem, index) => {
+              const globalIndex = i + index;
+              const story = storyTemplates[problem.operation](problem.num1, problem.num2);
+
+              return (
+                <div
+                  key={globalIndex}
+                  className={`border-2 rounded-lg p-6 print-problem ${
+                    theme === 'colorful' ? 'border-blue-300 bg-blue-50' :
+                    theme === 'kid-friendly' ? 'border-green-400 bg-green-50' :
+                    'border-gray-300 bg-white'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl font-bold text-gray-600 min-w-[2.5rem]">
+                      {globalIndex + 1}.
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-lg text-gray-800 mb-4 leading-relaxed">{story}</p>
+                      <div className="flex items-center gap-4">
+                        <span className="text-lg font-semibold text-gray-700">Answer:</span>
+                        {showAnswers ? (
+                          <span className="text-xl font-bold text-green-600">{problem.correct}</span>
+                        ) : (
+                          <span className="inline-block border-b-2 border-gray-800 min-w-[80px]"></span>
+                        )}
+                      </div>
+                      {includeWorkSpace && !showAnswers && (
+                        <div className="mt-4 border-t border-dashed border-gray-300 pt-3">
+                          <p className="text-sm text-gray-500 mb-2">Show your work:</p>
+                          <div className="min-h-[60px]"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    return <>{pages}</>;
+  };
 
   const renderLayout = () => {
     switch (layout) {
@@ -327,6 +435,36 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
                   </select>
                 </div>
 
+                {/* Font Size */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Font Size</label>
+                  <select
+                    value={fontSize}
+                    onChange={(e) => setFontSize(e.target.value as 'small' | 'medium' | 'large')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
+                  </select>
+                </div>
+
+                {/* Font Family */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Font Style</label>
+                  <select
+                    value={fontFamily}
+                    onChange={(e) => setFontFamily(e.target.value as 'sans' | 'serif' | 'mono')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="sans">Sans Serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="mono">Monospace</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                 {/* Custom Title */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Title</label>
@@ -351,8 +489,148 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
                 </div>
               </div>
 
+              {/* Problem Settings */}
+              {onSettingsChange && (
+                <div className="border-t border-gray-200 pt-4 space-y-4">
+                  <h3 className="text-sm font-bold text-gray-700 mb-3">Problem Settings:</h3>
+
+                  {/* Number of Problems */}
+                  <div className="flex items-center gap-4">
+                    <label className="text-sm font-semibold text-gray-700 min-w-[120px]">Problems:</label>
+                    <select
+                      value={settings.numProblems}
+                      onChange={(e) => {
+                        const newSettings = { ...settings, numProblems: Number(e.target.value) };
+                        onSettingsChange(newSettings);
+                      }}
+                      className="px-3 py-2 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none bg-white"
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={15}>15</option>
+                      <option value={20}>20</option>
+                      <option value={25}>25</option>
+                      <option value={30}>30</option>
+                      <option value={40}>40</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </div>
+
+                  {/* Operations */}
+                  <div className="flex items-center gap-4">
+                    <label className="text-sm font-semibold text-gray-700 min-w-[120px]">Operations:</label>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          // Prevent disabling if it's the only operation selected
+                          const totalSelected = [settings.includeAddition, settings.includeSubtraction, settings.includeMultiplication, settings.includeDivision].filter(Boolean).length;
+                          if (totalSelected === 1 && settings.includeAddition) return;
+
+                          const newSettings = { ...settings, includeAddition: !settings.includeAddition };
+                          onSettingsChange(newSettings);
+                        }}
+                        className={`w-10 h-10 rounded-lg font-bold text-xl transition-all ${
+                          settings.includeAddition
+                            ? 'bg-green-500 text-white shadow-lg'
+                            : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                        }`}
+                        title="Addition"
+                      >
+                        +
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Prevent disabling if it's the only operation selected
+                          const totalSelected = [settings.includeAddition, settings.includeSubtraction, settings.includeMultiplication, settings.includeDivision].filter(Boolean).length;
+                          if (totalSelected === 1 && settings.includeSubtraction) return;
+
+                          const newSettings = { ...settings, includeSubtraction: !settings.includeSubtraction };
+                          onSettingsChange(newSettings);
+                        }}
+                        className={`w-10 h-10 rounded-lg font-bold text-xl transition-all ${
+                          settings.includeSubtraction
+                            ? 'bg-blue-500 text-white shadow-lg'
+                            : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                        }`}
+                        title="Subtraction"
+                      >
+                        −
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Prevent disabling if it's the only operation selected
+                          const totalSelected = [settings.includeAddition, settings.includeSubtraction, settings.includeMultiplication, settings.includeDivision].filter(Boolean).length;
+                          if (totalSelected === 1 && settings.includeMultiplication) return;
+
+                          const newSettings = { ...settings, includeMultiplication: !settings.includeMultiplication };
+                          onSettingsChange(newSettings);
+                        }}
+                        className={`w-10 h-10 rounded-lg font-bold text-xl transition-all ${
+                          settings.includeMultiplication
+                            ? 'bg-purple-500 text-white shadow-lg'
+                            : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                        }`}
+                        title="Multiplication"
+                      >
+                        ×
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Prevent disabling if it's the only operation selected
+                          const totalSelected = [settings.includeAddition, settings.includeSubtraction, settings.includeMultiplication, settings.includeDivision].filter(Boolean).length;
+                          if (totalSelected === 1 && settings.includeDivision) return;
+
+                          const newSettings = { ...settings, includeDivision: !settings.includeDivision };
+                          onSettingsChange(newSettings);
+                        }}
+                        className={`w-10 h-10 rounded-lg font-bold text-xl transition-all ${
+                          settings.includeDivision
+                            ? 'bg-orange-500 text-white shadow-lg'
+                            : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                        }`}
+                        title="Division"
+                      >
+                        ÷
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Number Range */}
+                  <div className="flex items-center gap-4">
+                    <label className="text-sm font-semibold text-gray-700 min-w-[120px]">Range:</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min="1"
+                        max="999"
+                        value={settings.minNum}
+                        onChange={(e) => {
+                          const newSettings = { ...settings, minNum: Number(e.target.value) };
+                          onSettingsChange(newSettings);
+                        }}
+                        className="w-20 px-2 py-2 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none bg-white text-center"
+                        placeholder="Min"
+                      />
+                      <span className="text-gray-500">to</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="999"
+                        value={settings.maxNum}
+                        onChange={(e) => {
+                          const newSettings = { ...settings, maxNum: Number(e.target.value) };
+                          onSettingsChange(newSettings);
+                        }}
+                        className="w-20 px-2 py-2 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none bg-white text-center"
+                        placeholder="Max"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Checkboxes */}
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                   <input
                     type="checkbox"
@@ -370,15 +648,6 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
                     className="w-4 h-4 rounded"
                   />
                   Work Space
-                </label>
-                <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={includeInstructions}
-                    onChange={(e) => setIncludeInstructions(e.target.checked)}
-                    className="w-4 h-4 rounded"
-                  />
-                  Instructions
                 </label>
                 <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                   <input
@@ -406,23 +675,13 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
           {schoolName && (
             <div className="text-sm font-semibold text-gray-600 mb-2">{schoolName}</div>
           )}
-          <h1 className={`text-4xl font-bold mb-3 ${
+          <h1 className={`text-4xl font-bold ${
             theme === 'colorful' ? 'text-purple-600' :
             theme === 'kid-friendly' ? 'text-yellow-700' :
             'text-gray-800'
           }`}>
             {customTitle}
           </h1>
-          <div className="text-base text-gray-700 space-y-1">
-            <div className="flex justify-between max-w-2xl mx-auto">
-              <span>Name: <span className="font-semibold">{profileName}</span></span>
-              <span>Date: <span className="font-semibold">{new Date().toLocaleDateString()}</span></span>
-            </div>
-            <div className="flex justify-between max-w-2xl mx-auto">
-              <span>Difficulty: <span className="font-semibold">{getDifficultyLabel()}</span></span>
-              <span>Operations: <span className="font-semibold">{getOperationLabels()}</span></span>
-            </div>
-          </div>
           {includeScoreSection && (
             <div className="mt-4 flex justify-center gap-8 text-sm">
               <span>Score: _____ / {problems.length}</span>
@@ -431,16 +690,6 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
             </div>
           )}
         </div>
-
-        {/* Instructions */}
-        {includeInstructions && !showAnswers && (
-          <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-            <p className="text-sm text-gray-700">
-              <strong>Instructions:</strong> Solve each problem. Show your work in the space provided.
-              {settings.timedMode && ` Time limit: ${Math.floor((settings.timeLimit || 300) / 60)} minutes.`}
-            </p>
-          </div>
-        )}
 
         {/* Problems */}
         {renderLayout()}
@@ -470,11 +719,6 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
           </div>
         )}
 
-        {/* Footer */}
-        <div className="mt-12 pt-4 border-t-2 border-gray-300 text-center text-xs text-gray-500">
-          <p>Math Fun Worksheet - Generated on {new Date().toLocaleString()}</p>
-          <p className="mt-1">Keep practicing! You're doing great! 🌟</p>
-        </div>
       </div>
 
       {/* Print Styles */}
@@ -485,12 +729,20 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
           }
           .page-break {
             page-break-before: always;
+            break-before: page;
           }
           .page-break-after {
-            page-break-after: always;
+            page-break-after: always !important;
+            break-after: page !important;
+            display: block !important;
+          }
+          .print-page {
+            page-break-inside: avoid;
+            break-inside: avoid;
           }
           .print-problem {
             page-break-inside: avoid;
+            break-inside: avoid;
           }
           body {
             print-color-adjust: exact;
@@ -498,6 +750,12 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
           }
           @page {
             margin: 1cm;
+            size: auto;
+          }
+          /* Ensure the main container doesn't constrain pagination */
+          .print-content {
+            max-width: 100% !important;
+            padding: 0.5cm !important;
           }
         }
       `}</style>
