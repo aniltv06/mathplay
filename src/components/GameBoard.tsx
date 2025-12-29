@@ -39,6 +39,7 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
   const [allProblems, setAllProblems] = useState<Problem[]>([]);
   const [problemAnswers, setProblemAnswers] = useState<(number | null)[]>([]);
   const [newBadge, setNewBadge] = useState<any>(null);
+  const [isGameOver, setIsGameOver] = useState(false);
 
   // Shake animation for wrong answers
   const [shouldShake, setShouldShake] = useState(false);
@@ -79,26 +80,26 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
         problem = { num1: a, num2: b, operation: '+', correct: a + b };
     }
 
-    // Track problem
-    setAllProblems(prev => [...prev, problem]);
-    setProblemAnswers(prev => [...prev, null]);
-
     return problem;
   }, [difficulty, settings.problemTypes]);
 
   useEffect(() => {
-    const newProblem = generateProblem();
-    setProblem(newProblem);
+    if (!problem && !isGameOver) {
+      const newProblem = generateProblem();
+      setProblem(newProblem);
+      setAllProblems([newProblem]);
+      setProblemAnswers([null]);
 
-    // Speak the problem
-    if (newProblem) {
-      speakProblem(newProblem.num1, newProblem.operation, newProblem.num2);
+      // Speak the problem
+      if (newProblem) {
+        speakProblem(newProblem.num1, newProblem.operation, newProblem.num2);
+      }
     }
-  }, [generateProblem, speakProblem]);
+  }, []);
 
   // Timer
   useEffect(() => {
-    if (!isTimerActive || !settings.timeBonus) return;
+    if (!isTimerActive || !settings.timeBonus || isGameOver) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -111,9 +112,11 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isTimerActive, settings.timeBonus]);
+  }, [isTimerActive, settings.timeBonus, isGameOver]);
 
   const handleWrongAnswer = () => {
+    if (isGameOver) return;
+
     speak('Wrong!');
     setWrongAnswers((prev) => prev + 1);
     setLives((prev) => prev - 1);
@@ -132,7 +135,8 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
 
     setTimeout(() => {
       if (lives - 1 <= 0) {
-        // Game over - save session
+        // Game over - save session and end game
+        setIsGameOver(true);
         saveSession();
         onGameOver({
           score,
@@ -147,6 +151,8 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
         setShouldShake(false);
         const newProblem = generateProblem();
         setProblem(newProblem);
+        setAllProblems(prev => [...prev, newProblem]);
+        setProblemAnswers(prev => [...prev, null]);
         setTotalQuestions((prev) => prev + 1);
         setTimeLeft(30);
         setIsTimerActive(true);
@@ -160,7 +166,7 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
   };
 
   const handleSubmit = (answer: number) => {
-    if (!problem || isNaN(answer)) return;
+    if (!problem || isNaN(answer) || isGameOver) return;
 
     setIsTimerActive(false);
 
@@ -200,6 +206,8 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
         setFeedback(null);
         const newProblem = generateProblem();
         setProblem(newProblem);
+        setAllProblems(prev => [...prev, newProblem]);
+        setProblemAnswers(prev => [...prev, null]);
         setTotalQuestions((prev) => prev + 1);
         setTimeLeft(30);
         setIsTimerActive(true);
