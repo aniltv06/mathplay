@@ -283,15 +283,45 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
   const renderCoins = () => {
     if (!currentProblem || !showVisual || !currentProblem.coins) return null;
 
-    const getCoinClassName = (value: number): string => {
-      const baseClasses = 'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-md';
+    const getCoinStyle = (value: number): React.CSSProperties => {
+      const baseStyle: React.CSSProperties = {
+        width: '3rem',
+        height: '3rem',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontWeight: 'bold',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      };
 
       switch (value) {
-        case 1: return `${baseClasses} bg-gradient-to-br from-orange-500 to-amber-700`; // Penny (copper)
-        case 5: return `${baseClasses} bg-gradient-to-br from-slate-500 to-slate-700`; // Nickel
-        case 10: return `${baseClasses} bg-gradient-to-br from-gray-400 to-gray-600`; // Dime
-        case 25: return `${baseClasses} bg-gradient-to-br from-slate-600 to-slate-800`; // Quarter
-        default: return `${baseClasses} bg-gradient-to-br from-amber-400 to-yellow-600`;
+        case 1: // Penny (copper)
+          return {
+            ...baseStyle,
+            background: 'linear-gradient(to bottom right, #f97316, #b45309)',
+          };
+        case 5: // Nickel (silver)
+          return {
+            ...baseStyle,
+            background: 'linear-gradient(to bottom right, #64748b, #334155)',
+          };
+        case 10: // Dime (light silver)
+          return {
+            ...baseStyle,
+            background: 'linear-gradient(to bottom right, #9ca3af, #4b5563)',
+          };
+        case 25: // Quarter (dark silver)
+          return {
+            ...baseStyle,
+            background: 'linear-gradient(to bottom right, #475569, #1e293b)',
+          };
+        default:
+          return {
+            ...baseStyle,
+            background: 'linear-gradient(to bottom right, #fbbf24, #ca8a04)',
+          };
       }
     };
 
@@ -311,7 +341,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
                 {Array.from({ length: coin.count }).map((_, i) => (
                   <div
                     key={i}
-                    className={getCoinClassName(coin.value)}
+                    style={getCoinStyle(coin.value)}
                   >
                     {coin.value}
                   </div>
@@ -369,28 +399,40 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-orange-500 to-amber-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <div
+                      className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md"
+                      style={{ background: 'linear-gradient(to bottom right, #f97316, #b45309)' }}
+                    >
                       1¢
                     </div>
                     <p className="font-bold text-green-700">Penny</p>
                     <p className="text-sm text-gray-600">1 cent</p>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-slate-500 to-slate-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <div
+                      className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md"
+                      style={{ background: 'linear-gradient(to bottom right, #64748b, #334155)' }}
+                    >
                       5¢
                     </div>
                     <p className="font-bold text-green-700">Nickel</p>
                     <p className="text-sm text-gray-600">5 cents</p>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                    <div
+                      className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md"
+                      style={{ background: 'linear-gradient(to bottom right, #9ca3af, #4b5563)' }}
+                    >
                       10¢
                     </div>
                     <p className="font-bold text-green-700">Dime</p>
                     <p className="text-sm text-gray-600">10 cents</p>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                    <div
+                      className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md"
+                      style={{ background: 'linear-gradient(to bottom right, #475569, #1e293b)' }}
+                    >
                       25¢
                     </div>
                     <p className="font-bold text-green-700">Quarter</p>
