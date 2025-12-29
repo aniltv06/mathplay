@@ -283,6 +283,16 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
   const renderCoins = () => {
     if (!currentProblem || !showVisual || !currentProblem.coins) return null;
 
+    const getCoinColor = (value: number): string => {
+      switch (value) {
+        case 1: return 'from-orange-500 to-amber-700'; // Penny (copper)
+        case 5: return 'from-slate-500 to-slate-700'; // Nickel (silver-ish)
+        case 10: return 'from-gray-400 to-gray-600'; // Dime (silver)
+        case 25: return 'from-slate-600 to-slate-800'; // Quarter (silver-dark)
+        default: return 'from-amber-400 to-yellow-600';
+      }
+    };
+
     return (
       <div className="bg-green-50 rounded-xl p-6 mb-6">
         <h3 className="text-lg font-bold text-green-800 mb-4 text-center">
@@ -299,7 +309,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
                 {Array.from({ length: coin.count }).map((_, i) => (
                   <div
                     key={i}
-                    className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center text-white font-bold shadow-md"
+                    className={`w-12 h-12 rounded-full bg-gradient-to-br ${getCoinColor(coin.value)} flex items-center justify-center text-white font-bold shadow-md`}
                   >
                     {coin.value}
                   </div>
@@ -357,28 +367,28 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-orange-400 to-amber-600 flex items-center justify-center text-white font-bold text-xl">
+                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-orange-500 to-amber-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
                       1¢
                     </div>
                     <p className="font-bold text-green-700">Penny</p>
                     <p className="text-sm text-gray-600">1 cent</p>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-gray-400 to-slate-500 flex items-center justify-center text-white font-bold text-xl">
+                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-slate-500 to-slate-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
                       5¢
                     </div>
                     <p className="font-bold text-green-700">Nickel</p>
                     <p className="text-sm text-gray-600">5 cents</p>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-gray-300 to-slate-400 flex items-center justify-center text-white font-bold text-lg">
+                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
                       10¢
                     </div>
                     <p className="font-bold text-green-700">Dime</p>
                     <p className="text-sm text-gray-600">10 cents</p>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-slate-400 to-gray-600 flex items-center justify-center text-white font-bold text-lg">
+                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center text-white font-bold text-lg shadow-md">
                       25¢
                     </div>
                     <p className="font-bold text-green-700">Quarter</p>
