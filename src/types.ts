@@ -29,6 +29,7 @@ export interface Problem {
   num2: number;
   operation: Operation;
   correct: number;
+  wordProblem?: string; // Pre-generated word problem text for consistency
 }
 
 export interface ProblemSettings {

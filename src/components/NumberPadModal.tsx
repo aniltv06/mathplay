@@ -191,12 +191,9 @@ export function NumberPadModal({
           {questionText ? (
             /* Word Problem Display */
             <div className="bg-white rounded-2xl p-6 mb-4">
-              <p className="text-lg font-medium text-gray-800 leading-relaxed text-left mb-4">
+              <p className="text-lg font-medium text-gray-800 leading-relaxed">
                 {questionText}
               </p>
-              <div className="flex justify-center items-center gap-2 text-sm text-gray-600 border-t pt-4">
-                <span className="font-mono">{problem.num1} {problem.operation} {problem.num2} = ?</span>
-              </div>
             </div>
           ) : (
             /* Standard Math Display */

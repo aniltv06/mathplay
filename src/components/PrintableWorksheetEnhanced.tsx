@@ -70,11 +70,11 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
       {problems.map((problem, index) => (
         <div
           key={index}
-          className={`border-2 rounded-lg p-4 ${
+          className={`border-2 rounded-lg p-4 print-problem ${
             theme === 'colorful' ? 'border-purple-300 bg-white' :
             theme === 'kid-friendly' ? 'border-yellow-400 bg-white' :
             'border-gray-300 bg-gray-50'
-          }`}
+          } ${(index + 1) % 6 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''}`}
         >
           <div className="flex items-start gap-3">
             <span className="text-lg font-bold text-gray-600 min-w-[2rem]">
@@ -106,11 +106,11 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
       {problems.map((problem, index) => (
         <div
           key={index}
-          className={`border-2 rounded-lg p-4 ${
+          className={`border-2 rounded-lg p-4 print-problem ${
             theme === 'colorful' ? 'border-blue-300 bg-white' :
             theme === 'kid-friendly' ? 'border-orange-400 bg-white' :
             'border-gray-300 bg-white'
-          }`}
+          } ${(index + 1) % 12 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''}`}
         >
           <div className="text-center">
             <div className="text-sm font-bold text-gray-600 mb-3">#{index + 1}</div>
@@ -142,7 +142,9 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
   const renderTwoColumnLayout = () => (
     <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-12">
       {problems.map((problem, index) => (
-        <div key={index} className="flex items-start gap-3 py-2 border-b border-gray-300">
+        <div key={index} className={`flex items-start gap-3 py-2 border-b border-gray-300 print-problem ${
+          (index + 1) % 14 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''
+        }`}>
           <span className="text-lg font-bold text-gray-600 min-w-[2.5rem]">
             {index + 1}.
           </span>
@@ -167,11 +169,11 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
       {problems.map((problem, index) => (
         <div
           key={index}
-          className={`border-4 rounded-2xl p-4 text-center ${
+          className={`border-4 rounded-2xl p-4 text-center print-problem ${
             theme === 'colorful' ? 'border-purple-400 bg-gradient-to-br from-purple-100 to-pink-100' :
             theme === 'kid-friendly' ? 'border-yellow-500 bg-yellow-100' :
             'border-gray-400 bg-white'
-          }`}
+          } ${(index + 1) % 12 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''}`}
         >
           <div className="text-xs font-bold text-gray-500 mb-2">#{index + 1}</div>
           <div className="text-3xl font-bold text-gray-800 mb-2">
@@ -210,11 +212,11 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
         return (
           <div
             key={index}
-            className={`border-2 rounded-lg p-6 ${
+            className={`border-2 rounded-lg p-6 print-problem ${
               theme === 'colorful' ? 'border-blue-300 bg-blue-50' :
               theme === 'kid-friendly' ? 'border-green-400 bg-green-50' :
               'border-gray-300 bg-white'
-            }`}
+            } ${(index + 1) % 3 === 0 && index !== problems.length - 1 ? 'page-break-after' : ''}`}
           >
             <div className="flex items-start gap-3">
               <span className="text-xl font-bold text-gray-600 min-w-[2.5rem]">
@@ -484,9 +486,18 @@ export function PrintableWorksheetEnhanced({ problems, settings, profileName, on
           .page-break {
             page-break-before: always;
           }
+          .page-break-after {
+            page-break-after: always;
+          }
+          .print-problem {
+            page-break-inside: avoid;
+          }
           body {
             print-color-adjust: exact;
             -webkit-print-color-adjust: exact;
+          }
+          @page {
+            margin: 1cm;
           }
         }
       `}</style>

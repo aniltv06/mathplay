@@ -150,6 +150,12 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
         // Only add if not duplicate
         if (!problemSet.has(problemKey)) {
           problemSet.add(problemKey);
+
+          // Generate word problem text once and store it
+          if (settings.displayAsWordProblems) {
+            problem.wordProblem = getWordProblem(problem);
+          }
+
           problems.push(problem);
         }
       }
@@ -202,7 +208,11 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
     // Speak the problem when opening
     const problem = problems[index];
     if (problem) {
-      speakProblem(problem.num1, problem.operation, problem.num2);
+      if (settings.displayAsWordProblems && problem.wordProblem) {
+        speak(problem.wordProblem);
+      } else {
+        speakProblem(problem.num1, problem.operation, problem.num2);
+      }
     }
   };
 
@@ -238,7 +248,11 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
         // Speak next problem
         const nextProblem = problems[nextIndex];
         if (nextProblem) {
-          speakProblem(nextProblem.num1, nextProblem.operation, nextProblem.num2);
+          if (settings.displayAsWordProblems && nextProblem.wordProblem) {
+            speak(nextProblem.wordProblem);
+          } else {
+            speakProblem(nextProblem.num1, nextProblem.operation, nextProblem.num2);
+          }
         }
       } else {
         // All problems answered, close modal
@@ -263,7 +277,11 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
       // Speak the problem
       const problem = problems[newIndex];
       if (problem) {
-        speakProblem(problem.num1, problem.operation, problem.num2);
+        if (settings.displayAsWordProblems && problem.wordProblem) {
+          speak(problem.wordProblem);
+        } else {
+          speakProblem(problem.num1, problem.operation, problem.num2);
+        }
       }
     }
   };
@@ -277,7 +295,11 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
       // Speak the problem
       const problem = problems[newIndex];
       if (problem) {
-        speakProblem(problem.num1, problem.operation, problem.num2);
+        if (settings.displayAsWordProblems && problem.wordProblem) {
+          speak(problem.wordProblem);
+        } else {
+          speakProblem(problem.num1, problem.operation, problem.num2);
+        }
       }
     }
   };
@@ -417,7 +439,7 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
                     /* Word Problem Layout */
                     <div className="text-center max-w-md">
                       <p className="text-lg font-medium text-gray-800 leading-relaxed mb-6 text-left">
-                        {getWordProblem(problem)}
+                        {problem.wordProblem || `${problem.num1} ${problem.operation} ${problem.num2} = ?`}
                       </p>
                       <div className="flex items-center justify-center gap-2 mb-4">
                         <span className="text-xl font-semibold text-gray-700">Answer:</span>
@@ -494,7 +516,7 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
             hasPrevious={currentProblemIndex > 0}
             hasNext={currentProblemIndex < problems.length - 1}
             initialAnswer={answers[currentProblemIndex]}
-            questionText={settings.displayAsWordProblems ? getWordProblem(problems[currentProblemIndex]) : undefined}
+            questionText={settings.displayAsWordProblems ? problems[currentProblemIndex].wordProblem : undefined}
           />
         )}
       </div>
