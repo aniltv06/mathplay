@@ -10,7 +10,7 @@ import { VoiceFeedbackProvider } from './hooks/useVoiceFeedback';
 import { ProfileSelector } from './components/ProfileSelector';
 import { HomePage } from './pages/HomePage';
 import { MathChallengePage } from './pages/MathChallengePage';
-import { MathWorksheetPage } from './pages/MathWorksheetPage';
+import { MathWorksheetPageEnhanced } from './pages/MathWorksheetPageEnhanced';
 import { MultiplicationLearningPageEnhanced } from './pages/MultiplicationLearningPageEnhanced';
 import { ParentDashboardPage } from './pages/ParentDashboardPage';
 
@@ -66,7 +66,7 @@ export default function App() {
                   />
                 )}
                 {currentPage === 'math-worksheet' && (
-                  <MathWorksheetPage
+                  <MathWorksheetPageEnhanced
                     onBack={() => navigateTo('home')}
                     profileId={selectedProfile}
                   />
