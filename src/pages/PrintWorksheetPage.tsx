@@ -39,6 +39,7 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
   const [showAnswers, setShowAnswers] = useState(false);
   const [includeWorkspace, setIncludeWorkspace] = useState(false);
   const [worksheetTitle, setWorksheetTitle] = useState('Math Worksheet');
+  const [layout, setLayout] = useState<'horizontal' | 'vertical'>('horizontal');
   const [problems, setProblems] = useState<Problem[]>([]);
 
   // Generate problems
@@ -138,8 +139,9 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
     }
   };
 
-  // Split problems into pages (18 per page in 2-column layout)
-  const problemsPerPage = 18;
+  // Split problems into pages based on layout
+  const problemsPerPage = layout === 'vertical' ? 36 : 18; // Vertical: 4x9, Horizontal: 2x9
+  const columnsPerPage = layout === 'vertical' ? 4 : 2;
   const pages: Problem[][] = [];
   for (let i = 0; i < problems.length; i += problemsPerPage) {
     pages.push(problems.slice(i, i + problemsPerPage));
@@ -205,6 +207,12 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
                   <option value={40}>40</option>
                   <option value={50}>50</option>
                   <option value={100}>100</option>
+                  <option value={150}>150</option>
+                  <option value={200}>200</option>
+                  <option value={250}>250</option>
+                  <option value={300}>300</option>
+                  <option value={400}>400</option>
+                  <option value={500}>500</option>
                 </select>
               </div>
 
@@ -238,6 +246,18 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
                   className="px-3 py-2 border-2 border-gray-300 rounded-lg bg-white focus:border-blue-500 focus:outline-none"
                   placeholder="Worksheet title"
                 />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">Layout:</label>
+                <select
+                  value={layout}
+                  onChange={(e) => setLayout(e.target.value as 'horizontal' | 'vertical')}
+                  className="px-3 py-2 border-2 border-gray-300 rounded-lg bg-white focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="horizontal">Horizontal</option>
+                  <option value="vertical">Vertical</option>
+                </select>
               </div>
             </div>
 
@@ -337,26 +357,52 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
                 </div>
               </div>
 
-              {/* Problems Grid - 2 columns */}
-              <div className="grid grid-cols-2 gap-6">
+              {/* Problems Grid - Dynamic columns based on layout */}
+              <div className={`grid ${layout === 'vertical' ? 'grid-cols-4' : 'grid-cols-2'} gap-6`}>
                 {pageProblems.map((problem, index) => {
                   const globalIndex = pageIndex * problemsPerPage + index;
                   return (
                     <div key={globalIndex} className="problem-box">
-                      <div className="flex items-start gap-3">
-                        <span className="problem-number">{globalIndex + 1}.</span>
-                        <div className="flex-1">
-                          <div className="problem-text">
-                            {problem.num1} {problem.operation} {problem.num2} = _______
+                      {layout === 'horizontal' ? (
+                        // Horizontal Layout
+                        <div className="flex items-start gap-3">
+                          <span className="problem-number">{globalIndex + 1}.</span>
+                          <div className="flex-1">
+                            <div className="problem-text">
+                              {problem.num1} {problem.operation} {problem.num2} = _______
+                            </div>
+                            {includeWorkspace && (
+                              <div className="workspace">
+                                <p className="text-xs text-gray-400 mb-1">Show your work:</p>
+                                <div className="workspace-lines"></div>
+                              </div>
+                            )}
                           </div>
-                          {includeWorkspace && (
-                            <div className="workspace">
-                              <p className="text-xs text-gray-400 mb-1">Show your work:</p>
-                              <div className="workspace-lines"></div>
+                        </div>
+                      ) : (
+                        // Vertical Layout
+                        <div className="text-center">
+                          <div className="text-xs text-gray-600 mb-2">#{globalIndex + 1}</div>
+                          <div className="vertical-problem">
+                            <div className="problem-num">{problem.num1}</div>
+                            <div className="problem-op-line">
+                              <span className="problem-op">{problem.operation}</span>
+                              <span className="problem-num">{problem.num2}</span>
+                            </div>
+                            <div className="problem-line"></div>
+                            {showAnswers ? (
+                              <div className="problem-answer">{problem.answer}</div>
+                            ) : (
+                              <div className="problem-blank"></div>
+                            )}
+                          </div>
+                          {includeWorkspace && !showAnswers && (
+                            <div className="workspace-vertical">
+                              <p className="text-xs text-gray-400">Work</p>
                             </div>
                           )}
                         </div>
-                      </div>
+                      )}
                     </div>
                   );
                 })}
@@ -457,6 +503,57 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
             background: #f0fdf4;
             text-align: center;
           }
+
+          /* Vertical Problem Styles */
+          .vertical-problem {
+            font-family: monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 auto;
+            max-width: 120px;
+          }
+
+          .problem-num {
+            text-align: right;
+            padding: 4px 8px;
+          }
+
+          .problem-op-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+          }
+
+          .problem-op {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #7c3aed;
+          }
+
+          .problem-line {
+            border-bottom: 3px solid #1f2937;
+            margin: 8px 0;
+          }
+
+          .problem-answer {
+            text-align: right;
+            color: #16a34a;
+            font-weight: 700;
+            padding: 4px 8px;
+          }
+
+          .problem-blank {
+            min-height: 36px;
+          }
+
+          .workspace-vertical {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #d1d5db;
+            min-height: 40px;
+          }
         }
 
         /* Print Styles */
@@ -545,6 +642,57 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
             text-align: center;
             page-break-inside: avoid;
             break-inside: avoid;
+          }
+
+          /* Vertical Problem Styles for Print */
+          .vertical-problem {
+            font-family: monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #000;
+            margin: 0 auto;
+            max-width: 100px;
+          }
+
+          .problem-num {
+            text-align: right;
+            padding: 2px 6px;
+          }
+
+          .problem-op-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 6px;
+          }
+
+          .problem-op {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #000;
+          }
+
+          .problem-line {
+            border-bottom: 2px solid #000;
+            margin: 6px 0;
+          }
+
+          .problem-answer {
+            text-align: right;
+            color: #000;
+            font-weight: 700;
+            padding: 2px 6px;
+          }
+
+          .problem-blank {
+            min-height: 30px;
+          }
+
+          .workspace-vertical {
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px dashed #666;
+            min-height: 30px;
           }
 
           /* Ensure grid stays intact */
