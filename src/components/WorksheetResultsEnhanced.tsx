@@ -5,16 +5,19 @@
  * @email aniltv06@gmail.com
  */
 
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import {
   ArrowLeft, CheckCircle, XCircle, Clock, Zap, Trophy,
   TrendingUp, Target, Award, Star, Coins as CoinsIcon,
-  RotateCcw, Home, ChevronRight, Brain, Flame
+  RotateCcw, Home, ChevronRight, Brain, Flame, Printer
 } from 'lucide-react';
 import type { WorksheetSession, Problem } from '../types';
 import { RewardsDisplay } from './WorksheetEnhancedComponents';
 import { calculateRewards } from '../utils/rewards';
 import { useProfiles } from '../context/ProfileContext';
+import { PrintableWorksheetEnhanced } from './PrintableWorksheetEnhanced';
+import { formatName } from '../utils/formatters';
 
 interface Props {
   session: WorksheetSession;
@@ -27,6 +30,7 @@ interface Props {
 export function WorksheetResultsEnhanced({ session, onTryAgain, onBack, profileId, rewards }: Props) {
   const { getProfile } = useProfiles();
   const profile = getProfile(profileId);
+  const [showPrintView, setShowPrintView] = useState(false);
 
   const { problems, answers, correctCount, wrongCount, timeSpent, percentage, currentStreak } = session;
   const totalProblems = problems.length;
@@ -79,7 +83,16 @@ export function WorksheetResultsEnhanced({ session, onTryAgain, onBack, profileI
   const needsWork = operationStats.filter(s => s.accuracy < 80 && s.total > 0);
 
   return (
-    <div className="min-h-screen px-4 py-8">
+    <>
+      {showPrintView && profile ? (
+        <PrintableWorksheetEnhanced
+          problems={session.problems}
+          settings={session.settings}
+          profileName={formatName(profile.name)}
+          onClose={() => setShowPrintView(false)}
+        />
+      ) : (
+    <div className="min-h-screen px-4 py-8">{/* existing content */}
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
@@ -318,6 +331,14 @@ export function WorksheetResultsEnhanced({ session, onTryAgain, onBack, profileI
           className="flex flex-col sm:flex-row gap-4"
         >
           <button
+            onClick={() => setShowPrintView(true)}
+            className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white py-4 rounded-2xl text-xl font-bold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          >
+            <Printer className="w-6 h-6" />
+            Print Worksheet
+          </button>
+
+          <button
             onClick={onTryAgain}
             className="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white py-4 rounded-2xl text-xl font-bold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
           >
@@ -335,5 +356,7 @@ export function WorksheetResultsEnhanced({ session, onTryAgain, onBack, profileI
         </motion.div>
       </div>
     </div>
+      )}
+    </>
   );
 }

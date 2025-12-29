@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Trophy, Target, Clock, TrendingUp, Printer } from 'lucide-react';
-import { PrintableWorksheet } from './PrintableWorksheet';
+import { PrintableWorksheetEnhanced } from './PrintableWorksheetEnhanced';
 import { useProfiles } from '../context/ProfileContext';
 import type { WorksheetSession } from '../types';
 import { formatName } from '../utils/formatters';
@@ -51,7 +51,7 @@ export function WorksheetResults({ session, onTryAgain, onBack, profileId }: Pro
   return (
     <>
       {showPrintView && profile ? (
-        <PrintableWorksheet
+        <PrintableWorksheetEnhanced
           problems={session.problems}
           settings={session.settings}
           profileName={formatName(profile.name)}
