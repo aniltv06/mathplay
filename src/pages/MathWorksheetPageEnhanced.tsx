@@ -20,7 +20,6 @@ import { checkAndAwardBadges } from '../utils/badges';
 import { BadgeNotification } from '../components/BadgeComponents';
 import { calculateRewards, getTodaysChallenges, updateDailyChallenges } from '../utils/rewards';
 import { soundEffects } from '../utils/soundEffects';
-import { PrintableWorksheetEnhanced } from '../components/PrintableWorksheetEnhanced';
 import { formatName } from '../utils/formatters';
 
 interface Props {
@@ -167,8 +166,6 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
   const [newBadge, setNewBadge] = useState<any>(null);
   const [rewards, setRewards] = useState<any>(null);
   const [soundEnabled, setSoundEnabled] = useState(soundEffects.isEnabled());
-  const [showPrintPreview, setShowPrintPreview] = useState(false);
-  const [printProblems, setPrintProblems] = useState<Problem[]>([]);
 
   const handleModeSelect = (mode: string) => {
     setSelectedMode(mode as PracticeMode);
@@ -288,15 +285,6 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
     setVoiceEnabled(!voiceEnabled);
   };
 
-  const handlePrintPreview = (previewSettings: ProblemSettings) => {
-    // Generate problems for printing
-    const problems = generateProblems(previewSettings);
-    setPrintProblems(problems);
-    setSettings(previewSettings);
-    setShowSettings(false);
-    setShowPrintPreview(true);
-  };
-
   const generateProblems = (config: ProblemSettings): Problem[] => {
     const problems: Problem[] = [];
     const problemSet = new Set<string>();
@@ -346,11 +334,6 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
     }
 
     return problems;
-  };
-
-  const closePrintPreview = () => {
-    setShowPrintPreview(false);
-    setPrintProblems([]);
   };
 
   return (
@@ -403,19 +386,10 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
           settings={settings}
           onSave={handleSettingsSave}
           onClose={() => setShowSettings(false)}
-          onPrintPreview={handlePrintPreview}
         />
       )}
 
       {/* Print Preview */}
-      {showPrintPreview && profile && printProblems.length > 0 && (
-        <PrintableWorksheetEnhanced
-          problems={printProblems}
-          settings={settings}
-          profileName={formatName(profile.name)}
-          onClose={closePrintPreview}
-        />
-      )}
 
       {/* Page States */}
       <div className="relative z-1">

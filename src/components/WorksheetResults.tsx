@@ -8,10 +8,8 @@
  * Display results and statistics after completing a worksheet
  */
 
-import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Trophy, Target, Clock, TrendingUp, Printer } from 'lucide-react';
-import { PrintableWorksheetEnhanced } from './PrintableWorksheetEnhanced';
+import { Trophy, Target, Clock, TrendingUp } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import type { WorksheetSession } from '../types';
 import { formatName } from '../utils/formatters';
@@ -26,7 +24,6 @@ interface Props {
 export function WorksheetResults({ session, onTryAgain, onBack, profileId }: Props) {
   const { getProfile } = useProfiles();
   const profile = getProfile(profileId);
-  const [showPrintView, setShowPrintView] = useState(false);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -49,16 +46,7 @@ export function WorksheetResults({ session, onTryAgain, onBack, profileId }: Pro
   };
 
   return (
-    <>
-      {showPrintView && profile ? (
-        <PrintableWorksheetEnhanced
-          problems={session.problems}
-          settings={session.settings}
-          profileName={formatName(profile.name)}
-          onClose={() => setShowPrintView(false)}
-        />
-      ) : (
-        <div className="min-h-screen flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -174,13 +162,6 @@ export function WorksheetResults({ session, onTryAgain, onBack, profileId }: Pro
         {/* Action Buttons */}
         <div className="flex gap-4">
           <button
-            onClick={() => setShowPrintView(true)}
-            className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-4 rounded-2xl text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-          >
-            <Printer className="w-5 h-5" />
-            Print Worksheet
-          </button>
-          <button
             onClick={onTryAgain}
             className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-4 rounded-2xl text-lg transition-all shadow-lg hover:shadow-xl"
           >
@@ -195,7 +176,5 @@ export function WorksheetResults({ session, onTryAgain, onBack, profileId }: Pro
         </div>
       </motion.div>
     </div>
-      )}
-    </>
   );
 }

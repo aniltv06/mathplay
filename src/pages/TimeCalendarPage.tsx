@@ -67,10 +67,12 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
     };
   };
 
+  // Initialize first problem when mode or difficulty changes
   useEffect(() => {
     if (mode !== 'learn') {
       setCurrentProblem(generateProblem());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, difficulty]);
 
   const handleSubmit = () => {

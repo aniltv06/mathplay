@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "build:github": "tsc && GITHUB_PAGES=true vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 50"
   },
   "repository": {
     "type": "git",

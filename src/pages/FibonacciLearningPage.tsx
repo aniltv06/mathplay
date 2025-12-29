@@ -79,11 +79,12 @@ export function FibonacciLearningPage({ onBack, profileId }: Props) {
     return { position, answer, sequence };
   };
 
-  // Initialize first problem
+  // Initialize first problem when mode or difficulty changes
   useEffect(() => {
     if (mode !== 'learn') {
       setCurrentProblem(generateProblem());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, difficulty]);
 
   const handleSubmit = () => {

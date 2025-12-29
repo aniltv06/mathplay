@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Heart, Star, Trophy, Clock } from 'lucide-react';
-import type { Difficulty, GameSettings, GameStats, Problem, HangmanSession } from '../types';
+import type { Difficulty, GameSettings, GameStats, Problem, HangmanSession, Badge } from '../types';
 import { HangmanDisplay } from './HangmanDisplay';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
 import { useProfiles } from '../context/ProfileContext';
@@ -38,7 +38,7 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
   const [gameStartTime] = useState(Date.now());
   const [allProblems, setAllProblems] = useState<Problem[]>([]);
   const [problemAnswers, setProblemAnswers] = useState<(number | null)[]>([]);
-  const [newBadge, setNewBadge] = useState<any>(null);
+  const [newBadge, setNewBadge] = useState<Badge | null>(null);
   const [isGameOver, setIsGameOver] = useState(false);
 
   // Shake animation for wrong answers
@@ -83,6 +83,7 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
     return problem;
   }, [difficulty, settings.problemTypes]);
 
+  // Initialize first problem on mount - intentionally runs only once
   useEffect(() => {
     if (!problem && !isGameOver) {
       const newProblem = generateProblem();
@@ -95,26 +96,46 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
         speakProblem(newProblem.num1, newProblem.operation, newProblem.num2);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Timer
-  useEffect(() => {
-    if (!isTimerActive || !settings.timeBonus || isGameOver) return;
+  // Save session function
+  const saveSession = useCallback(() => {
+    const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
+    const livesUsed = settings.livesCount - lives;
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          handleWrongAnswer();
-          return 30;
+    const session: HangmanSession = {
+      date: new Date().toISOString(),
+      difficulty,
+      settings,
+      problems: allProblems,
+      answers: problemAnswers,
+      score,
+      livesUsed,
+      totalLives: settings.livesCount,
+      maxStreak,
+      timeSpent,
+      completed: lives > 0,
+    };
+
+    // Save to profile
+    saveHangmanSession(profileId, session);
+
+    // Check for new badges
+    const profile = getProfile(profileId);
+    if (profile) {
+      const newBadges = checkAndAwardBadges(profile);
+      if (newBadges.length > 0) {
+        // Show first badge notification
+        const badgeToShow = profile.badges.find(b => b.id === newBadges[0]);
+        if (badgeToShow) {
+          setNewBadge(badgeToShow);
         }
-        return prev - 1;
-      });
-    }, 1000);
+      }
+    }
+  }, [gameStartTime, settings, lives, difficulty, allProblems, problemAnswers, score, maxStreak, profileId, saveHangmanSession, getProfile]);
 
-    return () => clearInterval(timer);
-  }, [isTimerActive, settings.timeBonus, isGameOver]);
-
-  const handleWrongAnswer = () => {
+  const handleWrongAnswer = useCallback(() => {
     if (isGameOver) return;
 
     speak('Wrong!');
@@ -163,7 +184,24 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
         }
       }
     }, 1500);
-  };
+  }, [isGameOver, speak, allProblems.length, lives, score, correctAnswers, wrongAnswers, totalQuestions, streak, maxStreak, onGameOver, generateProblem, speakProblem, saveSession]);
+
+  // Timer
+  useEffect(() => {
+    if (!isTimerActive || !settings.timeBonus || isGameOver) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          handleWrongAnswer();
+          return 30;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isTimerActive, settings.timeBonus, isGameOver, handleWrongAnswer]);
 
   const handleSubmit = (answer: number) => {
     if (!problem || isNaN(answer) || isGameOver) return;
@@ -225,42 +263,6 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
   // Handle skip - same as wrong answer
   const handleSkip = () => {
     handleWrongAnswer();
-  };
-
-  // Save session function
-  const saveSession = () => {
-    const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
-    const livesUsed = settings.livesCount - lives;
-
-    const session: HangmanSession = {
-      date: new Date().toISOString(),
-      difficulty,
-      settings,
-      problems: allProblems,
-      answers: problemAnswers,
-      score,
-      livesUsed,
-      totalLives: settings.livesCount,
-      maxStreak,
-      timeSpent,
-      completed: lives > 0,
-    };
-
-    // Save to profile
-    saveHangmanSession(profileId, session);
-
-    // Check for new badges
-    const profile = getProfile(profileId);
-    if (profile) {
-      const newBadges = checkAndAwardBadges(profile);
-      if (newBadges.length > 0) {
-        // Show first badge notification
-        const badgeToShow = profile.badges.find(b => b.id === newBadges[0]);
-        if (badgeToShow) {
-          setNewBadge(badgeToShow);
-        }
-      }
-    }
   };
 
   if (!problem) return null;
