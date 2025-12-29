@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'motion/react';
-import { Grid3x3, LogOut, User, Trophy, Edit } from 'lucide-react';
+import { Grid3x3, LogOut, User, Trophy, Edit, Printer } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useI18n } from '../i18n/I18nContext';
@@ -226,11 +226,30 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               <p className="text-gray-600">{t.multiplicationLearningDesc}</p>
             </motion.button>
 
+            {/* Print Worksheets Card */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onNavigate('print-worksheet')}
+              className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all text-left group"
+            >
+              <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Printer className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl mb-2 text-orange-600">
+                Print Worksheets
+              </h3>
+              <p className="text-gray-600">Generate and print custom math worksheets</p>
+            </motion.button>
+
             {/* Coming Soon Tile */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.7 }}
               className="bg-white/50 backdrop-blur-sm border-4 border-dashed border-white/70 rounded-3xl p-8 shadow-xl flex flex-col items-center justify-center"
             >
               <div className="text-6xl mb-4">✨</div>

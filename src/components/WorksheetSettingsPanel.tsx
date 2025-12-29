@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Printer } from 'lucide-react';
 import type { ProblemSettings } from '../types';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
 
@@ -17,9 +17,10 @@ interface Props {
   settings: ProblemSettings;
   onSave: (settings: ProblemSettings) => void;
   onClose: () => void;
+  onPrintPreview?: (settings: ProblemSettings) => void;
 }
 
-export function WorksheetSettingsPanel({ settings, onSave, onClose }: Props) {
+export function WorksheetSettingsPanel({ settings, onSave, onClose, onPrintPreview }: Props) {
   const [localSettings, setLocalSettings] = useState<ProblemSettings>(settings);
   const { enabled: voiceEnabled, setEnabled: setVoiceEnabled } = useVoiceFeedback();
 
@@ -36,6 +37,23 @@ export function WorksheetSettingsPanel({ settings, onSave, onClose }: Props) {
     }
 
     onSave(localSettings);
+  };
+
+  const handlePrintPreview = () => {
+    // Validate at least one operation is selected
+    if (
+      !localSettings.includeAddition &&
+      !localSettings.includeSubtraction &&
+      !localSettings.includeMultiplication &&
+      !localSettings.includeDivision
+    ) {
+      alert('Please select at least one operation type!');
+      return;
+    }
+
+    if (onPrintPreview) {
+      onPrintPreview(localSettings);
+    }
   };
 
   return (
@@ -252,11 +270,20 @@ export function WorksheetSettingsPanel({ settings, onSave, onClose }: Props) {
 
         {/* Action Buttons */}
         <div className="flex gap-4 mt-8">
+          {onPrintPreview && (
+            <button
+              onClick={handlePrintPreview}
+              className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 rounded-2xl text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+            >
+              <Printer className="w-5 h-5" />
+              Print Preview
+            </button>
+          )}
           <button
             onClick={handleSave}
             className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-3 rounded-2xl text-lg transition-all shadow-lg hover:shadow-xl"
           >
-            Save Settings
+            Save & Start
           </button>
           <button
             onClick={onClose}

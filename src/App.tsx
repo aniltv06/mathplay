@@ -13,8 +13,9 @@ import { MathChallengePage } from './pages/MathChallengePage';
 import { MathWorksheetPageEnhanced } from './pages/MathWorksheetPageEnhanced';
 import { MultiplicationLearningPageEnhanced } from './pages/MultiplicationLearningPageEnhanced';
 import { ParentDashboardPage } from './pages/ParentDashboardPage';
+import { PrintWorksheetPage } from './pages/PrintWorksheetPage';
 
-export type Page = 'home' | 'math-challenge' | 'math-worksheet' | 'multiplication-learning' | 'parent-dashboard';
+export type Page = 'home' | 'math-challenge' | 'math-worksheet' | 'multiplication-learning' | 'parent-dashboard' | 'print-worksheet';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -79,6 +80,12 @@ export default function App() {
                 )}
                 {currentPage === 'multiplication-learning' && (
                   <MultiplicationLearningPageEnhanced
+                    onBack={() => navigateTo('home')}
+                    profileId={selectedProfile}
+                  />
+                )}
+                {currentPage === 'print-worksheet' && (
+                  <PrintWorksheetPage
                     onBack={() => navigateTo('home')}
                     profileId={selectedProfile}
                   />

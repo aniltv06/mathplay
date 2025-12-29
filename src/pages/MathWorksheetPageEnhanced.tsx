@@ -20,6 +20,8 @@ import { checkAndAwardBadges } from '../utils/badges';
 import { BadgeNotification } from '../components/BadgeComponents';
 import { calculateRewards, getTodaysChallenges, updateDailyChallenges } from '../utils/rewards';
 import { soundEffects } from '../utils/soundEffects';
+import { PrintableWorksheetEnhanced } from '../components/PrintableWorksheetEnhanced';
+import { formatName } from '../utils/formatters';
 
 interface Props {
   onBack: () => void;
@@ -157,6 +159,8 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
   const [newBadge, setNewBadge] = useState<any>(null);
   const [rewards, setRewards] = useState<any>(null);
   const [soundEnabled, setSoundEnabled] = useState(soundEffects.isEnabled());
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
+  const [printProblems, setPrintProblems] = useState<Problem[]>([]);
 
   const handleModeSelect = (mode: string) => {
     setSelectedMode(mode as PracticeMode);
@@ -276,6 +280,71 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
     setVoiceEnabled(!voiceEnabled);
   };
 
+  const handlePrintPreview = (previewSettings: ProblemSettings) => {
+    // Generate problems for printing
+    const problems = generateProblems(previewSettings);
+    setPrintProblems(problems);
+    setSettings(previewSettings);
+    setShowSettings(false);
+    setShowPrintPreview(true);
+  };
+
+  const generateProblems = (config: ProblemSettings): Problem[] => {
+    const problems: Problem[] = [];
+    const problemSet = new Set<string>();
+    const operations: Array<'+' | '-' | '×' | '÷'> = [];
+
+    if (config.includeAddition) operations.push('+');
+    if (config.includeSubtraction) operations.push('-');
+    if (config.includeMultiplication) operations.push('×');
+    if (config.includeDivision) operations.push('÷');
+
+    let attempts = 0;
+    const maxAttempts = config.numProblems * 10;
+
+    while (problems.length < config.numProblems && attempts < maxAttempts) {
+      attempts++;
+
+      const operation = operations[Math.floor(Math.random() * operations.length)];
+      let num1 = Math.floor(Math.random() * (config.maxNum - config.minNum + 1)) + config.minNum;
+      let num2 = Math.floor(Math.random() * (config.maxNum - config.minNum + 1)) + config.minNum;
+      let problem: Problem | null = null;
+
+      switch (operation) {
+        case '+':
+          problem = { num1, num2, operation, correct: num1 + num2 };
+          break;
+        case '-':
+          if (num1 < num2) [num1, num2] = [num2, num1];
+          problem = { num1, num2, operation, correct: num1 - num2 };
+          break;
+        case '×':
+          problem = { num1, num2, operation, correct: num1 * num2 };
+          break;
+        case '÷':
+          const quotient = num2;
+          const dividend = num1 * num2;
+          problem = { num1: dividend, num2: num1, operation, correct: quotient };
+          break;
+      }
+
+      if (problem) {
+        const problemKey = `${problem.num1}${problem.operation}${problem.num2}`;
+        if (!problemSet.has(problemKey)) {
+          problemSet.add(problemKey);
+          problems.push(problem);
+        }
+      }
+    }
+
+    return problems;
+  };
+
+  const closePrintPreview = () => {
+    setShowPrintPreview(false);
+    setPrintProblems([]);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-400 relative overflow-hidden">
       {/* Animated background elements */}
@@ -326,6 +395,17 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
           settings={settings}
           onSave={handleSettingsSave}
           onClose={() => setShowSettings(false)}
+          onPrintPreview={handlePrintPreview}
+        />
+      )}
+
+      {/* Print Preview */}
+      {showPrintPreview && profile && printProblems.length > 0 && (
+        <PrintableWorksheetEnhanced
+          problems={printProblems}
+          settings={settings}
+          profileName={formatName(profile.name)}
+          onClose={closePrintPreview}
         />
       )}
 
