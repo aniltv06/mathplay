@@ -29,7 +29,7 @@ interface Props {
 }
 
 type PageState = 'mode-select' | 'difficulty' | 'worksheet' | 'results';
-type PracticeMode = 'quick' | 'standard' | 'timed' | 'endless' | 'topic-add' | 'topic-sub' | 'topic-mul' | 'topic-div' | 'adaptive';
+type PracticeMode = 'quick' | 'standard' | 'timed' | 'endless' | 'topic-add' | 'topic-sub' | 'topic-mul' | 'topic-div' | 'adaptive' | 'word-problems';
 
 // Mode-specific settings
 const MODE_SETTINGS: Record<PracticeMode, Partial<ProblemSettings>> = {
@@ -97,6 +97,14 @@ const MODE_SETTINGS: Record<PracticeMode, Partial<ProblemSettings>> = {
     includeSubtraction: true,
     includeMultiplication: true,
     includeDivision: true
+  },
+  'word-problems': {
+    numProblems: 8,
+    includeAddition: true,
+    includeSubtraction: true,
+    includeMultiplication: true,
+    includeDivision: true,
+    displayAsWordProblems: true
   }
 };
 

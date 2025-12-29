@@ -42,6 +42,7 @@ export interface ProblemSettings {
   difficulty?: Difficulty;
   timedMode?: boolean;
   timeLimit?: number; // in seconds
+  displayAsWordProblems?: boolean; // Display problems as word stories
 }
 
 export interface WorksheetSession {

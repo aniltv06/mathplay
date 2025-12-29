@@ -10,7 +10,7 @@ import {
   ArrowLeft, Lightbulb, Eye, EyeOff, Book, Zap,
   Clock, Target, Shuffle, Brain, TrendingUp, Award,
   Star, Coins as CoinsIcon, ChevronRight, Play,
-  RotateCcw, CheckCircle, XCircle, Trophy, Timer
+  RotateCcw, CheckCircle, XCircle, Trophy, Timer, BookOpen
 } from 'lucide-react';
 import type { Problem } from '../types';
 import { generateHint, generateStepByStep, numberToWord, getOperationWord } from '../utils/problemVariants';
@@ -351,6 +351,14 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       icon: Brain,
       color: 'from-violet-400 to-purple-500',
       badge: 'Smart'
+    },
+    {
+      id: 'word-problems',
+      title: 'Word Problems',
+      description: 'Story-based math problems',
+      icon: BookOpen,
+      color: 'from-amber-400 to-orange-500',
+      badge: '📖'
     }
   ];
 

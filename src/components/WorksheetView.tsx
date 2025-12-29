@@ -15,6 +15,47 @@ import type { Problem, ProblemSettings, WorksheetSession } from '../types';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
 import { NumberPadModal } from './NumberPadModal';
 
+// Word problem templates
+const wordProblemTemplates: Record<'+' | '-' | '×' | '÷', (n1: number, n2: number) => string[]> = {
+  '+': (n1: number, n2: number) => [
+    `You have ${n1} apples. Your friend gives you ${n2} more apples. How many apples do you have now?`,
+    `There are ${n1} birds on a tree. ${n2} more birds join them. How many birds are there in total?`,
+    `You collect ${n1} coins on Monday and ${n2} coins on Tuesday. How many coins did you collect altogether?`,
+    `A baker makes ${n1} cookies in the morning and ${n2} cookies in the afternoon. How many cookies in total?`,
+    `You read ${n1} pages today and ${n2} pages yesterday. How many pages total?`
+  ],
+  '-': (n1: number, n2: number) => [
+    `You have ${n1} candies. You give ${n2} candies to your friend. How many candies do you have left?`,
+    `There are ${n1} students in class. ${n2} students go home early. How many students remain?`,
+    `You have ${n1} dollars. You spend ${n2} dollars on a toy. How much money do you have left?`,
+    `A tree has ${n1} leaves. ${n2} leaves fall off. How many leaves are still on the tree?`,
+    `There are ${n1} cars in a parking lot. ${n2} cars drive away. How many cars remain?`
+  ],
+  '×': (n1: number, n2: number) => [
+    `There are ${n1} boxes. Each box has ${n2} toys. How many toys are there in total?`,
+    `You buy ${n1} packs of stickers. Each pack has ${n2} stickers. How many stickers do you have?`,
+    `A garden has ${n1} rows of flowers. Each row has ${n2} flowers. How many flowers in total?`,
+    `${n1} friends each have ${n2} pencils. How many pencils do they have altogether?`,
+    `You run ${n1} laps. Each lap is ${n2} meters. How many meters did you run in total?`
+  ],
+  '÷': (n1: number, n2: number) => [
+    `You have ${n1} cookies to share equally among ${n2} friends. How many cookies does each friend get?`,
+    `A teacher has ${n1} pencils to divide equally into ${n2} groups. How many pencils per group?`,
+    `${n1} apples are packed into ${n2} bags equally. How many apples in each bag?`,
+    `You have ${n1} stickers to share with ${n2} people. How many stickers does each person get?`,
+    `A pizza is cut into ${n1} slices. ${n2} people share it equally. How many slices per person?`
+  ]
+};
+
+const getWordProblem = (problem: Problem): string => {
+  const templates = wordProblemTemplates[problem.operation];
+  if (templates) {
+    const stories = templates(problem.num1, problem.num2);
+    return stories[Math.floor(Math.random() * stories.length)];
+  }
+  return `${problem.num1} ${problem.operation} ${problem.num2} = ?`;
+};
+
 interface Props {
   settings: ProblemSettings;
   profileId: string;
@@ -370,28 +411,40 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
                   <CheckCircle className="w-5 h-5 text-blue-600" />
                 </button>
 
-                {/* Centered Vertical Math Layout */}
+                {/* Centered Vertical Math Layout or Word Problem */}
                 <div className="relative flex flex-col items-center pt-8">
-                  {/* Math Problem Container - Centered with right-aligned digits */}
-                  <div className="inline-block">
-                    {/* First Number - Right aligned */}
-                    <div className="text-6xl font-bold text-gray-800 mb-2 text-right">
-                      {problem.num1}
-                    </div>
-
-                    {/* Operation + Second Number Row - Right aligned */}
-                    <div className="flex items-center justify-end mb-3">
-                      <div className="text-5xl font-bold text-purple-600 mr-2">
-                        {problem.operation}
-                      </div>
-                      <div className="text-6xl font-bold text-gray-800">
-                        {problem.num2}
+                  {settings.displayAsWordProblems ? (
+                    /* Word Problem Layout */
+                    <div className="text-center max-w-md">
+                      <p className="text-lg font-medium text-gray-800 leading-relaxed mb-6 text-left">
+                        {getWordProblem(problem)}
+                      </p>
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        <span className="text-xl font-semibold text-gray-700">Answer:</span>
                       </div>
                     </div>
+                  ) : (
+                    /* Math Problem Container - Centered with right-aligned digits */
+                    <div className="inline-block">
+                      {/* First Number - Right aligned */}
+                      <div className="text-6xl font-bold text-gray-800 mb-2 text-right">
+                        {problem.num1}
+                      </div>
 
-                    {/* Divider Line with gradient */}
-                    <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent mb-4"></div>
-                  </div>
+                      {/* Operation + Second Number Row - Right aligned */}
+                      <div className="flex items-center justify-end mb-3">
+                        <div className="text-5xl font-bold text-purple-600 mr-2">
+                          {problem.operation}
+                        </div>
+                        <div className="text-6xl font-bold text-gray-800">
+                          {problem.num2}
+                        </div>
+                      </div>
+
+                      {/* Divider Line with gradient */}
+                      <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent mb-4"></div>
+                    </div>
+                  )}
 
                   {/* Answer Input - Centered */}
                   <input
