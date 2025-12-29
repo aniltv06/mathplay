@@ -288,7 +288,6 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               gradient="from-blue-400 to-indigo-500"
               color="text-blue-600"
               delay={0.7}
-              isComingSoon
             />
             <ActivityCard
               page="estimation-rounding"
@@ -298,7 +297,6 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               gradient="from-amber-400 to-orange-500"
               color="text-amber-600"
               delay={0.8}
-              isComingSoon
             />
           </CategorySection>
 
@@ -312,7 +310,6 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               gradient="from-orange-400 to-red-500"
               color="text-orange-600"
               delay={0.9}
-              isComingSoon
             />
             <ActivityCard
               page="money-shopping"
@@ -322,7 +319,6 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               gradient="from-green-400 to-emerald-500"
               color="text-green-600"
               delay={1.0}
-              isComingSoon
             />
           </CategorySection>
 
@@ -336,7 +332,6 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               gradient="from-yellow-400 to-amber-500"
               color="text-yellow-600"
               delay={1.1}
-              isComingSoon
             />
           </CategorySection>
 
@@ -350,7 +345,6 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               gradient="from-indigo-400 to-purple-500"
               color="text-indigo-600"
               delay={1.2}
-              isComingSoon
             />
             <ActivityCard
               page="fibonacci-learning"
@@ -360,7 +354,6 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               gradient="from-rose-400 to-pink-500"
               color="text-rose-600"
               delay={1.3}
-              isComingSoon
             />
           </CategorySection>
 
