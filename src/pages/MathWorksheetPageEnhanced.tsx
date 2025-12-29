@@ -365,7 +365,7 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-50 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-white"
+        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
       >
         <ArrowLeft className="w-5 h-5" />
         <span className="hidden sm:inline">Home</span>
@@ -376,13 +376,13 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
         {/* Sound Toggle */}
         <button
           onClick={toggleSound}
-          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all p-3 rounded-full shadow-lg"
+          className="bg-white hover:bg-gray-100 transition-all p-3 rounded-full shadow-lg"
           title={soundEnabled ? 'Disable Sounds' : 'Enable Sounds'}
         >
           {soundEnabled ? (
-            <Volume2 className="w-6 h-6 text-white" />
+            <Volume2 className="w-6 h-6 text-gray-800" />
           ) : (
-            <VolumeX className="w-6 h-6 text-white" />
+            <VolumeX className="w-6 h-6 text-gray-800" />
           )}
         </button>
 
@@ -390,9 +390,9 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
         {(pageState === 'mode-select' || pageState === 'difficulty' || pageState === 'results') && (
           <button
             onClick={() => setShowSettings(true)}
-            className="bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all p-3 rounded-full shadow-lg"
+            className="bg-white hover:bg-gray-100 transition-all p-3 rounded-full shadow-lg"
           >
-            <Settings className="w-6 h-6 text-white" />
+            <Settings className="w-6 h-6 text-gray-800" />
           </button>
         )}
       </div>

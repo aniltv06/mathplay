@@ -196,7 +196,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
 
         <button
           onClick={onBack}
-          className="absolute top-6 left-6 z-50 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-white"
+          className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="hidden sm:inline">Back to Home</span>
@@ -310,13 +310,13 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
               <div className="flex gap-4 justify-center pt-4">
                 <button
                   onClick={() => setMode('practice')}
-                  className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
+                  className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white hover:text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
                 >
                   Start Practice
                 </button>
                 <button
                   onClick={() => setMode('challenge')}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
                 >
                   Challenge Mode
                 </button>
@@ -338,7 +338,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
 
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-50 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-white"
+        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
       >
         <ArrowLeft className="w-5 h-5" />
         <span className="hidden sm:inline">Back</span>

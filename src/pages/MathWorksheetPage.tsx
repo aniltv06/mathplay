@@ -141,7 +141,7 @@ export function MathWorksheetPage({ onBack, profileId }: Props) {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-50 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-white"
+        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
       >
         <ArrowLeft className="w-5 h-5" />
         Home
@@ -151,9 +151,9 @@ export function MathWorksheetPage({ onBack, profileId }: Props) {
       {(pageState === 'difficulty' || pageState === 'results') && (
         <button
           onClick={() => setShowSettings(true)}
-          className="absolute top-6 right-6 z-10 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all p-3 rounded-full shadow-lg"
+          className="absolute top-6 right-6 z-10 bg-white hover:bg-gray-100 transition-all p-3 rounded-full shadow-lg"
         >
-          <Settings className="w-6 h-6 text-white" />
+          <Settings className="w-6 h-6 text-gray-800" />
         </button>
       )}
 

@@ -83,7 +83,7 @@ export function MultiplicationLearningPage({ onBack }: Props) {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-50 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-white"
+        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
       >
         <ArrowLeft className="w-5 h-5" />
         Home
@@ -187,14 +187,14 @@ export function MultiplicationLearningPage({ onBack }: Props) {
                 <div className="flex gap-4">
                   <button
                     onClick={() => handleModeChange('practice')}
-                    className="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                    className="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white hover:text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                   >
                     <Play className="w-6 h-6" />
                     Practice Mode
                   </button>
                   <button
                     onClick={() => handleModeChange('quiz')}
-                    className="flex-1 bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-500 hover:to-purple-600 text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                    className="flex-1 bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-500 hover:to-purple-600 text-white hover:text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                   >
                     <Star className="w-6 h-6" />
                     Quiz Mode
@@ -299,7 +299,7 @@ export function MultiplicationLearningPage({ onBack }: Props) {
                       <button
                         type="submit"
                         disabled={showFeedback !== null || userAnswer === ''}
-                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 rounded-2xl text-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:text-white py-4 rounded-2xl text-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                       >
                         Check Answer
                       </button>
@@ -351,14 +351,14 @@ export function MultiplicationLearningPage({ onBack }: Props) {
                           setCompleted([]);
                           setUserAnswer('');
                         }}
-                        className="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                        className="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white hover:text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                       >
                         <RotateCcw className="w-6 h-6" />
                         Try Again
                       </button>
                       <button
                         onClick={() => setMode('select')}
-                        className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl"
+                        className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl"
                       >
                         Choose New Table
                       </button>

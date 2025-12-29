@@ -208,7 +208,7 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
               onClick={() => setShowSettings(true)}
-              className="mt-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl transition-all"
+              className="mt-3 bg-white hover:bg-gray-100 text-gray-800 px-6 py-3 rounded-xl transition-all shadow-lg"
             >
               Customize Settings
             </motion.button>

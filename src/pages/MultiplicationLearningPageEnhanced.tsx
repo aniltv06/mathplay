@@ -479,7 +479,7 @@ export function MultiplicationLearningPageEnhanced({ onBack, profileId }: Props)
       {/* Back button */}
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-50 bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-white"
+        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
       >
         <ArrowLeft className="w-5 h-5" />
         <span className="hidden sm:inline">Home</span>
@@ -802,7 +802,7 @@ function LessonsView({ onBack, onSelectTable, speak, voiceEnabled }: any) {
                   speak(`Let's practice the ${selectedLesson} times table!`);
                 }
               }}
-              className="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+              className="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white hover:text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
             >
               <Play className="w-5 h-5" />
               Practice This Table
