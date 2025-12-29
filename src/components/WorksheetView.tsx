@@ -494,6 +494,7 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
             hasPrevious={currentProblemIndex > 0}
             hasNext={currentProblemIndex < problems.length - 1}
             initialAnswer={answers[currentProblemIndex]}
+            questionText={settings.displayAsWordProblems ? getWordProblem(problems[currentProblemIndex]) : undefined}
           />
         )}
       </div>

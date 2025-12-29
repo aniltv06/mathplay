@@ -28,6 +28,7 @@ interface Props {
   hasPrevious?: boolean;
   hasNext?: boolean;
   initialAnswer?: number | null;
+  questionText?: string; // Optional word problem text
 }
 
 export function NumberPadModal({
@@ -45,6 +46,7 @@ export function NumberPadModal({
   hasPrevious = false,
   hasNext = false,
   initialAnswer = null,
+  questionText,
 }: Props) {
   const [answer, setAnswer] = useState('');
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
@@ -186,12 +188,25 @@ export function NumberPadModal({
           </div>
 
           {/* Problem Display */}
-          <div className="bg-white rounded-2xl p-4 mb-4 flex justify-center items-center gap-3">
-            <div className="text-4xl font-bold text-purple-600">{problem.num1}</div>
-            <div className="text-4xl font-bold text-purple-700">{problem.operation}</div>
-            <div className="text-4xl font-bold text-purple-600">{problem.num2}</div>
-            <div className="text-4xl font-bold text-gray-800">= ?</div>
-          </div>
+          {questionText ? (
+            /* Word Problem Display */
+            <div className="bg-white rounded-2xl p-6 mb-4">
+              <p className="text-lg font-medium text-gray-800 leading-relaxed text-left mb-4">
+                {questionText}
+              </p>
+              <div className="flex justify-center items-center gap-2 text-sm text-gray-600 border-t pt-4">
+                <span className="font-mono">{problem.num1} {problem.operation} {problem.num2} = ?</span>
+              </div>
+            </div>
+          ) : (
+            /* Standard Math Display */
+            <div className="bg-white rounded-2xl p-4 mb-4 flex justify-center items-center gap-3">
+              <div className="text-4xl font-bold text-purple-600">{problem.num1}</div>
+              <div className="text-4xl font-bold text-purple-700">{problem.operation}</div>
+              <div className="text-4xl font-bold text-purple-600">{problem.num2}</div>
+              <div className="text-4xl font-bold text-gray-800">= ?</div>
+            </div>
+          )}
 
           {/* Answer Display */}
           <div
