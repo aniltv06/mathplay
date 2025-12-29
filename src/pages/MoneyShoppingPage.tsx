@@ -283,13 +283,15 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
   const renderCoins = () => {
     if (!currentProblem || !showVisual || !currentProblem.coins) return null;
 
-    const getCoinColor = (value: number): string => {
+    const getCoinClassName = (value: number): string => {
+      const baseClasses = 'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-md';
+
       switch (value) {
-        case 1: return 'from-orange-500 to-amber-700'; // Penny (copper)
-        case 5: return 'from-slate-500 to-slate-700'; // Nickel (silver-ish)
-        case 10: return 'from-gray-400 to-gray-600'; // Dime (silver)
-        case 25: return 'from-slate-600 to-slate-800'; // Quarter (silver-dark)
-        default: return 'from-amber-400 to-yellow-600';
+        case 1: return `${baseClasses} bg-gradient-to-br from-orange-500 to-amber-700`; // Penny (copper)
+        case 5: return `${baseClasses} bg-gradient-to-br from-slate-500 to-slate-700`; // Nickel
+        case 10: return `${baseClasses} bg-gradient-to-br from-gray-400 to-gray-600`; // Dime
+        case 25: return `${baseClasses} bg-gradient-to-br from-slate-600 to-slate-800`; // Quarter
+        default: return `${baseClasses} bg-gradient-to-br from-amber-400 to-yellow-600`;
       }
     };
 
@@ -309,7 +311,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
                 {Array.from({ length: coin.count }).map((_, i) => (
                   <div
                     key={i}
-                    className={`w-12 h-12 rounded-full bg-gradient-to-br ${getCoinColor(coin.value)} flex items-center justify-center text-white font-bold shadow-md`}
+                    className={getCoinClassName(coin.value)}
                   >
                     {coin.value}
                   </div>
