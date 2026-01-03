@@ -183,26 +183,71 @@ export function FibonacciLearningPage({ onBack, profileId }: Props) {
   // Render golden spiral visualization
   const renderGoldenSpiral = () => {
     return (
-      <div className="relative w-full max-w-md mx-auto h-64 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl overflow-hidden">
-        <svg viewBox="0 0 400 250" className="w-full h-full">
-          {/* Golden spiral squares */}
-          <rect x="10" y="110" width="89" height="89" fill="#fbbf24" opacity="0.3" stroke="#f59e0b" strokeWidth="2" />
-          <rect x="99" y="110" width="55" height="55" fill="#fb923c" opacity="0.3" stroke="#f97316" strokeWidth="2" />
-          <rect x="99" y="55" width="34" height="34" fill="#f87171" opacity="0.3" stroke="#ef4444" strokeWidth="2" />
-          <rect x="133" y="55" width="21" height="21" fill="#fb7185" opacity="0.3" stroke="#ec4899" strokeWidth="2" />
-          <rect x="133" y="76" width="13" height="13" fill="#e879f9" opacity="0.3" stroke="#d946ef" strokeWidth="2" />
+      <div
+        className="relative w-full max-w-md mx-auto h-80 rounded-2xl overflow-hidden shadow-2xl border-2 border-amber-200"
+        style={{
+          background: 'linear-gradient(to bottom right, rgb(254, 243, 199), rgb(254, 215, 170), rgb(253, 186, 116))'
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent"></div>
+        <svg viewBox="0 0 400 300" className="w-full h-full p-4">
+          {/* Golden spiral squares with Fibonacci numbers */}
+          <g>
+            {/* Largest square - 89 */}
+            <rect x="10" y="130" width="89" height="89" fill="#fbbf24" opacity="0.4" stroke="#f59e0b" strokeWidth="3" rx="4" />
+            <text x="55" y="180" textAnchor="middle" fill="#92400e" fontSize="24" fontWeight="bold">89</text>
 
-          {/* Spiral curve */}
+            {/* 55 square */}
+            <rect x="99" y="130" width="55" height="55" fill="#fb923c" opacity="0.4" stroke="#f97316" strokeWidth="3" rx="3" />
+            <text x="126.5" y="162" textAnchor="middle" fill="#9a3412" fontSize="20" fontWeight="bold">55</text>
+
+            {/* 34 square */}
+            <rect x="99" y="75" width="34" height="34" fill="#f87171" opacity="0.4" stroke="#ef4444" strokeWidth="3" rx="2" />
+            <text x="116" y="96" textAnchor="middle" fill="#991b1b" fontSize="16" fontWeight="bold">34</text>
+
+            {/* 21 square */}
+            <rect x="133" y="75" width="21" height="21" fill="#fb7185" opacity="0.4" stroke="#ec4899" strokeWidth="2" rx="2" />
+            <text x="143.5" y="88" textAnchor="middle" fill="#831843" fontSize="14" fontWeight="bold">21</text>
+
+            {/* 13 square */}
+            <rect x="133" y="96" width="13" height="13" fill="#e879f9" opacity="0.4" stroke="#d946ef" strokeWidth="2" rx="1" />
+            <text x="139.5" y="104" textAnchor="middle" fill="#701a75" fontSize="11" fontWeight="bold">13</text>
+
+            {/* 8 square */}
+            <rect x="146" y="96" width="8" height="8" fill="#c084fc" opacity="0.5" stroke="#a855f7" strokeWidth="2" rx="1" />
+            <text x="150" y="101.5" textAnchor="middle" fill="#581c87" fontSize="8" fontWeight="bold">8</text>
+          </g>
+
+          {/* Enhanced spiral curve with glow effect */}
+          <defs>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
           <path
-            d="M 10 199 Q 10 110, 99 110 Q 154 110, 154 55 Q 154 34, 133 34 Q 120 34, 120 55 Q 120 76, 133 76 Q 146 76, 146 89"
+            d="M 10 219 Q 10 130, 99 130 Q 154 130, 154 75 Q 154 54, 133 54 Q 120 54, 120 75 Q 120 96, 133 96 Q 146 96, 146 104 Q 150 104, 154 104"
             fill="none"
-            stroke="#9333ea"
-            strokeWidth="3"
-            opacity="0.7"
+            stroke="#7c3aed"
+            strokeWidth="4"
+            opacity="0.9"
+            filter="url(#glow)"
           />
+
+          {/* Small decorative dots at key points */}
+          <circle cx="10" cy="219" r="4" fill="#7c3aed" opacity="0.8" />
+          <circle cx="99" cy="130" r="3" fill="#7c3aed" opacity="0.8" />
+          <circle cx="154" cy="75" r="3" fill="#7c3aed" opacity="0.8" />
         </svg>
-        <div className="absolute bottom-2 left-0 right-0 text-center text-sm text-amber-800">
-          Fibonacci Spiral in Nature
+
+        <div className="absolute bottom-4 left-0 right-0 text-center">
+          <div className="inline-block bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+            <p className="text-sm font-semibold text-amber-900">Fibonacci Spiral in Nature 🌻</p>
+          </div>
         </div>
       </div>
     );

@@ -10,13 +10,14 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Eye, Gamepad2, HelpCircle, Grid3x3, Box, Calculator, RotateCw, Sparkles, Brain } from 'lucide-react';
+import { ArrowLeft, Eye, Gamepad2, HelpCircle, Grid3x3, Box, Calculator, RotateCw, Sparkles, Brain, Circle } from 'lucide-react';
 import { ExploreMode } from '../components/ShapeExploreMode';
 import { AdventureMode, QuizMode, MatchGame } from '../components/ShapeGameModes';
 import { Shape3DLearningMode } from '../components/Shape3DLearningMode';
 import { ShapeMathCalculator } from '../components/ShapeMathCalculator';
 import { ShapeTransformationsPlayground } from '../components/ShapeTransformationsPlayground';
 import { PatternSymmetryMode, AdvancedChallengesMode } from '../components/ShapeAdvancedModes';
+import { CircleGeometryMode } from '../components/CircleGeometryMode';
 
 interface Props {
   onBack: () => void;
@@ -24,7 +25,7 @@ interface Props {
 }
 
 type MenuLevel = 'main' | 'basic' | 'advanced';
-type ShapesMode = 'menu' | 'explore' | 'adventure' | 'quiz' | 'match' | '3d' | 'calculator' | 'transformations' | 'symmetry' | 'challenges';
+type ShapesMode = 'menu' | 'explore' | 'adventure' | 'quiz' | 'match' | '3d' | 'calculator' | 'transformations' | 'symmetry' | 'challenges' | 'circle-geometry';
 
 export function ShapesLearningPage({ onBack, profileId }: Props) {
   const [currentMode, setCurrentMode] = useState<ShapesMode>('menu');
@@ -75,6 +76,14 @@ export function ShapesLearningPage({ onBack, profileId }: Props) {
       emoji: '🧊',
     },
     {
+      id: 'circle-geometry' as ShapesMode,
+      title: 'Circle Geometry',
+      description: 'Learn all parts of a circle: radius, chord, tangent & more',
+      icon: Circle,
+      color: 'from-blue-400 to-cyan-500',
+      emoji: '⭕',
+    },
+    {
       id: 'calculator' as ShapesMode,
       title: 'Math Calculator',
       description: 'Calculate area, perimeter, volume & surface area',
@@ -123,6 +132,9 @@ export function ShapesLearningPage({ onBack, profileId }: Props) {
   }
   if (currentMode === '3d') {
     return <Shape3DLearningMode onBack={() => setCurrentMode('menu')} profileId={profileId} />;
+  }
+  if (currentMode === 'circle-geometry') {
+    return <CircleGeometryMode onBack={() => setCurrentMode('menu')} profileId={profileId} />;
   }
   if (currentMode === 'calculator') {
     return <ShapeMathCalculator onBack={() => setCurrentMode('menu')} profileId={profileId} />;
