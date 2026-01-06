@@ -10,9 +10,10 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ChevronLeft, ChevronRight, Volume2, Sparkles, Grid3x3 } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Volume2, Sparkles, Grid3x3, Gamepad2 } from 'lucide-react';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
 import { CirclePartsReference } from './CirclePartsReference';
+import { InteractiveCirclePlayground } from './InteractiveCirclePlayground';
 
 interface Props {
   onBack: () => void;
@@ -330,12 +331,17 @@ const CATEGORIES = [
   },
 ];
 
-export function CircleGeometryMode({ onBack }: Props) {
-  const [viewMode, setViewMode] = useState<'menu' | 'learning' | 'reference'>('menu');
+export function CircleGeometryMode({ onBack, profileId }: Props) {
+  const [viewMode, setViewMode] = useState<'menu' | 'learning' | 'reference' | 'interactive'>('menu');
   const [currentIndex, setCurrentIndex] = useState(0);
   const { speak } = useVoiceFeedback();
 
   const currentPart = CIRCLE_PARTS[currentIndex];
+
+  // If showing interactive playground, render that instead
+  if (viewMode === 'interactive') {
+    return <InteractiveCirclePlayground onBack={() => setViewMode('menu')} profileId={profileId} />;
+  }
 
   // If showing reference view, render that instead
   if (viewMode === 'reference') {
@@ -400,15 +406,26 @@ export function CircleGeometryMode({ onBack }: Props) {
               </p>
             </motion.div>
 
-            <motion.button
-              onClick={() => setViewMode('reference')}
-              className="bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all p-3 rounded-full shadow-lg text-white"
-              title="View all parts"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <Grid3x3 className="w-5 h-5" />
-            </motion.button>
+            <div className="flex items-center gap-2">
+              <motion.button
+                onClick={() => setViewMode('interactive')}
+                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all p-3 rounded-full shadow-lg text-white"
+                title="Interactive Playground"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Gamepad2 className="w-5 h-5" />
+              </motion.button>
+              <motion.button
+                onClick={() => setViewMode('reference')}
+                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all p-3 rounded-full shadow-lg text-white"
+                title="View all parts"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Grid3x3 className="w-5 h-5" />
+              </motion.button>
+            </div>
           </div>
         </div>
 
@@ -2272,6 +2289,15 @@ export function CircleGeometryMode({ onBack }: Props) {
           </motion.div>
 
           <div className="flex items-center gap-2">
+            <motion.button
+              onClick={() => setViewMode('interactive')}
+              className="bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all p-3 rounded-full shadow-lg text-white"
+              title="Interactive Playground"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Gamepad2 className="w-5 h-5" />
+            </motion.button>
             <motion.button
               onClick={() => setViewMode('reference')}
               className="bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all p-3 rounded-full shadow-lg text-white"
