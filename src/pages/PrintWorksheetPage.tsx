@@ -93,15 +93,28 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
           continue;
       }
 
-      // Check for duplicates
-      const problemKey = `${num1}${operation}${num2}`;
+      // Check for duplicates using a unique key with delimiters
+      // This ensures no false matches (e.g., "12+3" vs "1+23")
+      const problemKey = `${num1}|${operation}|${num2}`;
       if (!usedProblems.has(problemKey)) {
         usedProblems.add(problemKey);
         newProblems.push({ num1, num2, operation, answer });
       }
     }
 
-    setProblems(newProblems);
+    // Final verification: Remove any duplicates that might have slipped through
+    const finalProblems: Problem[] = [];
+    const finalKeys = new Set<string>();
+
+    for (const problem of newProblems) {
+      const key = `${problem.num1}|${problem.operation}|${problem.num2}`;
+      if (!finalKeys.has(key)) {
+        finalKeys.add(key);
+        finalProblems.push(problem);
+      }
+    }
+
+    setProblems(finalProblems);
   };
 
   // Generate initial problems
@@ -558,9 +571,14 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
 
         /* Print Styles */
         @media print {
+          * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
           body {
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
           }
 
           .no-print {
@@ -572,18 +590,29 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
             margin: 1.5cm 1cm;
           }
 
+          @page :first {
+            margin-top: 1cm;
+          }
+
           .print-content {
             background: white;
-            padding: 0;
+            padding: 0 !important;
+            margin: 0 !important;
           }
 
           .print-page {
             page-break-after: always;
             page-break-inside: avoid;
             background: white;
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
             width: 100%;
+            display: block;
+          }
+
+          .print-page:first-child {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
           }
 
           .print-page:last-child {
@@ -591,7 +620,8 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
           }
 
           .page-container {
-            padding: 0;
+            padding: 0 !important;
+            margin: 0 !important;
             width: 100%;
           }
 
