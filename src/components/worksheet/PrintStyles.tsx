@@ -48,22 +48,16 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             box-sizing: border-box;
           }
 
-          /* Ensure grid stays within bounds */
+          /* Grid with CSS variables for adaptive columns */
           .grid,
           .worksheet-grid {
             display: grid;
+            grid-template-columns: var(--grid-columns, repeat(2, 1fr));
             gap: 0.12in;
             width: 100%;
             box-sizing: border-box;
             max-width: 100%;
           }
-
-          .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
-          .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-          .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-          .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
-          .grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
-          .grid-cols-10 { grid-template-columns: repeat(10, 1fr); }
 
           /* Ensure worksheet header stays within bounds */
           .worksheet-header {
@@ -82,6 +76,7 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
 
           /* Constrain header info flex containers */
           .worksheet-info,
+          .worksheet-info-row,
           .page-container .flex.justify-between {
             display: flex;
             justify-content: space-between;
@@ -89,6 +84,14 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             gap: 0.1in;
             max-width: 100%;
             box-sizing: border-box;
+            width: 100%;
+            text-align: left;
+            font-size: 11pt;
+            color: #374151;
+          }
+
+          .worksheet-info-row > span {
+            flex-shrink: 0;
           }
 
           /* Ensure Tailwind gradient classes work */
@@ -131,6 +134,10 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             max-width: 100%;
             overflow: hidden;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 0.08in;
+            width: 100%;
           }
 
           .problem-text {
@@ -257,7 +264,7 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
 
           @page {
             size: letter;
-            margin: 0.5in;
+            margin: 0;
           }
 
           html, body {
@@ -371,11 +378,16 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             max-width: 100% !important;
             overflow: hidden !important;
             box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.08in !important;
+            width: 100% !important;
           }
 
-          /* Use absolute grid spacing */
+          /* Use absolute grid spacing with CSS variables */
           .grid,
           .worksheet-grid {
+            grid-template-columns: var(--grid-columns, repeat(2, 1fr)) !important;
             gap: 0.12in !important;
             overflow: visible !important;
             page-break-inside: auto !important;
@@ -428,6 +440,23 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             font-weight: 500 !important;
             orphans: 2;
             widows: 2;
+          }
+
+          /* Header info row styling */
+          .worksheet-info-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            flex-wrap: wrap !important;
+            gap: 0.15in !important;
+            text-align: left !important;
+            font-size: 11pt !important;
+            color: #000 !important;
+            font-weight: 500 !important;
+            width: 100% !important;
+          }
+
+          .worksheet-info-row > span {
+            flex-shrink: 0 !important;
           }
 
           /* Problem text with serif fonts and optimal sizing */

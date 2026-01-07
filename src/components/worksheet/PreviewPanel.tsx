@@ -59,7 +59,7 @@ export function PreviewPanel({
                     )}
                   </h1>
                 </div>
-                <div className="flex justify-between items-center text-sm text-gray-700">
+                <div className="worksheet-info-row">
                   <span>Name: {formatName(profileName)}</span>
                   <span>Date: __________</span>
                   {settings.timedPractice && (
@@ -82,12 +82,8 @@ export function PreviewPanel({
               <div
                 className="worksheet-grid"
                 style={{
-                  display: 'grid',
-                  gap: '0.12in',
-                  width: '100%',
-                  gridTemplateColumns: getGridColumns(settings.layout),
-                  boxSizing: 'border-box'
-                }}
+                  '--grid-columns': getGridColumns(settings.layout)
+                } as React.CSSProperties & { '--grid-columns'?: string }}
                 role="list"
                 aria-label={`Worksheet ${worksheetIndex + 1} problems`}
               >
@@ -115,15 +111,12 @@ export function PreviewPanel({
                   <div className="transform rotate-180" aria-label="Answer key (upside down)">
                     <h3 className="text-center font-bold mb-2">Answer Key</h3>
                     <div
+                      className="worksheet-grid"
                       style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(10, 1fr)',
-                        gap: '0.5rem',
+                        '--grid-columns': 'repeat(10, 1fr)',
                         fontSize: '0.75rem',
-                        lineHeight: '1rem',
-                        width: '100%',
-                        boxSizing: 'border-box'
-                      }}
+                        lineHeight: '1rem'
+                      } as React.CSSProperties & { '--grid-columns'?: string }}
                     >
                       {worksheet.map((problem, index) => (
                         <span key={index}>
@@ -148,13 +141,11 @@ export function PreviewPanel({
                   </h1>
                 </div>
                 <div
+                  className="worksheet-grid"
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(5, 1fr)',
-                    gap: '0.75rem',
-                    width: '100%',
-                    boxSizing: 'border-box'
-                  }}
+                    '--grid-columns': 'repeat(5, 1fr)',
+                    gap: '0.75rem'
+                  } as React.CSSProperties & { '--grid-columns'?: string }}
                   role="list"
                   aria-label="Answer key"
                 >

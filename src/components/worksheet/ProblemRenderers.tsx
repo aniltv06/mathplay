@@ -22,7 +22,7 @@ export function renderHorizontalProblem({ problem, index, settings }: ProblemRen
 
     return (
       <div key={index} className="problem-box">
-        <div className="flex items-start gap-3" style={{ minWidth: 0, width: '100%' }}>
+        <div className="flex items-start gap-3" style={{ minWidth: 0 }}>
           <span className="problem-number">{index + 1}.</span>
           <div className="problem-text-wrapper">
             <div className="problem-text" aria-label={`Problem ${index + 1}: Fill in the blank`}>
@@ -46,7 +46,7 @@ export function renderHorizontalProblem({ problem, index, settings }: ProblemRen
 
     return (
       <div key={index} className="problem-box">
-        <div className="flex items-start gap-3" style={{ minWidth: 0, width: '100%' }}>
+        <div className="flex items-start gap-3" style={{ minWidth: 0 }}>
           <span className="problem-number">{index + 1}.</span>
           <div className="problem-text-wrapper">
             <div className="problem-text" aria-label={`Problem ${index + 1}: Compare ${value1} and ${value2}`}>
@@ -66,7 +66,7 @@ export function renderHorizontalProblem({ problem, index, settings }: ProblemRen
   if (problem.type === 'missing-op') {
     return (
       <div key={index} className="problem-box">
-        <div className="flex items-start gap-3" style={{ minWidth: 0, width: '100%' }}>
+        <div className="flex items-start gap-3" style={{ minWidth: 0 }}>
           <span className="problem-number">{index + 1}.</span>
           <div className="problem-text-wrapper">
             <div className="problem-text" aria-label={`Problem ${index + 1}: Find the missing operator`}>
