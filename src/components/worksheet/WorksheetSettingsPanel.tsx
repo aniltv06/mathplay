@@ -339,8 +339,9 @@ export function WorksheetSettingsPanel({
                 }`}
               >
                 <option value="horizontal">Horizontal (2 cols)</option>
+                <option value="horizontal-3-column">Horizontal (3 cols)</option>
+                <option value="3-column">Vertical (3 cols)</option>
                 <option value="vertical">Vertical (4 cols)</option>
-                <option value="3-column">3 Columns</option>
                 <option value="flash-cards">Flash Cards</option>
                 <option value="large-print">Large Print</option>
               </select>

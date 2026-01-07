@@ -351,6 +351,7 @@ export function getThemeStyles(theme: string) {
 export function getLayoutColumns(layout: string): string {
   switch (layout) {
     case 'horizontal': return 'grid-cols-2';
+    case 'horizontal-3-column': return 'grid-cols-3';
     case 'vertical': return 'grid-cols-4';
     case '3-column': return 'grid-cols-3';
     case 'flash-cards': return 'grid-cols-2';
@@ -365,6 +366,7 @@ export function getLayoutColumns(layout: string): string {
 export function getGridColumns(layout: string): string {
   switch (layout) {
     case 'horizontal': return 'repeat(2, 1fr)';
+    case 'horizontal-3-column': return 'repeat(3, 1fr)';
     case 'vertical': return 'repeat(4, 1fr)';
     case '3-column': return 'repeat(3, 1fr)';
     case 'flash-cards': return 'repeat(2, 1fr)';

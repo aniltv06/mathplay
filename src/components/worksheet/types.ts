@@ -7,7 +7,7 @@ import type { Operation } from '../../types';
 
 export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced' | 'custom';
 export type ThemeType = 'standard' | 'space' | 'ocean' | 'holiday' | 'animal' | 'sports';
-export type LayoutType = 'horizontal' | 'vertical' | '3-column' | 'flash-cards' | 'large-print';
+export type LayoutType = 'horizontal' | 'horizontal-3-column' | 'vertical' | '3-column' | 'flash-cards' | 'large-print';
 export type SpacingType = 'compact' | 'normal' | 'large' | 'extra-large';
 export type AnswerKeyPosition = 'separate' | 'side-by-side' | 'upside-down' | 'none';
 
