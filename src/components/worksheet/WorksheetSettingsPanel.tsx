@@ -294,18 +294,18 @@ export function WorksheetSettingsPanel({
 
       {/* Advanced Options */}
       {showAdvanced && (
-        <div id="advanced-settings" className="space-y-4 border-t pt-4">
+        <div id="advanced-settings" className="space-y-1.5 border-t pt-4">
           {/* Problem Types */}
           <fieldset>
-            <legend className="text-sm font-semibold text-gray-700 mb-2">Problem Types:</legend>
-            <div className="grid grid-cols-2 gap-2">
+            <legend className="text-sm font-semibold text-gray-700 mb-1">Problem Types:</legend>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-0">
               {[
                 { key: 'standard', label: 'Standard (5 + 3 = __)' },
                 { key: 'fillBlank', label: 'Fill Blank (__ + 3 = 8)' },
                 { key: 'compare', label: 'Compare (7 __ 9)' },
                 { key: 'missingOperator', label: 'Missing Op (5 __ 3 = 8)' },
               ].map(({ key, label }) => (
-                <label key={key} className="flex items-center gap-2 cursor-pointer">
+                <label key={key} className="flex items-center gap-1.5 cursor-pointer leading-tight">
                   <input
                     type="checkbox"
                     checked={settings.problemTypes[key as keyof typeof settings.problemTypes]}
@@ -316,16 +316,16 @@ export function WorksheetSettingsPanel({
                     aria-label={label}
                     className="w-4 h-4 focus:ring-2 focus:ring-blue-500"
                   />
-                  <span className="text-sm">{label}</span>
+                  <span className="text-sm leading-tight">{label}</span>
                 </label>
               ))}
             </div>
           </fieldset>
 
           {/* Layout & Theme */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <label htmlFor="layout" className="text-sm font-semibold text-gray-700 mb-2 block">
+              <label htmlFor="layout" className="text-sm font-semibold text-gray-700 mb-1 block">
                 Layout:
               </label>
               <select
@@ -347,7 +347,7 @@ export function WorksheetSettingsPanel({
               </select>
             </div>
             <div>
-              <label htmlFor="theme" className="text-sm font-semibold text-gray-700 mb-2 block">
+              <label htmlFor="theme" className="text-sm font-semibold text-gray-700 mb-1 block">
                 Theme:
               </label>
               <select
@@ -371,7 +371,7 @@ export function WorksheetSettingsPanel({
           </div>
 
           {/* Additional Options */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-x-2 gap-y-0">
             {[
               { key: 'requireCarrying', label: 'Require Carrying' },
               { key: 'requireBorrowing', label: 'Require Borrowing' },
@@ -381,7 +381,7 @@ export function WorksheetSettingsPanel({
               { key: 'timedPractice', label: 'Timed Practice' },
               { key: 'includeCertificate', label: 'Include Certificate' },
             ].map(({ key, label }) => (
-              <label key={key} className="flex items-center gap-2 cursor-pointer">
+              <label key={key} className="flex items-center gap-1.5 cursor-pointer leading-tight">
                 <input
                   type="checkbox"
                   checked={settings[key as keyof WorksheetSettings] as boolean}
@@ -390,7 +390,7 @@ export function WorksheetSettingsPanel({
                   aria-label={label}
                   className="w-4 h-4 focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="text-sm">{label}</span>
+                <span className="text-sm leading-tight">{label}</span>
               </label>
             ))}
           </div>
@@ -421,7 +421,7 @@ export function WorksheetSettingsPanel({
 
           {/* Answer Key */}
           <div>
-            <label htmlFor="answerKey" className="text-sm font-semibold text-gray-700 mb-2 block">
+            <label htmlFor="answerKey" className="text-sm font-semibold text-gray-700 mb-1 block">
               Answer Key:
             </label>
             <select
@@ -443,7 +443,7 @@ export function WorksheetSettingsPanel({
 
           {/* Title */}
           <div>
-            <label htmlFor="worksheetTitle" className="text-sm font-semibold text-gray-700 mb-2 block">
+            <label htmlFor="worksheetTitle" className="text-sm font-semibold text-gray-700 mb-1 block">
               Worksheet Title:
             </label>
             <input

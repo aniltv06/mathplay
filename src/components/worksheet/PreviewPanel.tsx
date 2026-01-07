@@ -103,7 +103,9 @@ export function PreviewPanel({
                       style={{
                         '--grid-columns': 'repeat(10, 1fr)',
                         fontSize: '0.75rem',
-                        lineHeight: '1rem'
+                        lineHeight: '1rem',
+                        gap: '1rem',
+                        rowGap: '0.75rem'
                       } as React.CSSProperties & { '--grid-columns'?: string }}
                     >
                       {worksheet.map((problem, index) => (

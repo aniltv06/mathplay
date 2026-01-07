@@ -49,14 +49,34 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
           }
 
           /* Grid with CSS variables for adaptive columns */
-          .grid,
-          .worksheet-grid {
+          .page-container > .worksheet-grid:not(.answer-key-upside-down .worksheet-grid) {
             display: grid;
             grid-template-columns: var(--grid-columns, repeat(2, 1fr));
             gap: 0.12in;
             width: 100%;
             box-sizing: border-box;
             max-width: 100%;
+            align-content: space-between;
+            min-height: calc(11in - 1in);
+          }
+
+          /* Answer key grids without pagination spacing */
+          .answer-key-upside-down .worksheet-grid {
+            display: grid;
+            grid-template-columns: var(--grid-columns, repeat(10, 1fr)) !important;
+            min-height: auto !important;
+            align-content: start !important;
+            gap: 1rem !important;
+            row-gap: 0.75rem !important;
+          }
+
+          .page-container > .worksheet-grid[style*="repeat(5"] {
+            min-height: auto;
+            align-content: start;
+          }
+
+          .page-container > .worksheet-grid[style*="repeat(5"] .answer-key-box {
+            margin-bottom: 0.75rem;
           }
 
           /* Ensure worksheet header stays within bounds */
@@ -104,12 +124,25 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             padding: 0.1in;
             background: #f9fafb;
             page-break-inside: avoid;
+            break-inside: avoid;
             min-height: 0.65in;
             display: flex;
             align-items: center;
             max-width: 100%;
             overflow: hidden;
             box-sizing: border-box;
+          }
+
+          /* Prevent page breaks before first item on a page */
+          .worksheet-grid > *:first-child {
+            page-break-before: avoid;
+            break-before: avoid;
+          }
+
+          /* Prevent orphans - keep at least 2 items together */
+          .worksheet-grid > * {
+            page-break-inside: avoid;
+            break-inside: avoid;
           }
 
           .problem-box-vertical {
@@ -435,7 +468,6 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
           }
 
           /* Use absolute grid spacing with CSS variables */
-          .grid,
           .worksheet-grid {
             grid-template-columns: var(--grid-columns, repeat(2, 1fr)) !important;
             gap: 0.12in !important;
