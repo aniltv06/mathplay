@@ -1,0 +1,571 @@
+/**
+ * Print Styles Component
+ * Centralized print and screen styles for worksheets
+ */
+
+interface PrintStylesProps {
+  isResizing: boolean;
+}
+
+export function PrintStyles({ isResizing }: PrintStylesProps) {
+  return (
+    <style>{`
+  body {
+    user-select: ${isResizing ? 'none' : 'auto'};
+    cursor: ${isResizing ? 'col-resize' : 'auto'};
+  }
+
+        @media screen {
+          .print-content {
+            background: transparent;
+            padding: 0;
+            overflow: visible;
+          }
+
+          .print-page {
+            background: white;
+            margin: 0 auto 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 8.5in;
+            min-height: auto;
+            height: auto;
+            position: relative;
+            overflow: hidden;
+          }
+
+          .page-container {
+            width: 8.5in;
+            padding: 0.5in;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2in;
+            overflow: hidden;
+          }
+
+          .page-container > * {
+            max-width: 100%;
+            box-sizing: border-box;
+          }
+
+          /* Ensure grid stays within bounds */
+          .grid,
+          .worksheet-grid {
+            display: grid;
+            gap: 0.12in;
+            width: 100%;
+            box-sizing: border-box;
+            max-width: 100%;
+          }
+
+          .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+          .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+          .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+          .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+          .grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
+          .grid-cols-10 { grid-template-columns: repeat(10, 1fr); }
+
+          /* Ensure worksheet header stays within bounds */
+          .worksheet-header {
+            position: relative;
+            max-width: 100%;
+            box-sizing: border-box;
+            /* Fallback background in case Tailwind gradients don't render */
+            background: linear-gradient(to right, #374151, #1f2937) !important;
+          }
+
+          .worksheet-header h1 {
+            color: white !important;
+            position: relative;
+            z-index: 1;
+          }
+
+          /* Constrain header info flex containers */
+          .worksheet-info,
+          .page-container .flex.justify-between {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.1in;
+            max-width: 100%;
+            box-sizing: border-box;
+          }
+
+          /* Ensure Tailwind gradient classes work */
+          .bg-gradient-to-r {
+            background-image: linear-gradient(to right, var(--tw-gradient-stops)) !important;
+          }
+
+          .problem-box, .problem-box-vertical {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.1in;
+            padding: 0.1in;
+            background: #f9fafb;
+            page-break-inside: avoid;
+            min-height: 0.65in;
+            display: flex;
+            align-items: center;
+            max-width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
+          }
+
+          /* Flex items must have min-width: 0 */
+          .problem-box > *,
+          .problem-box-vertical > * {
+            min-width: 0;
+          }
+
+          .problem-number {
+            font-size: 12pt;
+            font-weight: 700;
+            color: #4b5563;
+            min-width: 0.25in;
+            flex-shrink: 0;
+          }
+
+          /* Problem text wrapper for flex containment */
+          .problem-text-wrapper {
+            flex: 1;
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
+          }
+
+          .problem-text {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #1f2937;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            min-width: 0;
+            max-width: 100%;
+          }
+
+          .answer-text {
+            font-size: 1rem;
+            color: #059669;
+            font-weight: 600;
+            margin-top: 4px;
+          }
+
+          .vertical-problem {
+            font-family: monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 auto;
+            max-width: 100px;
+          }
+
+          .problem-num {
+            text-align: right;
+            padding: 2px 4px;
+          }
+
+          .problem-op-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 4px;
+          }
+
+          .problem-op {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #7c3aed;
+          }
+
+          .problem-line {
+            border-bottom: 3px solid #1f2937;
+            margin: 4px 0;
+          }
+
+          .problem-answer {
+            text-align: right;
+            color: #16a34a;
+            font-weight: 700;
+            padding: 2px 4px;
+          }
+
+          .problem-blank {
+            min-height: 30px;
+          }
+
+          .flash-card {
+            border: 2px dashed #9ca3af;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: #fef3c7;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+          }
+
+          .answer-key-box {
+            border: 2px solid #d1fae5;
+            border-radius: 8px;
+            padding: 8px;
+            background: #f0fdf4;
+            text-align: center;
+          }
+
+          .workspace {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #d1d5db;
+          }
+
+          .workspace-lines {
+            min-height: 40px;
+            background-image: repeating-linear-gradient(
+              transparent,
+              transparent 18px,
+              #e5e7eb 18px,
+              #e5e7eb 19px
+            );
+          }
+        }
+
+        @media print {
+          * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+
+          /* Hide non-printable elements */
+          nav, footer, .no-print {
+            display: none !important;
+          }
+
+          body {
+            height: auto !important;
+            width: 100% !important;
+            overflow: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-family: Georgia, 'Times New Roman', Times, serif !important;
+            font-size: 12pt !important;
+            line-height: 1.6 !important;
+            color: #000 !important;
+            background: white !important;
+          }
+
+          @page {
+            size: letter;
+            margin: 0.5in;
+          }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+
+          /* Prevent awkward line breaks */
+          p {
+            orphans: 3;
+            widows: 3;
+          }
+
+          /* Prevent headings from being orphaned */
+          h1, h2, h3, h4, h5, h6 {
+            page-break-after: avoid;
+            break-after: avoid;
+            orphans: 3;
+            widows: 3;
+          }
+
+          /* Prevent tables and images from splitting */
+          table, img, figure {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          /* Clean link printing */
+          a {
+            text-decoration: underline;
+            color: #000 !important;
+          }
+
+          a[href]:after {
+            content: "";
+          }
+
+          .print-content {
+            background: white;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+          }
+
+          .print-page {
+            page-break-after: always !important;
+            page-break-inside: auto !important;
+            break-after: page !important;
+            break-inside: auto !important;
+            background: white;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 8.5in;
+            min-height: auto !important;
+            height: auto !important;
+            display: block;
+            position: relative;
+            overflow: visible !important;
+          }
+
+          .print-page:last-child {
+            page-break-after: auto !important;
+            break-after: auto !important;
+          }
+
+          .page-container {
+            padding: 0.5in !important;
+            margin: 0 !important;
+            width: 8.5in;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.2in !important;
+            height: auto !important;
+            overflow: visible !important;
+          }
+
+          /* Problem boxes with serif fonts and better spacing */
+          .problem-box, .problem-box-vertical {
+            border: 1.5pt solid #000 !important;
+            border-radius: 0.05in;
+            padding: 0.12in 0.1in !important;
+            background: white !important;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            margin-bottom: 0.1in;
+            min-height: 0.7in;
+            font-family: Georgia, 'Times New Roman', Times, serif !important;
+            orphans: 3;
+            widows: 3;
+            display: flex !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+          }
+
+          /* All flex items must have min-width: 0 */
+          .problem-box > *,
+          .problem-box-vertical > * {
+            min-width: 0 !important;
+          }
+
+          .problem-number {
+            flex-shrink: 0 !important;
+            min-width: 0.25in !important;
+          }
+
+          /* Problem text wrapper for flex containment */
+          .problem-text-wrapper {
+            flex: 1 !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+          }
+
+          /* Use absolute grid spacing */
+          .grid,
+          .worksheet-grid {
+            gap: 0.12in !important;
+            overflow: visible !important;
+            page-break-inside: auto !important;
+            break-inside: auto !important;
+            display: grid !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+
+          /* Print-specific header styling with high contrast */
+          .worksheet-header {
+            background: #000 !important;
+            background-image: none !important;
+            color: white !important;
+            border: 2pt solid #000 !important;
+            padding: 0.15in !important;
+            margin-bottom: 0.15in !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+            overflow: visible !important;
+          }
+
+          .worksheet-header h1 {
+            color: white !important;
+            font-size: 22pt !important;
+            font-weight: 700 !important;
+            margin: 0 !important;
+            font-family: Georgia, 'Times New Roman', Times, serif !important;
+            line-height: 1.4 !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+          }
+
+          /* Compact header info with better readability */
+          .text-center.mb-6 {
+            margin-bottom: 0.2in !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+          }
+
+          .text-center.mb-6 .pb-4 {
+            padding-bottom: 0.12in !important;
+          }
+
+          /* Text in header area - high contrast */
+          .text-sm {
+            font-size: 11pt !important;
+            line-height: 1.5 !important;
+            color: #000 !important;
+            font-weight: 500 !important;
+            orphans: 2;
+            widows: 2;
+          }
+
+          /* Problem text with serif fonts and optimal sizing */
+          .problem-text {
+            font-size: 14pt !important;
+            font-weight: 600 !important;
+            line-height: 1.6 !important;
+            color: #000 !important;
+            font-family: Georgia, 'Times New Roman', Times, serif !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            orphans: 2;
+            widows: 2;
+          }
+
+          .problem-number {
+            font-size: 13pt !important;
+            font-weight: 700 !important;
+            color: #000 !important;
+            line-height: 1.5 !important;
+            font-family: Georgia, 'Times New Roman', Times, serif !important;
+            flex-shrink: 0 !important;
+          }
+
+          /* Answer text with good contrast */
+          .answer-text {
+            font-size: 13pt !important;
+            font-weight: 600 !important;
+            color: #000 !important;
+            line-height: 1.6 !important;
+            orphans: 2;
+            widows: 2;
+          }
+
+          /* Vertical problem formatting */
+          .vertical-problem {
+            font-family: 'Courier New', Courier, monospace !important;
+            font-size: 14pt !important;
+            font-weight: 600 !important;
+            line-height: 1.5 !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          .problem-op {
+            font-size: 14pt !important;
+            font-weight: 700 !important;
+            color: #000 !important;
+          }
+
+          .problem-line {
+            border-bottom: 2pt solid #000 !important;
+          }
+
+          /* Flash cards with clear borders */
+          .flash-card {
+            border: 2pt dashed #000 !important;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            padding: 0.2in !important;
+          }
+
+          .flash-card-front {
+            font-size: 18pt !important;
+            font-weight: 700 !important;
+            line-height: 1.5 !important;
+          }
+
+          /* Certificate page */
+          .certificate-page {
+            page-break-before: always;
+            break-before: always;
+          }
+
+          /* Answer key styling */
+          .answer-key-box {
+            border: 1.5pt solid #000 !important;
+            background: white !important;
+            padding: 0.08in !important;
+            font-size: 12pt !important;
+            line-height: 1.5 !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          .answer-key-upside-down {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          /* Remove decorative elements that don't print well */
+          .shadow-lg, .shadow-md, .shadow {
+            box-shadow: none !important;
+          }
+
+          /* Ensure all borders are solid and visible */
+          .border-b-2, .border-t-2, .border {
+            border-color: #000 !important;
+          }
+
+          /* Remove background colors that waste ink */
+          .bg-gray-50, .bg-gray-100, .bg-blue-50, .bg-green-50 {
+            background: white !important;
+          }
+
+          /* Keep only essential decorations visible */
+          .text-gray-500, .text-gray-600, .text-gray-700 {
+            color: #000 !important;
+          }
+
+          /* Workspace lines - clear and visible */
+          .workspace {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          .workspace-lines {
+            background-image: repeating-linear-gradient(
+              transparent,
+              transparent 0.18in,
+              #000 0.18in,
+              #000 0.19in
+            ) !important;
+          }
+
+          /* Score/date fields - high contrast */
+          span {
+            font-family: Georgia, 'Times New Roman', Times, serif !important;
+          }
+
+          /* Motivational footer */
+          .mt-6 {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+        }
+      `}</style>
+  );
+}
