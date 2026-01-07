@@ -71,11 +71,6 @@ export function PreviewPanel({
                   )}
                   <span>Score: _____ / {settings.numProblems}</span>
                 </div>
-                {settings.numWorksheets > 1 && (
-                  <div className="text-xs text-gray-500 mt-2">
-                    Worksheet {worksheetIndex + 1} of {settings.numWorksheets}
-                  </div>
-                )}
               </div>
 
               {/* Problems Grid */}

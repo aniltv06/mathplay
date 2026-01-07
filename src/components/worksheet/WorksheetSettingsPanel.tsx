@@ -378,6 +378,7 @@ export function WorksheetSettingsPanel({
               { key: 'includeWorkspace', label: 'Include Workspace' },
               { key: 'addDecorations', label: 'Add Decorations' },
               { key: 'timedPractice', label: 'Timed Practice' },
+              { key: 'includeCertificate', label: 'Include Certificate' },
             ].map(({ key, label }) => (
               <label key={key} className="flex items-center gap-2 cursor-pointer">
                 <input
