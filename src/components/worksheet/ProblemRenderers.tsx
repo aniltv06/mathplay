@@ -105,8 +105,8 @@ export function renderHorizontalProblem({ problem, index, settings }: ProblemRen
 
 export function renderVerticalProblem({ problem, index, settings }: ProblemRenderProps) {
   return (
-    <div key={index} className="text-center problem-box-vertical">
-      <div className="text-xs text-gray-600 mb-2" aria-label={`Problem ${index + 1}`}>
+    <div key={index} className="problem-box-vertical">
+      <div className="vertical-problem-number" aria-label={`Problem ${index + 1}`}>
         #{index + 1}
       </div>
       <div className="vertical-problem" aria-label={`${problem.num1} ${problem.operation} ${problem.num2}`}>

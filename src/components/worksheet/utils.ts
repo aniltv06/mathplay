@@ -372,3 +372,54 @@ export function getGridColumns(layout: string): string {
     default: return 'repeat(2, 1fr)';
   }
 }
+
+/**
+ * Get the correct answer display for a problem based on its type
+ */
+export function getAnswerForProblem(problem: Problem): string {
+  switch (problem.type) {
+    case 'compare': {
+      // For compare problems, answer is the comparison operator
+      const value1 = problem.num1;
+      const value2 = problem.num2;
+      return value1 > value2 ? '>' : value1 < value2 ? '<' : '=';
+    }
+    case 'missing-op': {
+      // For missing operator problems, answer is the operation
+      return problem.operation;
+    }
+    case 'fill-blank': {
+      // For fill-blank problems, show which value was blank
+      if (problem.blankPosition === 'num1') return String(problem.num1);
+      if (problem.blankPosition === 'num2') return String(problem.num2);
+      return String(problem.answer);
+    }
+    case 'standard':
+    default: {
+      // For standard problems, show the numeric answer
+      return String(problem.answer);
+    }
+  }
+}
+
+/**
+ * Get the problem text for answer key display
+ */
+export function getProblemTextForAnswerKey(problem: Problem): string {
+  switch (problem.type) {
+    case 'compare':
+      return `${problem.num1} ___ ${problem.num2}`;
+    case 'missing-op':
+      return `${problem.num1} ___ ${problem.num2} = ${problem.answer}`;
+    case 'fill-blank': {
+      const blank = '___';
+      const num1Str = problem.blankPosition === 'num1' ? blank : problem.num1;
+      const num2Str = problem.blankPosition === 'num2' ? blank : problem.num2;
+      const answerStr = problem.blankPosition === 'answer' ? blank : problem.answer;
+      return `${num1Str} ${problem.operation} ${num2Str} = ${answerStr}`;
+    }
+    case 'standard':
+    default:
+      return `${problem.num1} ${problem.operation} ${problem.num2}`;
+  }
+}

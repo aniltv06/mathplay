@@ -7,7 +7,7 @@ import { Fragment } from 'react';
 import { formatName } from '../../utils/formatters';
 import { Problem, WorksheetSettings, ThemeStyles } from './types';
 import { renderProblem } from './ProblemRenderers';
-import { getGridColumns } from './utils';
+import { getGridColumns, getAnswerForProblem, getProblemTextForAnswerKey } from './utils';
 
 interface PreviewPanelProps {
   worksheets: Problem[][];
@@ -92,16 +92,9 @@ export function PreviewPanel({
                 })}
               </div>
 
-              {/* Motivational Footer */}
-              {settings.addDecorations && (
-                <div className="mt-6 text-center text-gray-500 text-sm border-t pt-3">
-                  <p className="font-semibold">🌟 You're doing great! Keep up the excellent work! 🌟</p>
-                </div>
-              )}
-
               {/* Upside Down Answer Key */}
               {settings.answerKeyPosition === 'upside-down' && (
-                <div className="border-t-2 border-dashed border-gray-400 mt-8 pt-4">
+                <div className="answer-key-upside-down border-t-2 border-dashed border-gray-400 mt-8 pt-4">
                   <p className="text-center text-xs text-gray-500 mb-2">✂️ Cut here for answers ✂️</p>
                   <div className="transform rotate-180" aria-label="Answer key (upside down)">
                     <h3 className="text-center font-bold mb-2">Answer Key</h3>
@@ -115,7 +108,7 @@ export function PreviewPanel({
                     >
                       {worksheet.map((problem, index) => (
                         <span key={index}>
-                          {index + 1}. {problem.answer}
+                          {index + 1}. {getAnswerForProblem(problem)}
                         </span>
                       ))}
                     </div>
@@ -148,10 +141,10 @@ export function PreviewPanel({
                     <div key={index} className="answer-key-box" role="listitem">
                       <div className="text-xs text-gray-600 mb-1">#{index + 1}</div>
                       <div className="text-sm font-mono text-gray-700">
-                        {problem.num1} {problem.operation} {problem.num2}
+                        {getProblemTextForAnswerKey(problem)}
                       </div>
                       <div className="text-xl font-bold text-green-600 mt-1">
-                        = {problem.answer}
+                        = {getAnswerForProblem(problem)}
                       </div>
                     </div>
                   ))}

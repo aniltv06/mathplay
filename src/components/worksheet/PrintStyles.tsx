@@ -64,8 +64,6 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             position: relative;
             max-width: 100%;
             box-sizing: border-box;
-            /* Fallback background in case Tailwind gradients don't render */
-            background: linear-gradient(to right, #374151, #1f2937) !important;
           }
 
           .worksheet-header h1 {
@@ -94,8 +92,9 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             flex-shrink: 0;
           }
 
-          /* Ensure Tailwind gradient classes work */
-          .bg-gradient-to-r {
+          /* Ensure Tailwind gradient classes work in worksheet area */
+          .print-content .bg-gradient-to-r,
+          .print-page .bg-gradient-to-r {
             background-image: linear-gradient(to right, var(--tw-gradient-stops)) !important;
           }
 
@@ -111,6 +110,24 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             max-width: 100%;
             overflow: hidden;
             box-sizing: border-box;
+          }
+
+          .problem-box-vertical {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 1.5rem;
+          }
+
+          .vertical-problem-number {
+            position: absolute;
+            top: 0.1in;
+            left: 0.1in;
+            font-size: 10pt;
+            font-weight: 600;
+            color: #4b5563;
           }
 
           /* Flex items must have min-width: 0 */
@@ -161,30 +178,45 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             font-family: monospace;
             font-size: 1.25rem;
             font-weight: 600;
-            margin: 0 auto;
-            max-width: 100px;
+            margin: 0;
+            width: 100%;
+            font-variant-numeric: tabular-nums;
           }
 
           .problem-num {
             text-align: right;
-            padding: 2px 4px;
+            padding: 2px 30% 2px 4px;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 4px;
+            letter-spacing: 0.15em;
           }
 
           .problem-op-line {
             display: flex;
             justify-content: space-between;
-            padding: 2px 4px;
+            align-items: center;
+            padding: 2px 30% 2px 4px;
+            margin-bottom: 2px;
           }
 
           .problem-op {
             font-size: 1rem;
             font-weight: 700;
             color: #7c3aed;
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+          }
+
+          .problem-op-line .problem-num {
+            flex: 1;
+            padding: 0;
           }
 
           .problem-line {
             border-bottom: 3px solid #1f2937;
             margin: 4px 0;
+            width: 100%;
           }
 
           .problem-answer {
@@ -195,7 +227,8 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
           }
 
           .problem-blank {
-            min-height: 30px;
+            min-height: 50px;
+            margin-top: 4px;
           }
 
           .flash-card {
@@ -360,6 +393,23 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             box-sizing: border-box !important;
           }
 
+          .problem-box-vertical {
+            position: relative !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding-top: 0.3in !important;
+          }
+
+          .vertical-problem-number {
+            position: absolute !important;
+            top: 0.08in !important;
+            left: 0.08in !important;
+            font-size: 9pt !important;
+            font-weight: 600 !important;
+            color: #000 !important;
+          }
+
           /* All flex items must have min-width: 0 */
           .problem-box > *,
           .problem-box-vertical > * {
@@ -501,16 +551,58 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             line-height: 1.5 !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
+            width: 100% !important;
+            margin: 0 !important;
+            font-variant-numeric: tabular-nums !important;
+          }
+
+          .problem-num {
+            text-align: right !important;
+            padding: 2px 30% 2px 4px !important;
+            font-variant-numeric: tabular-nums !important;
+            margin-bottom: 4px !important;
+            letter-spacing: 0.15em !important;
+          }
+
+          .problem-op-line {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 2px 30% 2px 4px !important;
+            margin-bottom: 2px !important;
           }
 
           .problem-op {
             font-size: 14pt !important;
             font-weight: 700 !important;
             color: #000 !important;
+            width: 18px !important;
+            text-align: center !important;
+            flex-shrink: 0 !important;
+          }
+
+          .problem-op-line .problem-num {
+            flex: 1 !important;
+            padding: 0 !important;
           }
 
           .problem-line {
             border-bottom: 2pt solid #000 !important;
+            margin: 4px 0 !important;
+            width: 100% !important;
+          }
+
+          .problem-blank {
+            min-height: 0.4in !important;
+            margin-top: 4pt !important;
+          }
+
+          .problem-answer {
+            text-align: right !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+            padding: 2px 4px !important;
+            min-height: 0.3in !important;
           }
 
           /* Flash cards with clear borders */
@@ -531,6 +623,46 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
           .certificate-page {
             page-break-before: always;
             break-before: always;
+          }
+
+          .certificate-page .page-container {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+
+          .certificate-page .border-8 {
+            border: 3pt double #000 !important;
+            padding: 0.5in !important;
+            background: white !important;
+          }
+
+          .certificate-page h1 {
+            font-size: 28pt !important;
+            font-weight: 700 !important;
+            color: #000 !important;
+            margin-bottom: 0.3in !important;
+          }
+
+          .certificate-page p {
+            color: #000 !important;
+            line-height: 1.8 !important;
+          }
+
+          .certificate-page .text-4xl {
+            font-size: 24pt !important;
+            font-weight: 700 !important;
+            color: #000 !important;
+          }
+
+          .certificate-page .text-3xl {
+            font-size: 20pt !important;
+            font-weight: 700 !important;
+            color: #000 !important;
+          }
+
+          .certificate-page .border-t-2 {
+            border-top: 2pt solid #000 !important;
           }
 
           /* Answer key styling */
