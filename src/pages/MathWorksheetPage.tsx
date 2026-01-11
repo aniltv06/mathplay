@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { Difficulty, Problem, ProblemSettings, WorksheetSession } from '../types';
-import { DifficultySelector } from '../components/DifficultySelector';
+import { DifficultySelector, OperationSelection } from '../components/DifficultySelector';
 import { WorksheetSettingsPanel } from '../components/WorksheetSettingsPanel';
 import { WorksheetView } from '../components/WorksheetView';
 import { WorksheetResults } from '../components/WorksheetResults';
@@ -78,27 +78,64 @@ export function MathWorksheetPage({ onBack, profileId }: Props) {
   const [pageState, setPageState] = useState<PageState>('difficulty');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [showSettings, setShowSettings] = useState(false);
-  const [settings, setSettings] = useState<ProblemSettings>(DIFFICULTY_PRESETS.easy);
+
+  // Load settings from localStorage or use defaults
+  const [settings, setSettings] = useState<ProblemSettings>(() => {
+    const saved = localStorage.getItem('practiceSettings');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return DIFFICULTY_PRESETS.easy;
+      }
+    }
+    return DIFFICULTY_PRESETS.easy;
+  });
+
   const [hasCustomSettings, setHasCustomSettings] = useState(false);
   const [session, setSession] = useState<WorksheetSession | null>(null);
   const [newBadge, setNewBadge] = useState<any>(null);
 
-  const handleDifficultySelect = (diff: Difficulty) => {
+  const handleDifficultySelect = (diff: Difficulty, operations: OperationSelection) => {
     setDifficulty(diff);
-    // Only use preset if no custom settings have been saved
-    if (!hasCustomSettings) {
-      setSettings(DIFFICULTY_PRESETS[diff]);
+
+    // Always apply the difficulty preset when user selects a difficulty
+    // This ensures the preset is properly honored
+    const newSettings = {
+      ...DIFFICULTY_PRESETS[diff],
+      // Override operations based on user selection
+      includeAddition: operations.addition,
+      includeSubtraction: operations.subtraction,
+      includeMultiplication: operations.multiplication,
+      includeDivision: operations.division,
+    };
+    setSettings(newSettings);
+
+    // Save to localStorage
+    try {
+      localStorage.setItem('practiceSettings', JSON.stringify(newSettings));
+    } catch (error) {
+      console.error('Failed to save practice settings:', error);
     }
+
+    setHasCustomSettings(false);
     setPageState('worksheet');
   };
 
   const handleSettingsSave = (newSettings: ProblemSettings) => {
+    // Save to localStorage for persistence
+    try {
+      localStorage.setItem('practiceSettings', JSON.stringify(newSettings));
+    } catch (error) {
+      console.error('Failed to save practice settings:', error);
+    }
+
     setSettings(newSettings);
     setHasCustomSettings(true);
     setShowSettings(false);
 
-    // Automatically start worksheet with custom settings
-    setPageState('worksheet');
+    // DO NOT auto-start worksheet - let user manually start when ready
+    // User can close settings and then select difficulty to start
   };
 
   const handleWorksheetComplete = (completedSession: WorksheetSession) => {
@@ -172,6 +209,12 @@ export function MathWorksheetPage({ onBack, profileId }: Props) {
           <DifficultySelector
             onSelect={handleDifficultySelect}
             hasCustomSettings={hasCustomSettings}
+            initialOperations={{
+              addition: settings.includeAddition,
+              subtraction: settings.includeSubtraction,
+              multiplication: settings.includeMultiplication,
+              division: settings.includeDivision,
+            }}
           />
         )}
 

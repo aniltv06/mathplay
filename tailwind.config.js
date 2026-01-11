@@ -5,6 +5,19 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   safelist: [
+    // Gradient directions
+    'bg-gradient-to-br',
+    'bg-gradient-to-r',
+    // Operation button colors (used dynamically)
+    'bg-green-500',
+    'bg-blue-500',
+    'bg-purple-500',
+    'bg-orange-500',
+    'text-white',
+    // Difficulty preset colors
+    'from-green-500',
+    'to-emerald-500',
+    // Existing gradient colors
     'from-blue-400',
     'to-cyan-500',
     'from-purple-400',
@@ -18,8 +31,6 @@ export default {
     'to-red-600',
     'from-amber-400',
     'to-orange-500',
-    'bg-gradient-to-br',
-    'bg-gradient-to-r',
     // Coin gradient colors
     'to-amber-700',
     'from-slate-500',

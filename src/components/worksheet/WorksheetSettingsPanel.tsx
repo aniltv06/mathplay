@@ -109,6 +109,10 @@ export function WorksheetSettingsPanel({
               disabled={isGenerating || level === 'custom'}
               aria-label={`${level} difficulty`}
               aria-pressed={settings.difficulty === level}
+              style={settings.difficulty === level ? {
+                background: 'linear-gradient(to right, #10b981, #059669)',
+                color: 'white'
+              } : undefined}
               className={`px-4 py-2 rounded-lg font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 settings.difficulty === level
                   ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg'
@@ -218,11 +222,11 @@ export function WorksheetSettingsPanel({
         </label>
         <div className="flex gap-2" role="group" aria-labelledby="operations-label">
           {[
-            { key: 'includeAddition', symbol: '+', label: 'Addition', color: 'green' },
-            { key: 'includeSubtraction', symbol: '−', label: 'Subtraction', color: 'blue' },
-            { key: 'includeMultiplication', symbol: '×', label: 'Multiplication', color: 'purple' },
-            { key: 'includeDivision', symbol: '÷', label: 'Division', color: 'orange' },
-          ].map(({ key, symbol, label, color }) => (
+            { key: 'includeAddition', symbol: '+', label: 'Addition', color: 'green', bgColor: '#22c55e' },
+            { key: 'includeSubtraction', symbol: '−', label: 'Subtraction', color: 'blue', bgColor: '#3b82f6' },
+            { key: 'includeMultiplication', symbol: '×', label: 'Multiplication', color: 'purple', bgColor: '#a855f7' },
+            { key: 'includeDivision', symbol: '÷', label: 'Division', color: 'orange', bgColor: '#f97316' },
+          ].map(({ key, symbol, label, color, bgColor }) => (
             <button
               key={key}
               onClick={() => onSettingsChange({ [key]: !settings[key as keyof WorksheetSettings] })}
@@ -230,6 +234,10 @@ export function WorksheetSettingsPanel({
               disabled={isGenerating}
               aria-label={`${label}: ${settings[key as keyof WorksheetSettings] ? 'enabled' : 'disabled'}`}
               aria-pressed={!!settings[key as keyof WorksheetSettings]}
+              style={settings[key as keyof WorksheetSettings] ? {
+                backgroundColor: bgColor,
+                color: 'white'
+              } : undefined}
               className={`w-12 h-12 rounded-lg font-bold text-2xl transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${color}-500 ${
                 settings[key as keyof WorksheetSettings]
                   ? `bg-${color}-500 text-white shadow-lg`
@@ -267,6 +275,10 @@ export function WorksheetSettingsPanel({
                 disabled={isGenerating}
                 aria-label={`${table} times table: ${settings.multiplicationTables.includes(table) ? 'selected' : 'not selected'}`}
                 aria-pressed={settings.multiplicationTables.includes(table)}
+                style={settings.multiplicationTables.includes(table) ? {
+                  backgroundColor: '#a855f7',
+                  color: 'white'
+                } : undefined}
                 className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 ${
                   settings.multiplicationTables.includes(table)
                     ? 'bg-purple-500 text-white'

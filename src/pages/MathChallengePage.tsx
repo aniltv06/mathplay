@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { DifficultySelector } from '../components/DifficultySelector';
+import { DifficultySelector, OperationSelection } from '../components/DifficultySelector';
 import { GameBoard } from '../components/GameBoard';
 import { FinalScore } from '../components/FinalScore';
 import { SettingsPanel } from '../components/SettingsPanel';
@@ -25,16 +25,70 @@ export function MathChallengePage({ onBack, profileId }: Props) {
   const [gameState, setGameState] = useState<GameState>('difficulty');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [showSettings, setShowSettings] = useState(false);
-  const [gameSettings, setGameSettings] = useState<GameSettings>({
-    problemTypes: ['addition', 'subtraction', 'multiplication', 'division'],
-    livesCount: 6,
-    timeBonus: true,
-    streakBonus: true,
+
+  // Load settings from localStorage or use defaults
+  const [gameSettings, setGameSettings] = useState<GameSettings>(() => {
+    const saved = localStorage.getItem('hangmanSettings');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return {
+          problemTypes: ['addition', 'subtraction', 'multiplication', 'division'],
+          livesCount: 6,
+          timeBonus: true,
+          streakBonus: true,
+        };
+      }
+    }
+    return {
+      problemTypes: ['addition', 'subtraction', 'multiplication', 'division'],
+      livesCount: 6,
+      timeBonus: true,
+      streakBonus: true,
+    };
   });
+
   const [finalStats, setFinalStats] = useState<GameStats | null>(null);
 
-  const handleDifficultySelect = (diff: Difficulty) => {
+  // Helper to convert OperationSelection to ProblemType[]
+  const operationsToProblemTypes = (operations: OperationSelection): ProblemType[] => {
+    const types: ProblemType[] = [];
+    if (operations.addition) types.push('addition');
+    if (operations.subtraction) types.push('subtraction');
+    if (operations.multiplication) types.push('multiplication');
+    if (operations.division) types.push('division');
+    return types;
+  };
+
+  // Helper to convert ProblemType[] to OperationSelection
+  const problemTypesToOperations = (types: ProblemType[]): OperationSelection => {
+    return {
+      addition: types.includes('addition'),
+      subtraction: types.includes('subtraction'),
+      multiplication: types.includes('multiplication'),
+      division: types.includes('division'),
+    };
+  };
+
+  const handleDifficultySelect = (diff: Difficulty, operations: OperationSelection) => {
     setDifficulty(diff);
+
+    // Apply selected operations to game settings
+    const newProblemTypes = operationsToProblemTypes(operations);
+    const updatedSettings = {
+      ...gameSettings,
+      problemTypes: newProblemTypes,
+    };
+
+    // Save to localStorage
+    try {
+      localStorage.setItem('hangmanSettings', JSON.stringify(updatedSettings));
+    } catch (error) {
+      console.error('Failed to save hangman settings:', error);
+    }
+
+    setGameSettings(updatedSettings);
     setGameState('playing');
   };
 
@@ -58,6 +112,12 @@ export function MathChallengePage({ onBack, profileId }: Props) {
   };
 
   const handleSettingsSave = (settings: GameSettings) => {
+    // Save to localStorage for persistence
+    try {
+      localStorage.setItem('hangmanSettings', JSON.stringify(settings));
+    } catch (error) {
+      console.error('Failed to save hangman settings:', error);
+    }
     setGameSettings(settings);
     setShowSettings(false);
   };
@@ -102,7 +162,10 @@ export function MathChallengePage({ onBack, profileId }: Props) {
       {/* Game States */}
       <div className="relative z-1">
         {gameState === 'difficulty' && (
-          <DifficultySelector onSelect={handleDifficultySelect} />
+          <DifficultySelector
+            onSelect={handleDifficultySelect}
+            initialOperations={problemTypesToOperations(gameSettings.problemTypes)}
+          />
         )}
 
         {gameState === 'playing' && (

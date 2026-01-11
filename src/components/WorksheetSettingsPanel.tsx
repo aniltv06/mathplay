@@ -283,7 +283,7 @@ export function WorksheetSettingsPanel({ settings, onSave, onClose, onPrintPrevi
             onClick={handleSave}
             className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-3 rounded-2xl text-lg transition-all shadow-lg hover:shadow-xl"
           >
-            Save & Start
+            Save Settings
           </button>
           <button
             onClick={onClose}
