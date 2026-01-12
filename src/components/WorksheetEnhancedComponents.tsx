@@ -285,7 +285,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Quick Practice',
       description: '5 problems - Fast warm-up',
       icon: Zap,
-      color: 'from-yellow-400 to-orange-500',
+      colorFrom: '#facc15',
+      colorTo: '#f97316',
       badge: '5 min'
     },
     {
@@ -293,7 +294,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Standard Practice',
       description: '10-15 problems - Regular session',
       icon: Book,
-      color: 'from-blue-400 to-cyan-500',
+      colorFrom: '#60a5fa',
+      colorTo: '#06b6d4',
       badge: '10 min'
     },
     {
@@ -301,7 +303,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Timed Challenge',
       description: 'Race against the clock!',
       icon: Timer,
-      color: 'from-red-400 to-pink-500',
+      colorFrom: '#f87171',
+      colorTo: '#ec4899',
       badge: 'Timed'
     },
     {
@@ -309,7 +312,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Endless Mode',
       description: 'Keep going as long as you can',
       icon: Shuffle,
-      color: 'from-purple-400 to-pink-500',
+      colorFrom: '#c084fc',
+      colorTo: '#ec4899',
       badge: '∞'
     },
     {
@@ -317,7 +321,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Addition Focus',
       description: 'Practice addition only',
       icon: Target,
-      color: 'from-green-400 to-emerald-500',
+      colorFrom: '#4ade80',
+      colorTo: '#10b981',
       badge: '+'
     },
     {
@@ -325,7 +330,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Subtraction Focus',
       description: 'Practice subtraction only',
       icon: Target,
-      color: 'from-teal-400 to-cyan-500',
+      colorFrom: '#2dd4bf',
+      colorTo: '#06b6d4',
       badge: '-'
     },
     {
@@ -333,7 +339,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Multiplication Focus',
       description: 'Practice multiplication only',
       icon: Target,
-      color: 'from-indigo-400 to-purple-500',
+      colorFrom: '#818cf8',
+      colorTo: '#a855f7',
       badge: '×'
     },
     {
@@ -341,7 +348,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Division Focus',
       description: 'Practice division only',
       icon: Target,
-      color: 'from-pink-400 to-rose-500',
+      colorFrom: '#f472b6',
+      colorTo: '#f43f5e',
       badge: '÷'
     },
     {
@@ -349,7 +357,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Adaptive Practice',
       description: 'Difficulty adjusts to your level',
       icon: Brain,
-      color: 'from-violet-400 to-purple-500',
+      colorFrom: '#a78bfa',
+      colorTo: '#a855f7',
       badge: 'Smart'
     },
     {
@@ -357,7 +366,8 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
       title: 'Word Problems',
       description: 'Story-based math problems',
       icon: BookOpen,
-      color: 'from-amber-400 to-orange-500',
+      colorFrom: '#fbbf24',
+      colorTo: '#f97316',
       badge: '📖'
     }
   ];
@@ -404,7 +414,12 @@ export function ModeSelectionMenu({ onSelectMode, onBack }: {
               </div>
 
               {/* Icon */}
-              <div className={`w-14 h-14 mb-4 rounded-xl bg-gradient-to-br ${mode.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+              <div
+                style={{
+                  background: `linear-gradient(to bottom right, ${mode.colorFrom}, ${mode.colorTo})`
+                }}
+                className="w-14 h-14 mb-4 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform"
+              >
                 <Icon className="w-7 h-7 text-white" />
               </div>
 

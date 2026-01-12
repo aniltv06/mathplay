@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { X, Printer } from 'lucide-react';
 import type { ProblemSettings } from '../types';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { GradientButton } from './GradientButton';
 
 interface Props {
   settings: ProblemSettings;
@@ -271,20 +272,28 @@ export function WorksheetSettingsPanel({ settings, onSave, onClose, onPrintPrevi
         {/* Action Buttons */}
         <div className="flex gap-4 mt-8">
           {onPrintPreview && (
-            <button
+            <GradientButton
               onClick={handlePrintPreview}
-              className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 rounded-2xl text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+              fromColor="#f97316"
+              toColor="#ef4444"
+              hoverFromColor="#ea580c"
+              hoverToColor="#dc2626"
+              className="flex-1 py-3 rounded-2xl text-lg shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
               <Printer className="w-5 h-5" />
               Print Preview
-            </button>
+            </GradientButton>
           )}
-          <button
+          <GradientButton
             onClick={handleSave}
-            className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-3 rounded-2xl text-lg transition-all shadow-lg hover:shadow-xl"
+            fromColor="#3b82f6"
+            toColor="#06b6d4"
+            hoverFromColor="#2563eb"
+            hoverToColor="#0891b2"
+            className="flex-1 py-3 rounded-2xl text-lg shadow-lg hover:shadow-xl"
           >
             Save Settings
-          </button>
+          </GradientButton>
           <button
             onClick={onClose}
             className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-2xl text-lg transition-all"

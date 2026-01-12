@@ -11,6 +11,7 @@ import { ArrowLeft, Percent, CheckCircle, XCircle } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
 import { useI18n } from '../i18n/I18nContext';
+import { GradientButton } from '../components/GradientButton';
 
 interface Props {
   onBack: () => void;
@@ -384,18 +385,26 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
 
               {/* Action Buttons */}
               <div className="flex gap-4 justify-center pt-4">
-                <button
+                <GradientButton
                   onClick={() => setMode('practice')}
-                  className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white hover:text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
+                  fromColor="#3b82f6"
+                  toColor="#6366f1"
+                  hoverFromColor="#2563eb"
+                  hoverToColor="#4f46e5"
+                  className="px-8 py-4 rounded-xl text-lg font-bold shadow-lg"
                 >
                   Start Practice
-                </button>
-                <button
+                </GradientButton>
+                <GradientButton
                   onClick={() => setMode('challenge')}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
+                  fromColor="#a855f7"
+                  toColor="#ec4899"
+                  hoverFromColor="#9333ea"
+                  hoverToColor="#db2777"
+                  className="px-8 py-4 rounded-xl text-lg font-bold shadow-lg"
                 >
                   Challenge Mode
-                </button>
+                </GradientButton>
               </div>
             </div>
           </motion.div>

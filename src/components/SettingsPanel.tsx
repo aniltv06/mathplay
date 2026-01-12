@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Save, Settings as SettingsIcon } from 'lucide-react';
 import type { GameSettings, ProblemType } from '../types';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { GradientButton } from './GradientButton';
 
 interface Props {
   settings: GameSettings;
@@ -201,13 +202,17 @@ export function SettingsPanel({ settings, onSave, onClose }: Props) {
 
           {/* Footer */}
           <div className="sticky bottom-0 bg-gray-50 p-6 rounded-b-3xl border-t border-gray-200">
-            <button
+            <GradientButton
               onClick={handleSave}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 rounded-2xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+              fromColor="#a855f7"
+              toColor="#ec4899"
+              hoverFromColor="#9333ea"
+              hoverToColor="#db2777"
+              className="w-full py-4 rounded-2xl text-xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
               <Save className="w-6 h-6" />
               Save Settings
-            </button>
+            </GradientButton>
           </div>
         </motion.div>
       </motion.div>

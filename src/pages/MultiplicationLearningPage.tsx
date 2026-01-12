@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Star, CheckCircle, Play, RotateCcw } from 'lucide-react';
+import { GradientButton } from '../components/GradientButton';
 
 interface Props {
   onBack: () => void;
@@ -185,20 +186,28 @@ export function MultiplicationLearningPage({ onBack }: Props) {
                 </div>
 
                 <div className="flex gap-4">
-                  <button
+                  <GradientButton
                     onClick={() => handleModeChange('practice')}
-                    className="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white hover:text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                    fromColor="#4ade80"
+                    toColor="#10b981"
+                    hoverFromColor="#22c55e"
+                    hoverToColor="#059669"
+                    className="flex-1 py-4 rounded-xl text-xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                   >
                     <Play className="w-6 h-6" />
                     Practice Mode
-                  </button>
-                  <button
+                  </GradientButton>
+                  <GradientButton
                     onClick={() => handleModeChange('quiz')}
-                    className="flex-1 bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-500 hover:to-purple-600 text-white hover:text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                    fromColor="#60a5fa"
+                    toColor="#a855f7"
+                    hoverFromColor="#3b82f6"
+                    hoverToColor="#9333ea"
+                    className="flex-1 py-4 rounded-xl text-xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                   >
                     <Star className="w-6 h-6" />
                     Quiz Mode
-                  </button>
+                  </GradientButton>
                 </div>
               </div>
             </motion.div>
@@ -296,13 +305,17 @@ export function MultiplicationLearningPage({ onBack }: Props) {
                         autoFocus
                         disabled={showFeedback !== null}
                       />
-                      <button
+                      <GradientButton
                         type="submit"
                         disabled={showFeedback !== null || userAnswer === ''}
-                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:text-white py-4 rounded-2xl text-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                        fromColor="#a855f7"
+                        toColor="#ec4899"
+                        hoverFromColor="#9333ea"
+                        hoverToColor="#db2777"
+                        className="w-full py-4 rounded-2xl text-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                       >
                         Check Answer
-                      </button>
+                      </GradientButton>
                     </form>
 
                     {/* Feedback */}
@@ -344,24 +357,32 @@ export function MultiplicationLearningPage({ onBack }: Props) {
                       Score: {score}/12
                     </p>
                     <div className="flex gap-4">
-                      <button
+                      <GradientButton
                         onClick={() => {
                           setCurrentQuestion(1);
                           setScore(0);
                           setCompleted([]);
                           setUserAnswer('');
                         }}
-                        className="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white hover:text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                        fromColor="#4ade80"
+                        toColor="#10b981"
+                        hoverFromColor="#22c55e"
+                        hoverToColor="#059669"
+                        className="flex-1 py-4 rounded-xl text-xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                       >
                         <RotateCcw className="w-6 h-6" />
                         Try Again
-                      </button>
-                      <button
+                      </GradientButton>
+                      <GradientButton
                         onClick={() => setMode('select')}
-                        className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:text-white py-4 rounded-xl text-xl transition-all shadow-lg hover:shadow-xl"
+                        fromColor="#a855f7"
+                        toColor="#ec4899"
+                        hoverFromColor="#9333ea"
+                        hoverToColor="#db2777"
+                        className="flex-1 py-4 rounded-xl text-xl shadow-lg hover:shadow-xl"
                       >
                         Choose New Table
-                      </button>
+                      </GradientButton>
                     </div>
                   </motion.div>
                 )}

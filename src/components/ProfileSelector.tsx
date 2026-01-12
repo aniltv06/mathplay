@@ -7,10 +7,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, User, Trash2, Database, Edit, Download, Upload, CheckCircle, XCircle, BarChart3 } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
-import { DataMigration } from './DataMigration';
-import { needsMigration, exportData, importData } from '../utils/dataMigration';
 import { EditProfileModal } from './EditProfileModal';
 import { formatName } from '../utils/formatters';
+import { GradientButton } from './GradientButton';
 
 interface Props {
   onSelectProfile: (profileId: string) => void;
@@ -28,7 +27,6 @@ const AVATAR_OPTIONS = [
 export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Props) {
   const { profiles, addProfile, deleteProfile } = useProfiles();
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showMigration, setShowMigration] = useState(false);
   const [showSyncBackup, setShowSyncBackup] = useState(false);
   const [newName, setNewName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_OPTIONS[0]);
@@ -65,35 +63,41 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
     }
   };
 
-  const handleMigrationComplete = () => {
-    window.location.reload();
-  };
-
   const handleExport = () => {
-    const data = exportData();
-    if (!data) {
+    // Export all localStorage data
+    try {
+      const data = {
+        profiles: localStorage.getItem('mathplay_profiles'),
+        currentProfileId: localStorage.getItem('mathplay_currentProfileId'),
+        hangmanSettings: localStorage.getItem('hangmanSettings'),
+        practiceSettings: localStorage.getItem('practiceSettings'),
+        worksheetSettings: localStorage.getItem('worksheetSettings'),
+        timestamp: new Date().toISOString(),
+      };
+
+      const jsonString = JSON.stringify(data, null, 2);
+
+      // Create download link
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mathplay-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setSyncStatus({
+        type: 'success',
+        message: 'Data exported successfully!',
+      });
+    } catch (error) {
       setSyncStatus({
         type: 'error',
-        message: 'No data found to export',
+        message: 'Failed to export data',
       });
-      return;
     }
-
-    // Create download link
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `mathplay-backup-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    setSyncStatus({
-      type: 'success',
-      message: 'Data exported successfully!',
-    });
 
     setTimeout(() => {
       setSyncStatus({ type: 'idle', message: '' });
@@ -108,22 +112,32 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string;
-        const success = importData(content);
+        const data = JSON.parse(content);
 
-        if (success) {
-          setSyncStatus({
-            type: 'success',
-            message: 'Data imported successfully! Page will reload...',
-          });
-          setTimeout(() => {
-            window.location.reload();
-          }, 2000);
-        } else {
-          setSyncStatus({
-            type: 'error',
-            message: 'Failed to import data. Please check the file format.',
-          });
+        // Restore localStorage data
+        if (data.profiles) {
+          localStorage.setItem('mathplay_profiles', data.profiles);
         }
+        if (data.currentProfileId) {
+          localStorage.setItem('mathplay_currentProfileId', data.currentProfileId);
+        }
+        if (data.hangmanSettings) {
+          localStorage.setItem('hangmanSettings', data.hangmanSettings);
+        }
+        if (data.practiceSettings) {
+          localStorage.setItem('practiceSettings', data.practiceSettings);
+        }
+        if (data.worksheetSettings) {
+          localStorage.setItem('worksheetSettings', data.worksheetSettings);
+        }
+
+        setSyncStatus({
+          type: 'success',
+          message: 'Data imported successfully! Page will reload...',
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } catch (error) {
         setSyncStatus({
           type: 'error',
@@ -136,8 +150,6 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
     // Reset file input
     event.target.value = '';
   };
-
-  const showMigrationButton = needsMigration();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 flex items-center justify-center px-4 py-8">
@@ -245,26 +257,6 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
           )}
         </div>
 
-        {/* Migration Button */}
-        {showMigrationButton && !showCreateForm && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6 text-center"
-          >
-            <button
-              onClick={() => setShowMigration(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 mx-auto"
-            >
-              <Database className="w-5 h-5" />
-              Migrate Old Data
-            </button>
-            <p className="text-white text-sm mt-2">
-              Found data from the old Math Fun app
-            </p>
-          </motion.div>
-        )}
-
         {/* Parent Dashboard Button */}
         {!showCreateForm && onNavigateToDashboard && (
           <motion.div
@@ -272,13 +264,17 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
             animate={{ opacity: 1, y: 0 }}
             className="mt-6 text-center"
           >
-            <button
+            <GradientButton
               onClick={onNavigateToDashboard}
-              className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 mx-auto"
+              fromColor="#6366f1"
+              toColor="#a855f7"
+              hoverFromColor="#4f46e5"
+              hoverToColor="#9333ea"
+              className="px-6 py-3 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2 mx-auto"
             >
               <BarChart3 className="w-5 h-5" />
               Parent Dashboard
-            </button>
+            </GradientButton>
             <p className="text-white/90 text-sm mt-2">
               View progress and analytics for all profiles
             </p>
@@ -292,25 +288,21 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
             animate={{ opacity: 1, y: 0 }}
             className="mt-6 text-center"
           >
-            <button
+            <GradientButton
               onClick={() => setShowSyncBackup(true)}
-              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 mx-auto"
+              fromColor="#3b82f6"
+              toColor="#06b6d4"
+              hoverFromColor="#2563eb"
+              hoverToColor="#0891b2"
+              className="px-6 py-3 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2 mx-auto"
             >
               <Database className="w-5 h-5" />
               Backup & Restore
-            </button>
+            </GradientButton>
             <p className="text-white/90 text-sm mt-2">
               Export or import your progress data
             </p>
           </motion.div>
-        )}
-
-        {/* Migration Modal */}
-        {showMigration && (
-          <DataMigration
-            onClose={() => setShowMigration(false)}
-            onMigrationComplete={handleMigrationComplete}
-          />
         )}
 
         {/* Create Profile Form */}
@@ -357,13 +349,17 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
                 </div>
 
                 <div className="flex gap-3">
-                  <button
+                  <GradientButton
                     type="submit"
                     disabled={!newName.trim()}
-                    className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    fromColor="#a855f7"
+                    toColor="#ec4899"
+                    hoverFromColor="#9333ea"
+                    hoverToColor="#db2777"
+                    className="flex-1 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Create Profile
-                  </button>
+                  </GradientButton>
                   <button
                     type="button"
                     onClick={() => {
@@ -435,24 +431,37 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
               {/* Actions */}
               <div className="space-y-3 mb-6">
                 {/* Export Button */}
-                <button
+                <GradientButton
                   onClick={handleExport}
-                  className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white p-4 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center gap-3"
+                  fromColor="#22c55e"
+                  toColor="#10b981"
+                  hoverFromColor="#16a34a"
+                  hoverToColor="#059669"
+                  className="w-full p-4 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-3"
                 >
                   <Download className="w-5 h-5 text-white" />
                   <div className="text-left flex-1 text-white">
                     <div className="font-bold text-white">Export Data</div>
                     <div className="text-sm opacity-90 text-white">Download backup as JSON file</div>
                   </div>
-                </button>
+                </GradientButton>
 
                 {/* Import Button */}
-                <label className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white p-4 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center gap-3 cursor-pointer">
-                  <Upload className="w-5 h-5 text-white" />
-                  <div className="text-left flex-1 text-white">
-                    <div className="font-bold text-white">Import Data</div>
-                    <div className="text-sm opacity-90 text-white">Restore from JSON backup file</div>
-                  </div>
+                <label className="w-full block cursor-pointer">
+                  <GradientButton
+                    onClick={() => {}}
+                    fromColor="#3b82f6"
+                    toColor="#06b6d4"
+                    hoverFromColor="#2563eb"
+                    hoverToColor="#0891b2"
+                    className="w-full p-4 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-3"
+                  >
+                    <Upload className="w-5 h-5 text-white" />
+                    <div className="text-left flex-1 text-white">
+                      <div className="font-bold text-white">Import Data</div>
+                      <div className="text-sm opacity-90 text-white">Restore from JSON backup file</div>
+                    </div>
+                  </GradientButton>
                   <input
                     type="file"
                     accept=".json"

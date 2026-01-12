@@ -21,6 +21,7 @@ interface Props {
   title?: string;
   description?: string;
   initialOperations?: OperationSelection;
+  hideOperationSelection?: boolean;
 }
 
 export function DifficultySelector({
@@ -28,7 +29,8 @@ export function DifficultySelector({
   hasCustomSettings,
   title = 'Math Hangman! 🎯',
   description = 'Choose your difficulty level to begin',
-  initialOperations
+  initialOperations,
+  hideOperationSelection = false
 }: Props) {
   // Initialize operations state
   const [operations, setOperations] = useState<OperationSelection>(
@@ -112,43 +114,45 @@ export function DifficultySelector({
       </motion.div>
 
       {/* Operation Selection */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="mb-8"
-      >
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-2xl">
-          <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
-            Select Operations
-          </h3>
-          <div className="flex gap-3 justify-center">
-            {operationButtons.map(({ key, symbol, label, color, bgColor }) => (
-              <button
-                key={key}
-                onClick={() => toggleOperation(key)}
-                style={operations[key] ? {
-                  backgroundColor: bgColor,
-                  color: 'white'
-                } : undefined}
-                className={`w-16 h-16 rounded-2xl font-bold text-3xl transition-all transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-offset-2 ${
-                  operations[key]
-                    ? `bg-${color}-500 text-white shadow-lg ring-${color}-300`
-                    : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
-                }`}
-                title={label}
-                aria-label={`${label}: ${operations[key] ? 'selected' : 'not selected'}`}
-                aria-pressed={operations[key]}
-              >
-                {symbol}
-              </button>
-            ))}
+      {!hideOperationSelection && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-2xl">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+              Select Operations
+            </h3>
+            <div className="flex gap-3 justify-center">
+              {operationButtons.map(({ key, symbol, label, color, bgColor }) => (
+                <button
+                  key={key}
+                  onClick={() => toggleOperation(key)}
+                  style={operations[key] ? {
+                    backgroundColor: bgColor,
+                    color: 'white'
+                  } : undefined}
+                  className={`w-16 h-16 rounded-2xl font-bold text-3xl transition-all transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-offset-2 ${
+                    operations[key]
+                      ? `bg-${color}-500 text-white shadow-lg ring-${color}-300`
+                      : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                  }`}
+                  title={label}
+                  aria-label={`${label}: ${operations[key] ? 'selected' : 'not selected'}`}
+                  aria-pressed={operations[key]}
+                >
+                  {symbol}
+                </button>
+              ))}
+            </div>
+            <p className="text-sm text-gray-600 text-center mt-3">
+              Select at least one operation type
+            </p>
           </div>
-          <p className="text-sm text-gray-600 text-center mt-3">
-            Select at least one operation type
-          </p>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* Difficulty Selection */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">

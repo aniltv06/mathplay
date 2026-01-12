@@ -21,6 +21,7 @@ interface Props {
 
 export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldShake = false, onShakeComplete }: Props) {
   const [answer, setAnswer] = useState('');
+  const [hoveredButton, setHoveredButton] = useState<number | null>(null);
 
   // Reset answer when disabled changes (new problem)
   useEffect(() => {
@@ -93,6 +94,28 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
     }
   };
 
+  // Get gradient style for number buttons
+  const getNumberButtonStyle = (num: number) => {
+    const isHovered = hoveredButton === num;
+    return {
+      background: isHovered
+        ? 'linear-gradient(to bottom right, #9333ea, #db2777)' // purple-600 to pink-600
+        : 'linear-gradient(to bottom right, #a855f7, #ec4899)', // purple-500 to pink-500
+      color: 'white',
+    };
+  };
+
+  // Get gradient style for submit button
+  const getSubmitButtonStyle = () => {
+    const isHovered = hoveredButton === -1; // Use -1 for submit button
+    return {
+      background: isHovered
+        ? 'linear-gradient(to right, #16a34a, #059669)' // green-600 to emerald-600
+        : 'linear-gradient(to right, #22c55e, #10b981)', // green-500 to emerald-500
+      color: 'white',
+    };
+  };
+
   return (
     <motion.div
       animate={shouldShake ? { x: [-10, 10, -10, 10, 0] } : {}}
@@ -118,8 +141,11 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
             key={num}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleNumberClick(String(num))}
+            onMouseEnter={() => setHoveredButton(num)}
+            onMouseLeave={() => setHoveredButton(null)}
             disabled={disabled}
-            className="bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold py-6 rounded-xl shadow-lg transition-all active:shadow-xl"
+            style={getNumberButtonStyle(num)}
+            className="disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold py-6 rounded-xl shadow-lg transition-all active:shadow-xl"
           >
             {num}
           </motion.button>
@@ -129,7 +155,8 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
           whileTap={{ scale: 0.95 }}
           onClick={handleClear}
           disabled={disabled}
-          className="bg-orange-400 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-2xl font-bold py-6 rounded-xl shadow-lg transition-all"
+          style={{ backgroundColor: '#fb923c', color: 'white' }} // orange-400
+          className="hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-2xl font-bold py-6 rounded-xl shadow-lg transition-all"
         >
           C
         </motion.button>
@@ -137,8 +164,11 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => handleNumberClick('0')}
+          onMouseEnter={() => setHoveredButton(0)}
+          onMouseLeave={() => setHoveredButton(null)}
           disabled={disabled}
-          className="bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold py-6 rounded-xl shadow-lg transition-all active:shadow-xl"
+          style={getNumberButtonStyle(0)}
+          className="disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold py-6 rounded-xl shadow-lg transition-all active:shadow-xl"
         >
           0
         </motion.button>
@@ -147,7 +177,8 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
           whileTap={{ scale: 0.95 }}
           onClick={handleBackspace}
           disabled={disabled}
-          className="bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-2xl font-bold py-6 rounded-xl shadow-lg transition-all"
+          style={{ backgroundColor: '#facc15', color: 'white' }} // yellow-400
+          className="hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-2xl font-bold py-6 rounded-xl shadow-lg transition-all"
         >
           ←
         </motion.button>
@@ -159,18 +190,22 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
           whileTap={{ scale: 0.98 }}
           onClick={handleSkipClick}
           disabled={disabled}
-          className="bg-gray-400 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl text-lg font-medium transition-all shadow-md"
+          style={{ backgroundColor: '#9ca3af', color: 'white' }} // gray-400
+          className="hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl text-lg font-medium transition-all shadow-md"
         >
           Skip ⏭️
         </motion.button>
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={handleSubmit}
+          onMouseEnter={() => answer !== '' && !disabled && setHoveredButton(-1)}
+          onMouseLeave={() => setHoveredButton(null)}
           disabled={disabled || answer === ''}
+          style={answer === '' || disabled ? undefined : getSubmitButtonStyle()}
           className={`py-4 rounded-xl text-lg font-medium transition-all shadow-md ${
             answer === '' || disabled
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white'
+              : ''
           }`}
         >
           Submit Answer ✓

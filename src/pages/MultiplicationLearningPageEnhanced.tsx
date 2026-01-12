@@ -47,6 +47,7 @@ import {
 } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { GradientButton } from '../components/GradientButton';
 import { EmbeddedNumberPad } from '../components/EmbeddedNumberPad';
 import {
   multiplicationLessons,
@@ -795,18 +796,22 @@ function LessonsView({ onBack, onSelectTable, speak, voiceEnabled }: any) {
               <ArrowLeft className="w-5 h-5" />
               Back to lessons
             </button>
-            <button
+            <GradientButton
               onClick={() => {
                 onSelectTable(selectedLesson, 'practice');
                 if (voiceEnabled) {
                   speak(`Let's practice the ${selectedLesson} times table!`);
                 }
               }}
-              className="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white hover:text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+              fromColor="#4ade80"
+              toColor="#10b981"
+              hoverFromColor="#22c55e"
+              hoverToColor="#059669"
+              className="px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl flex items-center gap-2"
             >
               <Play className="w-5 h-5" />
               Practice This Table
-            </button>
+            </GradientButton>
           </div>
 
           {/* Lesson Content */}

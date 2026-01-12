@@ -404,6 +404,7 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
           <DifficultySelector
             onSelect={handleDifficultySelect}
             hasCustomSettings={hasCustomSettings}
+            hideOperationSelection={selectedMode.startsWith('topic-')}
           />
         )}
 

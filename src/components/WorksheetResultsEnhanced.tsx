@@ -16,6 +16,7 @@ import { RewardsDisplay } from './WorksheetEnhancedComponents';
 import { calculateRewards } from '../utils/rewards';
 import { useProfiles } from '../context/ProfileContext';
 import { formatName } from '../utils/formatters';
+import { GradientButton } from './GradientButton';
 
 interface Props {
   session: WorksheetSession;
@@ -318,21 +319,29 @@ export function WorksheetResultsEnhanced({ session, onTryAgain, onBack, profileI
           transition={{ delay: 0.8 }}
           className="flex flex-col sm:flex-row gap-4"
         >
-          <button
+          <GradientButton
             onClick={onTryAgain}
-            className="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white py-4 rounded-2xl text-xl font-bold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+            fromColor="#4ade80"
+            toColor="#10b981"
+            hoverFromColor="#22c55e"
+            hoverToColor="#059669"
+            className="flex-1 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
           >
             <RotateCcw className="w-6 h-6" />
             Try Again
-          </button>
+          </GradientButton>
 
-          <button
+          <GradientButton
             onClick={onBack}
-            className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 rounded-2xl text-xl font-bold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+            fromColor="#a855f7"
+            toColor="#ec4899"
+            hoverFromColor="#9333ea"
+            hoverToColor="#db2777"
+            className="flex-1 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
           >
             <Home className="w-6 h-6" />
             Back to Menu
-          </button>
+          </GradientButton>
         </motion.div>
       </div>
     </div>

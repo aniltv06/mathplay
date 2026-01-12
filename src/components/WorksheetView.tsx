@@ -14,6 +14,7 @@ import { Clock, CheckCircle, Calculator } from 'lucide-react';
 import type { Problem, ProblemSettings, WorksheetSession } from '../types';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
 import { NumberPadModal } from './NumberPadModal';
+import { GradientButton } from './GradientButton';
 
 // Word problem templates
 const wordProblemTemplates: Record<'+' | '-' | '×' | '÷', (n1: number, n2: number) => string[]> = {
@@ -493,12 +494,16 @@ export function WorksheetView({ settings, profileId, onComplete }: Props) {
           </div>
 
           {/* Complete Button */}
-          <button
+          <GradientButton
             onClick={handleComplete}
-            className="w-full mt-8 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-4 rounded-2xl text-xl transition-all shadow-lg hover:shadow-xl"
+            fromColor="#3b82f6"
+            toColor="#06b6d4"
+            hoverFromColor="#2563eb"
+            hoverToColor="#0891b2"
+            className="w-full mt-8 py-4 rounded-2xl text-xl shadow-lg hover:shadow-xl"
           >
             Complete Worksheet
-          </button>
+          </GradientButton>
         </motion.div>
 
         {/* Number Pad Modal */}

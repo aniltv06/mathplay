@@ -6,6 +6,7 @@
 import { motion } from 'motion/react';
 import { Trophy, Target, Flame, TrendingUp, RotateCcw } from 'lucide-react';
 import type { GameStats, Difficulty } from '../types';
+import { GradientButton } from './GradientButton';
 
 interface Props {
   stats: GameStats;
@@ -144,18 +145,25 @@ export function FinalScore({ stats, difficulty, onPlayAgain }: Props) {
         </motion.div>
 
         {/* Play Again Button */}
-        <motion.button
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onPlayAgain}
-          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-6 rounded-3xl text-2xl shadow-2xl hover:shadow-3xl transition-all flex items-center justify-center gap-3"
         >
-          <RotateCcw className="w-8 h-8" />
-          Play Again
-        </motion.button>
+          <GradientButton
+            onClick={onPlayAgain}
+            fromColor="#a855f7"
+            toColor="#ec4899"
+            hoverFromColor="#9333ea"
+            hoverToColor="#db2777"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-full py-6 rounded-3xl text-2xl shadow-2xl hover:shadow-3xl flex items-center justify-center gap-3"
+          >
+            <RotateCcw className="w-8 h-8" />
+            Play Again
+          </GradientButton>
+        </motion.div>
       </motion.div>
     </div>
   );

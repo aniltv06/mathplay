@@ -13,6 +13,7 @@ import { Trophy, Target, Clock, TrendingUp } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import type { WorksheetSession } from '../types';
 import { formatName } from '../utils/formatters';
+import { GradientButton } from './GradientButton';
 
 interface Props {
   session: WorksheetSession;
@@ -161,12 +162,16 @@ export function WorksheetResults({ session, onTryAgain, onBack, profileId }: Pro
 
         {/* Action Buttons */}
         <div className="flex gap-4">
-          <button
+          <GradientButton
             onClick={onTryAgain}
-            className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-4 rounded-2xl text-lg transition-all shadow-lg hover:shadow-xl"
+            fromColor="#3b82f6"
+            toColor="#06b6d4"
+            hoverFromColor="#2563eb"
+            hoverToColor="#0891b2"
+            className="flex-1 py-4 rounded-2xl text-lg shadow-lg hover:shadow-xl"
           >
             Try Again
-          </button>
+          </GradientButton>
           <button
             onClick={onBack}
             className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-4 rounded-2xl text-lg transition-all"

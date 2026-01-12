@@ -11,6 +11,7 @@ import { ArrowLeft, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
 import { useI18n } from '../i18n/I18nContext';
+import { GradientButton } from '../components/GradientButton';
 
 interface Props {
   onBack: () => void;
@@ -247,18 +248,26 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
               </div>
 
               <div className="flex gap-4 justify-center pt-4">
-                <button
+                <GradientButton
                   onClick={() => setMode('practice')}
-                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white hover:text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
+                  fromColor="#f97316"
+                  toColor="#ef4444"
+                  hoverFromColor="#ea580c"
+                  hoverToColor="#dc2626"
+                  className="px-8 py-4 rounded-xl text-lg font-bold shadow-lg"
                 >
                   Start Practice
-                </button>
-                <button
+                </GradientButton>
+                <GradientButton
                   onClick={() => setMode('challenge')}
-                  className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white hover:text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all"
+                  fromColor="#ef4444"
+                  toColor="#ec4899"
+                  hoverFromColor="#dc2626"
+                  hoverToColor="#db2777"
+                  className="px-8 py-4 rounded-xl text-lg font-bold shadow-lg"
                 >
                   Challenge Mode
-                </button>
+                </GradientButton>
               </div>
             </div>
           </motion.div>

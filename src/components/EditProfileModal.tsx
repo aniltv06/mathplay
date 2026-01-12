@@ -32,6 +32,7 @@ export function EditProfileModal({ profile, isOpen, onClose }: Props) {
   const { updateProfile } = useProfiles();
   const [name, setName] = useState(profile.name);
   const [avatar, setAvatar] = useState(profile.avatar);
+  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +43,17 @@ export function EditProfileModal({ profile, isOpen, onClose }: Props) {
       });
       onClose();
     }
+  };
+
+  // Get gradient style for save button
+  const getSaveButtonStyle = () => {
+    const isHovered = hoveredButton === 'save';
+    return {
+      background: isHovered
+        ? 'linear-gradient(to right, #9333ea, #db2777)' // purple-600 to pink-600
+        : 'linear-gradient(to right, #a855f7, #ec4899)', // purple-500 to pink-500
+      color: 'white',
+    };
   };
 
   if (!isOpen) return null;
@@ -122,7 +134,10 @@ export function EditProfileModal({ profile, isOpen, onClose }: Props) {
               <button
                 type="submit"
                 disabled={!name.trim()}
-                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                onMouseEnter={() => name.trim() && setHoveredButton('save')}
+                onMouseLeave={() => setHoveredButton(null)}
+                style={name.trim() ? getSaveButtonStyle() : undefined}
+                className="flex-1 text-white py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <Save className="w-5 h-5" />
                 Save Changes
