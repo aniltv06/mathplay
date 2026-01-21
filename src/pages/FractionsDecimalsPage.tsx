@@ -47,6 +47,7 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
   const [attempts, setAttempts] = useState(0);
   const [showVisual, setShowVisual] = useState(true);
   const [streak, setStreak] = useState(0);
+  const [previousProblems, setPreviousProblems] = useState<Problem[]>([]);
 
   // Generate fraction to decimal problem
   const generateFractionToDecimal = (): Problem => {
@@ -150,25 +151,54 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
   // Generate problem based on difficulty and mode
   const generateProblem = (): Problem => {
     const problemTypes: ProblemType[] = ['fraction-to-decimal', 'decimal-to-fraction', 'fraction-to-percent', 'percent-to-fraction'];
-    const randomType = problemTypes[Math.floor(Math.random() * problemTypes.length)];
 
-    switch (randomType) {
-      case 'fraction-to-decimal':
-        return generateFractionToDecimal();
-      case 'decimal-to-fraction':
-        return generateDecimalToFraction();
-      case 'fraction-to-percent':
-        return generateFractionToPercent();
-      case 'percent-to-fraction':
-        return generatePercentToFraction();
-      default:
-        return generateFractionToDecimal();
-    }
+    // Helper to check if problem is duplicate
+    const isProblemDuplicate = (newProblem: Problem): boolean => {
+      return previousProblems.some(
+        (p) =>
+          p.displayQuestion === newProblem.displayQuestion &&
+          p.answer === newProblem.answer
+      );
+    };
+
+    // Generate unique problem (max 100 attempts)
+    let problem: Problem;
+    let attempts = 0;
+    const maxAttempts = 100;
+
+    do {
+      const randomType = problemTypes[Math.floor(Math.random() * problemTypes.length)];
+
+      switch (randomType) {
+        case 'fraction-to-decimal':
+          problem = generateFractionToDecimal();
+          break;
+        case 'decimal-to-fraction':
+          problem = generateDecimalToFraction();
+          break;
+        case 'fraction-to-percent':
+          problem = generateFractionToPercent();
+          break;
+        case 'percent-to-fraction':
+          problem = generatePercentToFraction();
+          break;
+        default:
+          problem = generateFractionToDecimal();
+      }
+
+      attempts++;
+    } while (isProblemDuplicate(problem) && attempts < maxAttempts);
+
+    // Track this problem
+    setPreviousProblems(prev => [...prev, problem]);
+
+    return problem;
   };
 
   // Initialize first problem when mode or difficulty changes
   useEffect(() => {
     if (mode !== 'learn') {
+      setPreviousProblems([]); // Reset previous problems on mode/difficulty change
       setCurrentProblem(generateProblem());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -23,8 +23,9 @@ import { FractionsDecimalsPage } from './pages/FractionsDecimalsPage';
 import { TimeCalendarPage } from './pages/TimeCalendarPage';
 import { MoneyShoppingPage } from './pages/MoneyShoppingPage';
 import { EstimationRoundingPage } from './pages/EstimationRoundingPage';
+import { GraphCalculatorPage } from './pages/GraphCalculatorPage';
 
-export type Page = 'home' | 'math-challenge' | 'math-worksheet' | 'multiplication-learning' | 'parent-dashboard' | 'print-worksheet' | 'shapes-learning' | 'division-learning' | 'factorial-learning' | 'fibonacci-learning' | 'fractions-decimals' | 'time-calendar' | 'money-shopping' | 'estimation-rounding';
+export type Page = 'home' | 'math-challenge' | 'math-worksheet' | 'multiplication-learning' | 'parent-dashboard' | 'print-worksheet' | 'shapes-learning' | 'division-learning' | 'factorial-learning' | 'fibonacci-learning' | 'fractions-decimals' | 'time-calendar' | 'money-shopping' | 'estimation-rounding' | 'graph-calculator';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -145,6 +146,12 @@ export default function App() {
                 )}
                 {currentPage === 'estimation-rounding' && (
                   <EstimationRoundingPage
+                    onBack={() => navigateTo('home')}
+                    profileId={selectedProfile}
+                  />
+                )}
+                {currentPage === 'graph-calculator' && (
+                  <GraphCalculatorPage
                     onBack={() => navigateTo('home')}
                     profileId={selectedProfile}
                   />

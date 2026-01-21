@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'motion/react';
-import { Grid3x3, LogOut, User, Trophy, Edit, Printer, Shapes, Divide, Hash, TrendingUp, Percent, Clock, DollarSign, Target } from 'lucide-react';
+import { Grid3x3, LogOut, User, Trophy, Edit, Printer, Shapes, Divide, Hash, TrendingUp, Percent, Clock, DollarSign, Target, LineChart } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import { useProgress } from '../context/ProgressContext';
 import { LanguageSelector } from '../components/LanguageSelector';
@@ -390,11 +390,20 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               color="text-orange-600"
               delay={1.4}
             />
+            <ActivityCard
+              page="graph-calculator"
+              title="Graph Calculator"
+              description="Interactive graphing calculator for visualizing functions"
+              icon={LineChart}
+              gradient="from-cyan-400 to-blue-500"
+              color="text-cyan-600"
+              delay={1.5}
+            />
             {/* Coming Soon Tile */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.5 }}
+              transition={{ delay: 1.6 }}
               className="bg-white/50 backdrop-blur-sm border-4 border-dashed border-white/70 rounded-3xl p-8 shadow-xl flex flex-col items-center justify-center"
             >
               <div className="text-6xl mb-4">✨</div>

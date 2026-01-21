@@ -43,41 +43,69 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
   const [attempts, setAttempts] = useState(0);
   const [showVisual, setShowVisual] = useState(true);
   const [streak, setStreak] = useState(0);
+  const [previousProblems, setPreviousProblems] = useState<DivisionProblem[]>([]);
 
   // Generate division problem based on difficulty
   const generateProblem = (): DivisionProblem => {
-    let dividend: number, divisor: number, quotient: number, remainder: number;
+    // Helper to check if problem is duplicate
+    const isProblemDuplicate = (newProblem: DivisionProblem): boolean => {
+      return previousProblems.some(
+        (p) =>
+          p.dividend === newProblem.dividend &&
+          p.divisor === newProblem.divisor
+      );
+    };
 
-    switch (difficulty) {
-      case 'beginner':
-        divisor = Math.floor(Math.random() * 9) + 2; // 2-10
-        quotient = Math.floor(Math.random() * 5) + 1; // 1-5
-        dividend = divisor * quotient;
-        remainder = 0;
-        return { dividend, divisor, quotient, remainder };
+    // Generate unique problem (max 100 attempts)
+    let problem: DivisionProblem;
+    let attempts = 0;
+    const maxAttempts = 100;
 
-      case 'intermediate':
-        divisor = Math.floor(Math.random() * 9) + 2; // 2-10
-        quotient = Math.floor(Math.random() * 10) + 1; // 1-10
-        remainder = Math.floor(Math.random() * (divisor - 1)); // 0 to divisor-1
-        dividend = (divisor * quotient) + remainder;
-        return { dividend, divisor, quotient, remainder };
+    do {
+      let dividend: number, divisor: number, quotient: number, remainder: number;
 
-      case 'advanced':
-        divisor = Math.floor(Math.random() * 10) + 5; // 5-14
-        quotient = Math.floor(Math.random() * 15) + 5; // 5-19
-        remainder = Math.floor(Math.random() * divisor);
-        dividend = (divisor * quotient) + remainder;
-        return { dividend, divisor, quotient, remainder };
+      switch (difficulty) {
+        case 'beginner':
+          divisor = Math.floor(Math.random() * 9) + 2; // 2-10
+          quotient = Math.floor(Math.random() * 5) + 1; // 1-5
+          dividend = divisor * quotient;
+          remainder = 0;
+          problem = { dividend, divisor, quotient, remainder };
+          break;
 
-      default:
-        return { dividend: 10, divisor: 2, quotient: 5, remainder: 0 };
-    }
+        case 'intermediate':
+          divisor = Math.floor(Math.random() * 9) + 2; // 2-10
+          quotient = Math.floor(Math.random() * 10) + 1; // 1-10
+          remainder = Math.floor(Math.random() * (divisor - 1)); // 0 to divisor-1
+          dividend = (divisor * quotient) + remainder;
+          problem = { dividend, divisor, quotient, remainder };
+          break;
+
+        case 'advanced':
+          divisor = Math.floor(Math.random() * 10) + 5; // 5-14
+          quotient = Math.floor(Math.random() * 15) + 5; // 5-19
+          remainder = Math.floor(Math.random() * divisor);
+          dividend = (divisor * quotient) + remainder;
+          problem = { dividend, divisor, quotient, remainder };
+          break;
+
+        default:
+          problem = { dividend: 10, divisor: 2, quotient: 5, remainder: 0 };
+      }
+
+      attempts++;
+    } while (isProblemDuplicate(problem) && attempts < maxAttempts);
+
+    // Track this problem
+    setPreviousProblems(prev => [...prev, problem]);
+
+    return problem;
   };
 
   // Initialize first problem when mode or difficulty changes
   useEffect(() => {
     if (mode !== 'learn') {
+      setPreviousProblems([]); // Reset previous problems on mode/difficulty change
       setCurrentProblem(generateProblem());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

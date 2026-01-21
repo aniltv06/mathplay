@@ -52,36 +52,53 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
     if (difficulty === 'medium') max = 20;
     if (difficulty === 'hard') max = 100;
 
-    const a = Math.floor(Math.random() * max) + 1;
-    const b = Math.floor(Math.random() * max) + 1;
+    // Helper function to check if problem is duplicate
+    const isProblemDuplicate = (newProblem: Problem): boolean => {
+      return allProblems.some(
+        (p) =>
+          p.num1 === newProblem.num1 &&
+          p.num2 === newProblem.num2 &&
+          p.operation === newProblem.operation
+      );
+    };
 
+    // Generate unique problem (max 100 attempts to avoid infinite loop)
     let problem: Problem;
+    let attempts = 0;
+    const maxAttempts = 100;
 
-    switch (type) {
-      case 'addition':
-        problem = { num1: a, num2: b, operation: '+', correct: a + b };
-        break;
-      case 'subtraction':
-        const larger = Math.max(a, b);
-        const smaller = Math.min(a, b);
-        problem = { num1: larger, num2: smaller, operation: '-', correct: larger - smaller };
-        break;
-      case 'multiplication':
-        const ma = Math.floor(Math.random() * (max / 2)) + 1;
-        const mb = Math.floor(Math.random() * (max / 2)) + 1;
-        problem = { num1: ma, num2: mb, operation: '×', correct: ma * mb };
-        break;
-      case 'division':
-        const divisor = Math.floor(Math.random() * 10) + 1;
-        const result = Math.floor(Math.random() * 10) + 1;
-        problem = { num1: divisor * result, num2: divisor, operation: '÷', correct: result };
-        break;
-      default:
-        problem = { num1: a, num2: b, operation: '+', correct: a + b };
-    }
+    do {
+      const a = Math.floor(Math.random() * max) + 1;
+      const b = Math.floor(Math.random() * max) + 1;
+
+      switch (type) {
+        case 'addition':
+          problem = { num1: a, num2: b, operation: '+', correct: a + b };
+          break;
+        case 'subtraction':
+          const larger = Math.max(a, b);
+          const smaller = Math.min(a, b);
+          problem = { num1: larger, num2: smaller, operation: '-', correct: larger - smaller };
+          break;
+        case 'multiplication':
+          const ma = Math.floor(Math.random() * (max / 2)) + 1;
+          const mb = Math.floor(Math.random() * (max / 2)) + 1;
+          problem = { num1: ma, num2: mb, operation: '×', correct: ma * mb };
+          break;
+        case 'division':
+          const divisor = Math.floor(Math.random() * 10) + 1;
+          const result = Math.floor(Math.random() * 10) + 1;
+          problem = { num1: divisor * result, num2: divisor, operation: '÷', correct: result };
+          break;
+        default:
+          problem = { num1: a, num2: b, operation: '+', correct: a + b };
+      }
+
+      attempts++;
+    } while (isProblemDuplicate(problem) && attempts < maxAttempts);
 
     return problem;
-  }, [difficulty, settings.problemTypes]);
+  }, [difficulty, settings.problemTypes, allProblems]);
 
   // Initialize first problem on mount - intentionally runs only once
   useEffect(() => {
