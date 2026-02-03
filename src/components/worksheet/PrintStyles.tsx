@@ -477,6 +477,8 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             display: grid !important;
             width: 100% !important;
             box-sizing: border-box !important;
+            min-height: auto !important;
+            align-content: start !important;
           }
 
           /* Print-specific header styling with high contrast */
