@@ -23,7 +23,7 @@ interface Props {
 
 export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props) {
   const { speakProblem, speak } = useVoiceFeedback();
-  const { saveHangmanSession, getProfile } = useProfiles();
+  const { saveHangmanSession, getProfile, awardBadge } = useProfiles();
   const [problem, setProblem] = useState<Problem | null>(null);
   const [lives, setLives] = useState(settings.livesCount);
   const [wrongAnswers, setWrongAnswers] = useState(0);
@@ -138,19 +138,21 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
     // Save to profile
     saveHangmanSession(profileId, session);
 
-    // Check for new badges
-    const profile = getProfile(profileId);
-    if (profile) {
-      const newBadges = checkAndAwardBadges(profile);
-      if (newBadges.length > 0) {
-        // Show first badge notification
-        const badgeToShow = profile.badges.find(b => b.id === newBadges[0]);
-        if (badgeToShow) {
-          setNewBadge(badgeToShow);
+    // Check for new badges — saveHangmanSession is async state update, so we
+    // re-read the profile after a tick to get the updated stats.
+    setTimeout(() => {
+      const updatedProfile = getProfile(profileId);
+      if (updatedProfile) {
+        const newBadgeIds = checkAndAwardBadges(updatedProfile);
+        newBadgeIds.forEach(id => awardBadge(profileId, id));
+        if (newBadgeIds.length > 0) {
+          const badgeToShow = updatedProfile.badges.find(b => b.id === newBadgeIds[0])
+            ?? { id: newBadgeIds[0], name: newBadgeIds[0], description: '', icon: '🏆', earned: false };
+          setNewBadge({ ...badgeToShow, earned: true });
         }
       }
-    }
-  }, [gameStartTime, settings, lives, difficulty, allProblems, problemAnswers, score, maxStreak, profileId, saveHangmanSession, getProfile]);
+    }, 0);
+  }, [gameStartTime, settings, lives, difficulty, allProblems, problemAnswers, score, maxStreak, profileId, saveHangmanSession, getProfile, awardBadge]);
 
   const handleWrongAnswer = useCallback(() => {
     if (isGameOver) return;

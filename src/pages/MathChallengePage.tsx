@@ -10,7 +10,6 @@ import { GameBoard } from '../components/GameBoard';
 import { FinalScore } from '../components/FinalScore';
 import { SettingsPanel } from '../components/SettingsPanel';
 import { Settings } from 'lucide-react';
-import { useProfiles } from '../context/ProfileContext';
 import type { Difficulty, ProblemType, GameSettings, GameStats } from '../types';
 
 interface Props {
@@ -21,7 +20,6 @@ interface Props {
 type GameState = 'difficulty' | 'playing' | 'finished';
 
 export function MathChallengePage({ onBack, profileId }: Props) {
-  const { updateStats, getProfile } = useProfiles();
   const [gameState, setGameState] = useState<GameState>('difficulty');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [showSettings, setShowSettings] = useState(false);
@@ -95,15 +93,7 @@ export function MathChallengePage({ onBack, profileId }: Props) {
   const handleGameOver = (stats: GameStats) => {
     setFinalStats(stats);
     setGameState('finished');
-
-    // TODO: Update to use saveHangmanSession with proper HangmanSession structure
-    // For now, stats are tracked within the game but not persisted to profile
-    // const profile = getProfile(profileId);
-    // if (profile) {
-    //   updateStats(profileId, {
-    //     ...stats tracking...
-    //   });
-    // }
+    // Session is already saved by GameBoard via saveHangmanSession before calling this callback
   };
 
   const handlePlayAgain = () => {

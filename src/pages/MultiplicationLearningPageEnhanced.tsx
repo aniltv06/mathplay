@@ -93,7 +93,7 @@ interface MultiplicationProgress {
 }
 
 export function MultiplicationLearningPageEnhanced({ onBack, profileId }: Props) {
-  const { getProfile, updateProfile } = useProfiles();
+  const { getProfile, updateProfile, awardBadge } = useProfiles();
   const profile = getProfile(profileId);
   const { speak, enabled: voiceEnabled } = useVoiceFeedback();
 
@@ -396,7 +396,8 @@ export function MultiplicationLearningPageEnhanced({ onBack, profileId }: Props)
 
     // Check for new badges
     if (profile) {
-      checkAndAwardBadges(profile);
+      const newBadgeIds = checkAndAwardBadges(profile);
+      newBadgeIds.forEach(id => awardBadge(profileId, id));
     }
 
     // Voice feedback for completion

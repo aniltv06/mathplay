@@ -123,10 +123,10 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       currentHangmanSession: null,
       badges: initializeBadges(),
       worksheetMastery: {
-        '+': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity },
-        '-': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity },
-        '×': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity },
-        '÷': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity }
+        '+': { practiced: 0, mastered: false, accuracy: 0, bestTime: Number.MAX_SAFE_INTEGER },
+        '-': { practiced: 0, mastered: false, accuracy: 0, bestTime: Number.MAX_SAFE_INTEGER },
+        '×': { practiced: 0, mastered: false, accuracy: 0, bestTime: Number.MAX_SAFE_INTEGER },
+        '÷': { practiced: 0, mastered: false, accuracy: 0, bestTime: Number.MAX_SAFE_INTEGER }
       },
       coins: 0,
       stars: 0,

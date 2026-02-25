@@ -73,7 +73,7 @@ const DIFFICULTY_PRESETS: Record<Difficulty, ProblemSettings> = {
 };
 
 export function MathWorksheetPage({ onBack, profileId }: Props) {
-  const { saveWorksheetSession, getProfile } = useProfiles();
+  const { saveWorksheetSession, getProfile, awardBadge } = useProfiles();
   const { speak } = useVoiceFeedback();
   const [pageState, setPageState] = useState<PageState>('difficulty');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
@@ -148,6 +148,7 @@ export function MathWorksheetPage({ onBack, profileId }: Props) {
     const profile = getProfile(profileId);
     if (profile) {
       const newBadges = checkAndAwardBadges(profile);
+      newBadges.forEach(id => awardBadge(profileId, id));
       if (newBadges.length > 0) {
         const badgeToShow = profile.badges.find(b => b.id === newBadges[0]);
         if (badgeToShow) {

@@ -152,7 +152,7 @@ const DIFFICULTY_PRESETS: Record<Difficulty, ProblemSettings> = {
 };
 
 export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
-  const { saveWorksheetSession, getProfile, updateProfile } = useProfiles();
+  const { saveWorksheetSession, getProfile, updateProfile, awardBadge } = useProfiles();
   const profile = getProfile(profileId);
   const { speak, enabled: voiceEnabled, setEnabled: setVoiceEnabled } = useVoiceFeedback();
 
@@ -250,6 +250,7 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
     const updatedProfile = getProfile(profileId);
     if (updatedProfile) {
       const newBadges = checkAndAwardBadges(updatedProfile);
+      newBadges.forEach(id => awardBadge(profileId, id));
       if (newBadges.length > 0) {
         const badgeToShow = updatedProfile.badges.find(b => b.id === newBadges[0]);
         if (badgeToShow) {
