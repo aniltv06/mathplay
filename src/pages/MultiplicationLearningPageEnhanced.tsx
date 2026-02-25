@@ -597,7 +597,17 @@ function MainMenu({
   progress,
   wrongAnswersCount,
   voiceEnabled
-}: any) {
+}: {
+  onSelectMode: (mode: MainMode) => void;
+  onSelectTable: (table: number, mode?: LearningMode) => void;
+  onMixedPractice: () => void;
+  onReviewMode: () => void;
+  difficulty: DifficultyLevel;
+  onDifficultyChange: (d: DifficultyLevel) => void;
+  progress: MultiplicationProgress;
+  wrongAnswersCount: number;
+  voiceEnabled: boolean;
+}) {
   const menuOptions = [
     {
       id: 'lessons',
@@ -634,7 +644,7 @@ function MainMenu({
   ];
 
   // Count mastered tables
-  const masteredCount = Object.values(progress).filter((p: any) => p.mastered).length;
+  const masteredCount = Object.values(progress).filter(p => p.mastered).length;
 
   return (
     <motion.div
@@ -774,7 +784,12 @@ function MainMenu({
 // ============================================================================
 // LESSONS VIEW COMPONENT - Learning tricks and tips
 // ============================================================================
-function LessonsView({ onBack, onSelectTable, speak, voiceEnabled }: any) {
+function LessonsView({ onBack, onSelectTable, speak, voiceEnabled }: {
+  onBack: () => void;
+  onSelectTable: (table: number, mode?: LearningMode) => void;
+  speak: (text: string) => void;
+  voiceEnabled: boolean;
+}) {
   const [selectedLesson, setSelectedLesson] = useState<number | null>(null);
   const [showTips, setShowTips] = useState(false);
   const [showStrategies, setShowStrategies] = useState(false);

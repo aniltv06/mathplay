@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Settings, Volume2, VolumeX } from 'lucide-react';
 import { motion } from 'motion/react';
-import type { Difficulty, Problem, ProblemSettings, WorksheetSession } from '../types';
+import type { Difficulty, Problem, ProblemSettings, WorksheetSession, Badge } from '../types';
 import { DifficultySelector } from '../components/DifficultySelector';
 import { WorksheetSettingsPanel } from '../components/WorksheetSettingsPanel';
 import { WorksheetView } from '../components/WorksheetView';
@@ -163,8 +163,8 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
   const [settings, setSettings] = useState<ProblemSettings>(DIFFICULTY_PRESETS.easy);
   const [hasCustomSettings, setHasCustomSettings] = useState(false);
   const [session, setSession] = useState<WorksheetSession | null>(null);
-  const [newBadge, setNewBadge] = useState<any>(null);
-  const [rewards, setRewards] = useState<any>(null);
+  const [newBadge, setNewBadge] = useState<Badge | null>(null);
+  const [rewards, setRewards] = useState<{ coins: number; stars: number; reason: string } | undefined>(undefined);
   const [soundEnabled, setSoundEnabled] = useState(soundEffects.isEnabled());
 
   const handleModeSelect = (mode: string) => {
@@ -268,7 +268,7 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
 
   const handleTryAgain = () => {
     setSession(null);
-    setRewards(null);
+    setRewards(undefined);
     setHasCustomSettings(false);
     setPageState('mode-select');
   };

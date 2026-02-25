@@ -4,6 +4,12 @@
  * @email aniltv06@gmail.com
  */
 
+// webkit AudioContext fallback for older browsers (Safari)
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+  }
+}
 export type SoundType =
   | 'correct'
   | 'wrong'
@@ -39,7 +45,7 @@ export class SoundEffects {
 
   private getContext(): AudioContext {
     if (!this.context) {
-      this.context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.context = new (window.AudioContext || window.webkitAudioContext!)();
     }
     return this.context;
   }

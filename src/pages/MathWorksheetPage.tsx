@@ -11,7 +11,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { motion } from 'motion/react';
-import type { Difficulty, Problem, ProblemSettings, WorksheetSession } from '../types';
+import type { Difficulty, Problem, ProblemSettings, WorksheetSession, Badge } from '../types';
 import { DifficultySelector, OperationSelection } from '../components/DifficultySelector';
 import { WorksheetSettingsPanel } from '../components/WorksheetSettingsPanel';
 import { WorksheetView } from '../components/WorksheetView';
@@ -94,7 +94,7 @@ export function MathWorksheetPage({ onBack, profileId }: Props) {
 
   const [hasCustomSettings, setHasCustomSettings] = useState(false);
   const [session, setSession] = useState<WorksheetSession | null>(null);
-  const [newBadge, setNewBadge] = useState<any>(null);
+  const [newBadge, setNewBadge] = useState<Badge | null>(null);
 
   const handleDifficultySelect = (diff: Difficulty, operations: OperationSelection) => {
     setDifficulty(diff);

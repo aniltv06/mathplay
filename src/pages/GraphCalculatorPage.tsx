@@ -64,16 +64,42 @@ const examples: Example[] = [
   }
 ];
 
-// Declare Desmos global type
+// Expression object passed to Desmos setExpression
+interface DesmosExpression {
+  id?: string;
+  latex?: string;
+  color?: string;
+  sliderBounds?: { min: number | string; max: number | string; step?: number | string };
+  [key: string]: unknown;
+}
+
+// Helper expression returned by calculator.HelperExpression
+interface DesmosHelperExpression {
+  numericValue: number;
+  observe: (prop: string, cb: () => void) => void;
+}
+
+// Minimal interface for the Desmos calculator instance
+interface DesmosCalculator {
+  setExpression: (expr: DesmosExpression) => void;
+  setBlank: () => void;
+  HelperExpression: (opts: { latex: string }) => DesmosHelperExpression;
+  destroy: () => void;
+}
+
+// Desmos global loaded via CDN script tag
 declare global {
   interface Window {
-    Desmos: any;
+    Desmos: {
+      GraphingCalculator: (el: HTMLElement, options?: Record<string, unknown>) => DesmosCalculator;
+      Styles: Record<string, string>;
+    };
   }
 }
 
 export function GraphCalculatorPage({ onBack, profileId }: Props) {
   const calculatorRef = useRef<HTMLDivElement>(null);
-  const [calculator, setCalculator] = useState<any>(null);
+  const [calculator, setCalculator] = useState<DesmosCalculator | null>(null);
   const [customInput, setCustomInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [activeExample, setActiveExample] = useState(0);

@@ -18,6 +18,7 @@ import {
   useAutoSave,
   usePanelResize,
   getThemeStyles,
+  type SavedTemplate,
 } from '../components/worksheet';
 
 interface Props {
@@ -70,7 +71,7 @@ export function PrintWorksheetPage({ onBack, profileId }: Props) {
   }, [saveTemplate, settings]);
 
   // Handle template load
-  const handleLoadTemplate = useCallback((template: { name: string; settings: any }) => {
+  const handleLoadTemplate = useCallback((template: SavedTemplate) => {
     updateSettings(loadTemplate(template));
     alert(`Loaded template: ${template.name}`);
   }, [loadTemplate, updateSettings]);
