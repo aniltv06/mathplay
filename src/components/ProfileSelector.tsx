@@ -42,15 +42,12 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
 
   const handleCreateProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newName.trim()) {
-      const profile = addProfile(newName.trim(), selectedAvatar);
-      setNewName('');
-      setShowCreateForm(false);
-      // Small delay to ensure profile is saved before navigating
-      setTimeout(() => {
-        onSelectProfile(profile.id);
-      }, 50);
-    }
+    const trimmed = newName.trim().slice(0, 30); // enforce max length
+    if (!trimmed) return;
+    const profile = addProfile(trimmed, selectedAvatar);
+    setNewName('');
+    setShowCreateForm(false);
+    onSelectProfile(profile.id); // safe – profile is already in state before this call
   };
 
   const handleDeleteProfile = (id: string) => {
@@ -317,15 +314,21 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
               <h2 className="text-3xl text-gray-800 mb-6">Create New Profile</h2>
               <form onSubmit={handleCreateProfile} className="space-y-6">
                 <div>
-                  <label className="block text-gray-700 mb-2">Name</label>
+                  <label htmlFor="profile-name" className="block text-gray-700 mb-2">Name</label>
                   <input
+                    id="profile-name"
                     type="text"
                     value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
+                    onChange={(e) => setNewName(e.target.value.slice(0, 30))}
                     placeholder="Enter your name"
+                    maxLength={30}
                     className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-purple-500 outline-none transition-colors"
                     autoFocus
+                    aria-describedby="name-hint"
                   />
+                  <p id="name-hint" className="text-xs text-gray-500 mt-1 text-right">
+                    {newName.trim().length}/30
+                  </p>
                 </div>
 
                 <div>
@@ -448,25 +451,22 @@ export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Prop
 
                 {/* Import Button */}
                 <label className="w-full block cursor-pointer">
-                  <GradientButton
-                    onClick={() => {}}
-                    fromColor="#3b82f6"
-                    toColor="#06b6d4"
-                    hoverFromColor="#2563eb"
-                    hoverToColor="#0891b2"
-                    className="w-full p-4 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-3"
+                  <div
+                    className="w-full p-4 rounded-xl shadow-lg flex items-center gap-3 text-white"
+                    style={{ background: 'linear-gradient(to right,rgb(59,130,246),rgb(6,182,212))' }}
                   >
-                    <Upload className="w-5 h-5 text-white" />
+                    <Upload className="w-5 h-5 text-white flex-shrink-0" aria-hidden="true" />
                     <div className="text-left flex-1 text-white">
                       <div className="font-bold text-white">Import Data</div>
                       <div className="text-sm opacity-90 text-white">Restore from JSON backup file</div>
                     </div>
-                  </GradientButton>
+                  </div>
                   <input
                     type="file"
                     accept=".json"
                     onChange={handleImport}
                     className="hidden"
+                    aria-label="Import backup file"
                   />
                 </label>
               </div>

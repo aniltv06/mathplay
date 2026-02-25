@@ -34,7 +34,7 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
           }
 
           .page-container {
-            width: 8.5in;
+            width: 7.5in;
             padding: 0.5in;
             box-sizing: border-box;
             display: flex;
@@ -330,7 +330,7 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
 
           @page {
             size: letter;
-            margin: 0;
+            margin: 0.5in;
           }
 
           html, body {
@@ -397,9 +397,9 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
           }
 
           .page-container {
-            padding: 0.5in !important;
+            padding: 0.4in !important;
             margin: 0 !important;
-            width: 8.5in;
+            width: 7.5in;
             box-sizing: border-box;
             display: flex !important;
             flex-direction: column !important;

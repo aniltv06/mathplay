@@ -58,8 +58,20 @@ const defaultActivityProgress: ActivityProgress = {
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const [progressData, setProgressData] = useState<ProgressData>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return {};
+      const parsed: unknown = JSON.parse(stored);
+      // Basic validation: must be a plain object
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed as ProgressData;
+      }
+      return {};
+    } catch {
+      console.warn('Failed to parse progress data, resetting');
+      localStorage.removeItem(STORAGE_KEY);
+      return {};
+    }
   });
 
   // Save to localStorage whenever progressData changes

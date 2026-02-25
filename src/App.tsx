@@ -3,38 +3,67 @@
  * @email aniltv06@gmail.com
  */
 
-import { useState, useEffect } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { ProfileProvider } from './context/ProfileContext';
 import { I18nProvider } from './i18n/I18nContext';
 import { VoiceFeedbackProvider } from './hooks/useVoiceFeedback';
 import { ProgressProvider } from './context/ProgressContext';
 import { ProfileSelector } from './components/ProfileSelector';
-import { HomePage } from './pages/HomePage';
-import { MathChallengePage } from './pages/MathChallengePage';
-import { MathWorksheetPageEnhanced } from './pages/MathWorksheetPageEnhanced';
-import { MultiplicationLearningPageEnhanced } from './pages/MultiplicationLearningPageEnhanced';
-import { ParentDashboardPage } from './pages/ParentDashboardPage';
-import { PrintWorksheetPage } from './pages/PrintWorksheetPage';
-import { ShapesLearningPage } from './pages/ShapesLearningPage';
-import { DivisionLearningPageEnhanced } from './pages/DivisionLearningPageEnhanced';
-import { FactorialLearningPage } from './pages/FactorialLearningPage';
-import { FibonacciLearningPage } from './pages/FibonacciLearningPage';
-import { FractionsDecimalsPage } from './pages/FractionsDecimalsPage';
-import { TimeCalendarPage } from './pages/TimeCalendarPage';
-import { MoneyShoppingPage } from './pages/MoneyShoppingPage';
-import { EstimationRoundingPage } from './pages/EstimationRoundingPage';
-import { GraphCalculatorPage } from './pages/GraphCalculatorPage';
+import type { Language } from './i18n/translations';
 
-export type Page = 'home' | 'math-challenge' | 'math-worksheet' | 'multiplication-learning' | 'parent-dashboard' | 'print-worksheet' | 'shapes-learning' | 'division-learning' | 'factorial-learning' | 'fibonacci-learning' | 'fractions-decimals' | 'time-calendar' | 'money-shopping' | 'estimation-rounding' | 'graph-calculator';
+// Lazy-load all pages for code splitting
+const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
+const MathChallengePage = lazy(() => import('./pages/MathChallengePage').then(m => ({ default: m.MathChallengePage })));
+const MathWorksheetPageEnhanced = lazy(() => import('./pages/MathWorksheetPageEnhanced').then(m => ({ default: m.MathWorksheetPageEnhanced })));
+const MultiplicationLearningPageEnhanced = lazy(() => import('./pages/MultiplicationLearningPageEnhanced').then(m => ({ default: m.MultiplicationLearningPageEnhanced })));
+const ParentDashboardPage = lazy(() => import('./pages/ParentDashboardPage').then(m => ({ default: m.ParentDashboardPage })));
+const PrintWorksheetPage = lazy(() => import('./pages/PrintWorksheetPage').then(m => ({ default: m.PrintWorksheetPage })));
+const ShapesLearningPage = lazy(() => import('./pages/ShapesLearningPage').then(m => ({ default: m.ShapesLearningPage })));
+const DivisionLearningPageEnhanced = lazy(() => import('./pages/DivisionLearningPageEnhanced').then(m => ({ default: m.DivisionLearningPageEnhanced })));
+const FactorialLearningPage = lazy(() => import('./pages/FactorialLearningPage').then(m => ({ default: m.FactorialLearningPage })));
+const FibonacciLearningPage = lazy(() => import('./pages/FibonacciLearningPage').then(m => ({ default: m.FibonacciLearningPage })));
+const FractionsDecimalsPage = lazy(() => import('./pages/FractionsDecimalsPage').then(m => ({ default: m.FractionsDecimalsPage })));
+const TimeCalendarPage = lazy(() => import('./pages/TimeCalendarPage').then(m => ({ default: m.TimeCalendarPage })));
+const MoneyShoppingPage = lazy(() => import('./pages/MoneyShoppingPage').then(m => ({ default: m.MoneyShoppingPage })));
+const EstimationRoundingPage = lazy(() => import('./pages/EstimationRoundingPage').then(m => ({ default: m.EstimationRoundingPage })));
+const GraphCalculatorPage = lazy(() => import('./pages/GraphCalculatorPage').then(m => ({ default: m.GraphCalculatorPage })));
 
-export default function App() {
+export type Page =
+  | 'home'
+  | 'math-challenge'
+  | 'math-worksheet'
+  | 'multiplication-learning'
+  | 'parent-dashboard'
+  | 'print-worksheet'
+  | 'shapes-learning'
+  | 'division-learning'
+  | 'factorial-learning'
+  | 'fibonacci-learning'
+  | 'fractions-decimals'
+  | 'time-calendar'
+  | 'money-shopping'
+  | 'estimation-rounding'
+  | 'graph-calculator';
+
+function PageFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 flex items-center justify-center">
+      <div className="bg-white/90 rounded-3xl p-8 shadow-2xl text-center">
+        <div className="text-5xl mb-4 animate-bounce">📚</div>
+        <p className="text-xl text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+function AppContent({ language }: { language: Language }) {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
   const [showDashboard, setShowDashboard] = useState(false);
 
   const handleProfileSelect = (profileId: string) => {
     setSelectedProfile(profileId);
-    setCurrentPage('home'); // Reset to home page when profile is selected
+    setCurrentPage('home');
     setShowDashboard(false);
   };
 
@@ -48,119 +77,86 @@ export default function App() {
     setCurrentPage(page);
   };
 
-  const handleNavigateToDashboard = () => {
-    setShowDashboard(true);
+  const goHome = () => navigateTo('home');
+
+  const renderPage = () => {
+    if (showDashboard) {
+      return <ParentDashboardPage onBack={() => setShowDashboard(false)} />;
+    }
+
+    if (!selectedProfile) {
+      return (
+        <ProfileSelector
+          onSelectProfile={handleProfileSelect}
+          onNavigateToDashboard={() => setShowDashboard(true)}
+        />
+      );
+    }
+
+    const sharedProps = { profileId: selectedProfile, onBack: goHome };
+
+    switch (currentPage) {
+      case 'home':
+        return (
+          <HomePage
+            onNavigate={navigateTo}
+            onLogout={handleLogout}
+            profileId={selectedProfile}
+          />
+        );
+      case 'math-worksheet':
+        return <MathWorksheetPageEnhanced {...sharedProps} />;
+      case 'math-challenge':
+        return <MathChallengePage {...sharedProps} />;
+      case 'multiplication-learning':
+        return <MultiplicationLearningPageEnhanced {...sharedProps} />;
+      case 'print-worksheet':
+        return <PrintWorksheetPage {...sharedProps} />;
+      case 'shapes-learning':
+        return <ShapesLearningPage {...sharedProps} />;
+      case 'division-learning':
+        return <DivisionLearningPageEnhanced {...sharedProps} />;
+      case 'factorial-learning':
+        return <FactorialLearningPage {...sharedProps} />;
+      case 'fibonacci-learning':
+        return <FibonacciLearningPage {...sharedProps} />;
+      case 'fractions-decimals':
+        return <FractionsDecimalsPage {...sharedProps} />;
+      case 'time-calendar':
+        return <TimeCalendarPage {...sharedProps} />;
+      case 'money-shopping':
+        return <MoneyShoppingPage {...sharedProps} />;
+      case 'estimation-rounding':
+        return <EstimationRoundingPage {...sharedProps} />;
+      case 'graph-calculator':
+        return <GraphCalculatorPage {...sharedProps} />;
+      default:
+        return (
+          <HomePage
+            onNavigate={navigateTo}
+            onLogout={handleLogout}
+            profileId={selectedProfile}
+          />
+        );
+    }
   };
 
-  const handleBackFromDashboard = () => {
-    setShowDashboard(false);
-  };
+  return (
+    <VoiceFeedbackProvider language={language}>
+      <Suspense fallback={<PageFallback />}>
+        {renderPage()}
+      </Suspense>
+    </VoiceFeedbackProvider>
+  );
+}
 
+export default function App() {
   return (
     <ProfileProvider>
       <ProgressProvider>
         <I18nProvider>
-          {({ language }) => (
-            <VoiceFeedbackProvider language={language}>
-              {showDashboard ? (
-                <ParentDashboardPage onBack={handleBackFromDashboard} />
-              ) : !selectedProfile ? (
-                <ProfileSelector
-                  onSelectProfile={handleProfileSelect}
-                  onNavigateToDashboard={handleNavigateToDashboard}
-                />
-              ) : (
-                <>
-                  {currentPage === 'home' && (
-                    <HomePage
-                      onNavigate={navigateTo}
-                      onLogout={handleLogout}
-                      profileId={selectedProfile}
-                    />
-                  )}
-                {currentPage === 'math-worksheet' && (
-                  <MathWorksheetPageEnhanced
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'math-challenge' && (
-                  <MathChallengePage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'multiplication-learning' && (
-                  <MultiplicationLearningPageEnhanced
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'print-worksheet' && (
-                  <PrintWorksheetPage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'shapes-learning' && (
-                  <ShapesLearningPage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'division-learning' && (
-                  <DivisionLearningPageEnhanced
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'factorial-learning' && (
-                  <FactorialLearningPage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'fibonacci-learning' && (
-                  <FibonacciLearningPage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'fractions-decimals' && (
-                  <FractionsDecimalsPage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'time-calendar' && (
-                  <TimeCalendarPage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'money-shopping' && (
-                  <MoneyShoppingPage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'estimation-rounding' && (
-                  <EstimationRoundingPage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-                {currentPage === 'graph-calculator' && (
-                  <GraphCalculatorPage
-                    onBack={() => navigateTo('home')}
-                    profileId={selectedProfile}
-                  />
-                )}
-              </>
-            )}
-          </VoiceFeedbackProvider>
-        )}
-      </I18nProvider>
+          {({ language }) => <AppContent language={language} />}
+        </I18nProvider>
       </ProgressProvider>
     </ProfileProvider>
   );

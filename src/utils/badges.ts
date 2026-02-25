@@ -4,7 +4,7 @@
  * @email aniltv06@gmail.com
  */
 
-import type { Badge, BadgeId, WorksheetSession, HangmanSession, Problem } from '../types';
+import type { Badge, BadgeId, Problem } from '../types';
 import type { Profile } from '../context/ProfileContext';
 
 /**
@@ -116,18 +116,20 @@ export function initializeBadges(): Badge[] {
 }
 
 /**
- * Check and award badges based on profile stats and latest session
+ * Check and award badges based on profile stats and latest session.
+ * Returns the IDs of newly-earned badges. Does NOT mutate the profile.
+ * Callers are responsible for updating profile.badges via the context.
  */
 export function checkAndAwardBadges(profile: Profile): BadgeId[] {
-  if (!profile.badges || profile.badges.length === 0) {
-    profile.badges = initializeBadges();
-  }
+  const badges = (profile.badges && profile.badges.length > 0)
+    ? profile.badges
+    : initializeBadges();
 
   const newlyEarned: BadgeId[] = [];
   const latestWorksheetSession = profile.worksheetHistory[profile.worksheetHistory.length - 1];
   const latestHangmanSession = profile.hangmanHistory[profile.hangmanHistory.length - 1];
 
-  profile.badges.forEach(badge => {
+  badges.forEach(badge => {
     if (badge.earned) return; // Already earned
 
     let shouldEarn = false;
@@ -143,25 +145,26 @@ export function checkAndAwardBadges(profile: Profile): BadgeId[] {
         break;
 
       case 'speed-demon':
-        shouldEarn = latestWorksheetSession &&
+        shouldEarn = !!(latestWorksheetSession &&
                      latestWorksheetSession.problems.length >= 10 &&
-                     latestWorksheetSession.timeSpent <= 120;
+                     latestWorksheetSession.timeSpent <= 120);
         break;
 
       case 'marathon':
-        shouldEarn = latestWorksheetSession && latestWorksheetSession.problems.length >= 20;
+        shouldEarn = !!(latestWorksheetSession && latestWorksheetSession.problems.length >= 20);
         break;
 
       case 'streak-master':
         shouldEarn = profile.stats.bestStreak >= 10;
         break;
 
-      case 'division-expert':
+      case 'division-expert': {
         const divisionProblems = profile.worksheetHistory.reduce((count, session) => {
           return count + session.problems.filter((p: Problem) => p.operation === '÷').length;
         }, 0);
         shouldEarn = divisionProblems >= 50;
         break;
+      }
 
       case 'math-wizard':
         shouldEarn = profile.stats.totalProblems >= 100;
@@ -175,29 +178,30 @@ export function checkAndAwardBadges(profile: Profile): BadgeId[] {
         shouldEarn = profile.worksheetHistory.some(s => s.settings.timedMode === true);
         break;
 
-      case 'accuracy-master':
+      case 'accuracy-master': {
         const recentSessions = profile.worksheetHistory.slice(-5);
         if (recentSessions.length >= 5) {
           const avgAccuracy = recentSessions.reduce((sum, s) => sum + s.percentage, 0) / 5;
           shouldEarn = avgAccuracy >= 90;
         }
         break;
+      }
 
       // Hangman badges
       case 'hangman-survivor':
-        shouldEarn = latestHangmanSession &&
+        shouldEarn = !!(latestHangmanSession &&
                      latestHangmanSession.completed &&
-                     latestHangmanSession.livesUsed < latestHangmanSession.totalLives;
+                     latestHangmanSession.livesUsed < latestHangmanSession.totalLives);
         break;
 
       case 'hangman-perfect':
-        shouldEarn = latestHangmanSession &&
+        shouldEarn = !!(latestHangmanSession &&
                      latestHangmanSession.completed &&
-                     latestHangmanSession.livesUsed === 0;
+                     latestHangmanSession.livesUsed === 0);
         break;
 
       case 'hangman-speedster':
-        shouldEarn = latestHangmanSession && latestHangmanSession.score >= 100;
+        shouldEarn = !!(latestHangmanSession && latestHangmanSession.score >= 100);
         break;
 
       case 'hangman-champion':
@@ -206,8 +210,6 @@ export function checkAndAwardBadges(profile: Profile): BadgeId[] {
     }
 
     if (shouldEarn) {
-      badge.earned = true;
-      badge.earnedAt = new Date().toISOString();
       newlyEarned.push(badge.id);
     }
   });

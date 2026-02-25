@@ -6,7 +6,9 @@
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { ProfileStats, Badge, WorksheetSession, HangmanSession } from '../types';
+import type { ProfileStats, Badge, BadgeId, WorksheetSession, HangmanSession } from '../types';
+import { getBadgeById, initializeBadges } from '../utils/badges';
+import type { DailyChallenge } from '../utils/rewards';
 
 export interface WorksheetMastery {
   '+': { practiced: number; mastered: boolean; accuracy: number; bestTime: number };
@@ -27,11 +29,11 @@ export interface Profile {
   currentWorksheetSession: WorksheetSession | null;
   currentHangmanSession: HangmanSession | null;
   badges: Badge[];
-  multiplicationProgress?: any; // Track multiplication table mastery
+  multiplicationProgress?: Record<string, unknown>; // Track multiplication table mastery
   worksheetMastery?: WorksheetMastery; // Track mastery per operation
   coins?: number; // Reward coins
   stars?: number; // Star rating
-  dailyChallenges?: any[]; // Daily challenge progress
+  dailyChallenges?: DailyChallenge[]; // Daily challenge progress
   unlockedItems?: string[]; // Purchased items
 }
 
@@ -83,10 +85,12 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        const parsed = JSON.parse(stored);
-        // Validate that parsed data is an array
-        if (Array.isArray(parsed)) {
-          setProfiles(parsed);
+        const parsed: unknown = JSON.parse(stored);
+        // Validate that parsed data is an array of profile-shaped objects
+        if (Array.isArray(parsed) && parsed.every(
+          (p) => p && typeof p === 'object' && typeof (p as Record<string, unknown>).id === 'string'
+        )) {
+          setProfiles(parsed as Profile[]);
         } else {
           console.warn('Invalid profiles data format, clearing storage');
           localStorage.removeItem(STORAGE_KEY);
@@ -117,7 +121,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       hangmanHistory: [],
       currentWorksheetSession: null,
       currentHangmanSession: null,
-      badges: [],
+      badges: initializeBadges(),
       worksheetMastery: {
         '+': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity },
         '-': { practiced: 0, mastered: false, accuracy: 0, bestTime: Infinity },
@@ -249,15 +253,18 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         const alreadyEarned = profile.badges.some(b => b.id === badgeId);
         if (alreadyEarned) return profile;
 
-        // Create new badge (badge details would come from badge definitions)
-        const newBadge: Badge = {
-          id: badgeId as any,
-          name: badgeId,
-          description: '',
-          icon: '🏆',
-          earned: true,
-          earnedAt: new Date().toISOString(),
-        };
+        // Look up badge definition; fall back to minimal badge if unknown
+        const definition = getBadgeById(badgeId as BadgeId);
+        const newBadge: Badge = definition
+          ? { ...definition, earned: true, earnedAt: new Date().toISOString() }
+          : {
+              id: badgeId as BadgeId,
+              name: badgeId,
+              description: '',
+              icon: '🏆',
+              earned: true,
+              earnedAt: new Date().toISOString(),
+            };
 
         return {
           ...profile,
