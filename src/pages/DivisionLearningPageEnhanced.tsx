@@ -253,16 +253,27 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
               {/* What is Division */}
               <div className="bg-teal-50 rounded-xl p-6">
                 <h2 className="text-2xl font-bold text-teal-700 mb-3">What is Division?</h2>
-                <p className="text-gray-700 leading-relaxed">
-                  Division is splitting a number into equal groups. It's the opposite of multiplication!
-                  When we divide 12 ÷ 3, we're asking: "If we split 12 objects into 3 equal groups,
-                  how many are in each group?"
+                <p className="text-gray-700 leading-relaxed mb-3">
+                  Division is <strong>splitting a number into equal groups</strong>. It is the opposite of multiplication!
+                  When we write <strong>12 ÷ 3</strong>, we are asking one of two questions:
                 </p>
+                <ul className="space-y-2 ml-4">
+                  <li className="flex items-start gap-2">
+                    <span className="text-teal-600 font-bold mt-0.5">•</span>
+                    <span className="text-gray-700"><strong>Sharing:</strong> "If 12 biscuits are shared equally among 3 children, how many does each child get?" → 4 each</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-teal-600 font-bold mt-0.5">•</span>
+                    <span className="text-gray-700"><strong>Grouping:</strong> "How many groups of 3 can I make from 12?" → 4 groups</span>
+                  </li>
+                </ul>
+                <p className="text-teal-700 font-semibold mt-3 text-sm">Both give the same answer — 4. These are the two ways to think about division!</p>
               </div>
 
-              {/* Example */}
+              {/* Example with visual */}
               <div className="bg-blue-50 rounded-xl p-6">
                 <h2 className="text-2xl font-bold text-blue-700 mb-4">Example: 15 ÷ 3</h2>
+                <p className="text-gray-700 mb-4">Imagine 15 apples shared equally into 3 groups:</p>
                 <div className="flex flex-wrap gap-4 justify-center mb-4">
                   {[1, 2, 3].map(group => (
                     <div key={group} className="flex flex-col items-center gap-2">
@@ -276,52 +287,192 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
                   ))}
                 </div>
                 <p className="text-center text-blue-800 font-bold text-xl">
-                  15 ÷ 3 = 5 (Each group has 5 objects)
+                  15 ÷ 3 = 5 ✓ Each group has exactly 5
                 </p>
-              </div>
-
-              {/* Division & Multiplication Relationship */}
-              <div className="bg-purple-50 rounded-xl p-6">
-                <h2 className="text-2xl font-bold text-purple-700 mb-3">
-                  Division & Multiplication Connection
-                </h2>
-                <p className="text-gray-700 mb-3">
-                  Division and multiplication are opposites:
+                <p className="text-center text-blue-600 text-sm mt-2">
+                  Check: 3 groups × 5 each = 15 total ✓
                 </p>
-                <div className="flex items-center justify-center gap-4 text-lg">
-                  <span className="bg-white px-4 py-2 rounded-lg font-mono">3 × 5 = 15</span>
-                  <span className="text-purple-600">↔️</span>
-                  <span className="bg-white px-4 py-2 rounded-lg font-mono">15 ÷ 3 = 5</span>
-                </div>
               </div>
 
               {/* Division Terms */}
               <div className="bg-amber-50 rounded-xl p-6">
-                <h2 className="text-2xl font-bold text-amber-700 mb-3">Division Terms</h2>
-                <div className="flex items-center justify-center gap-4 text-xl mb-4">
-                  <span className="text-gray-700">20</span>
+                <h2 className="text-2xl font-bold text-amber-700 mb-4">Key Vocabulary</h2>
+                <div className="flex items-center justify-center gap-2 text-2xl font-mono mb-5 flex-wrap">
+                  <span className="bg-amber-200 px-3 py-1 rounded-lg text-amber-800 font-bold">20</span>
                   <span className="text-amber-600 font-bold">÷</span>
-                  <span className="text-gray-700">4</span>
-                  <span className="text-amber-600 font-bold">=</span>
-                  <span className="text-gray-700">5</span>
+                  <span className="bg-blue-200 px-3 py-1 rounded-lg text-blue-800 font-bold">4</span>
+                  <span className="text-gray-600 font-bold">=</span>
+                  <span className="bg-green-200 px-3 py-1 rounded-lg text-green-800 font-bold">5</span>
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="bg-white rounded-lg p-3">
-                    <p className="font-bold text-amber-700">Dividend</p>
-                    <p className="text-gray-600 text-sm">Number being divided</p>
-                    <p className="text-2xl">20</p>
+                  <div className="bg-amber-100 rounded-lg p-3 border-2 border-amber-300">
+                    <p className="font-bold text-amber-800 text-lg">Dividend</p>
+                    <p className="text-amber-600 text-xs mb-1">The number being divided up</p>
+                    <p className="text-3xl font-bold text-amber-700">20</p>
                   </div>
-                  <div className="bg-white rounded-lg p-3">
-                    <p className="font-bold text-amber-700">Divisor</p>
-                    <p className="text-gray-600 text-sm">Number of groups</p>
-                    <p className="text-2xl">4</p>
+                  <div className="bg-blue-100 rounded-lg p-3 border-2 border-blue-300">
+                    <p className="font-bold text-blue-800 text-lg">Divisor</p>
+                    <p className="text-blue-600 text-xs mb-1">How many groups (or group size)</p>
+                    <p className="text-3xl font-bold text-blue-700">4</p>
                   </div>
-                  <div className="bg-white rounded-lg p-3">
-                    <p className="font-bold text-amber-700">Quotient</p>
-                    <p className="text-gray-600 text-sm">Answer (per group)</p>
-                    <p className="text-2xl">5</p>
+                  <div className="bg-green-100 rounded-lg p-3 border-2 border-green-300">
+                    <p className="font-bold text-green-800 text-lg">Quotient</p>
+                    <p className="text-green-600 text-xs mb-1">The answer</p>
+                    <p className="text-3xl font-bold text-green-700">5</p>
                   </div>
                 </div>
+                <p className="text-center text-gray-600 text-sm mt-3">Memory tip: <strong>Dividend ÷ Divisor = Quotient</strong></p>
+              </div>
+
+              {/* Division & Multiplication Fact Families */}
+              <div className="bg-purple-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-purple-700 mb-3">
+                  Fact Families — Your Secret Weapon!
+                </h2>
+                <p className="text-gray-700 mb-4">
+                  Every multiplication fact creates a <strong>fact family</strong> — two multiplication and two division sentences that all belong together.
+                </p>
+                <div className="bg-white rounded-xl p-4 border-2 border-purple-200 mb-3">
+                  <p className="text-center font-bold text-purple-700 mb-3">Fact Family for 3, 5, and 15:</p>
+                  <div className="grid grid-cols-2 gap-3 text-center">
+                    <div className="bg-purple-100 rounded-lg p-2 font-mono text-lg">3 × 5 = 15</div>
+                    <div className="bg-purple-100 rounded-lg p-2 font-mono text-lg">5 × 3 = 15</div>
+                    <div className="bg-teal-100 rounded-lg p-2 font-mono text-lg">15 ÷ 3 = 5</div>
+                    <div className="bg-teal-100 rounded-lg p-2 font-mono text-lg">15 ÷ 5 = 3</div>
+                  </div>
+                </div>
+                <p className="text-purple-700 font-semibold text-sm">
+                  Tip: If you know your multiplication tables, you already know your division facts! If 7 × 8 = 56, then 56 ÷ 7 = 8 and 56 ÷ 8 = 7.
+                </p>
+              </div>
+
+              {/* Remainders */}
+              <div className="bg-orange-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-orange-700 mb-3">Remainders — When It Doesn't Divide Evenly</h2>
+                <p className="text-gray-700 mb-4">
+                  Sometimes a number cannot be split into perfectly equal groups. The amount left over is called the <strong>remainder</strong>.
+                </p>
+                <div className="bg-white rounded-xl p-4 border-2 border-orange-200 mb-4">
+                  <p className="text-center font-bold text-orange-700 mb-2">Example: 17 ÷ 5</p>
+                  <div className="flex flex-wrap gap-2 justify-center mb-3">
+                    {[1,2,3].map(g => (
+                      <div key={g} className="bg-orange-100 rounded-lg p-2 text-center">
+                        <div className="flex gap-1 mb-1">
+                          {[1,2,3,4,5].map(i => <div key={i} className="w-5 h-5 bg-orange-500 rounded-full" />)}
+                        </div>
+                        <span className="text-xs text-orange-700">Group {g}</span>
+                      </div>
+                    ))}
+                    <div className="bg-red-100 rounded-lg p-2 text-center border-2 border-dashed border-red-400">
+                      <div className="flex gap-1 mb-1">
+                        {[1,2].map(i => <div key={i} className="w-5 h-5 bg-red-400 rounded-full" />)}
+                      </div>
+                      <span className="text-xs text-red-700">Left over</span>
+                    </div>
+                  </div>
+                  <p className="text-center font-bold text-orange-800">17 ÷ 5 = 3 remainder 2</p>
+                  <p className="text-center text-gray-600 text-sm mt-1">Written as: 17 ÷ 5 = 3 R 2</p>
+                </div>
+                <p className="text-orange-700 text-sm">
+                  <strong>Check your answer:</strong> (Quotient × Divisor) + Remainder = Dividend<br/>
+                  (3 × 5) + 2 = 15 + 2 = 17 ✓
+                </p>
+              </div>
+
+              {/* Divisibility Rules */}
+              <div className="bg-indigo-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-indigo-700 mb-3">Divisibility Rules — Instant Mental Checks!</h2>
+                <p className="text-gray-700 mb-4">
+                  You can tell if a number divides evenly WITHOUT doing the calculation. These rules save lots of time!
+                </p>
+                <div className="space-y-2">
+                  {[
+                    { n: 2, rule: "Last digit is even (0, 2, 4, 6, 8)", ex: "48 is divisible by 2 ✓ (ends in 8)" },
+                    { n: 3, rule: "Sum of all digits is divisible by 3", ex: "57: 5+7=12, 12÷3=4 ✓" },
+                    { n: 4, rule: "Last two digits form a number divisible by 4", ex: "312: last two digits = 12, 12÷4=3 ✓" },
+                    { n: 5, rule: "Last digit is 0 or 5", ex: "85 is divisible by 5 ✓ (ends in 5)" },
+                    { n: 9, rule: "Sum of all digits is divisible by 9", ex: "729: 7+2+9=18, 18÷9=2 ✓" },
+                    { n: 10, rule: "Last digit is 0", ex: "340 is divisible by 10 ✓ (ends in 0)" },
+                  ].map(({ n, rule, ex }) => (
+                    <div key={n} className="flex items-start gap-3 bg-white rounded-lg p-3 border border-indigo-100">
+                      <div className="flex-shrink-0 w-9 h-9 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">
+                        ÷{n}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-800">{rule}</p>
+                        <p className="text-sm text-indigo-600">{ex}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step-by-Step Division */}
+              <div className="bg-cyan-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-cyan-700 mb-3">Step-by-Step: How to Divide</h2>
+                <p className="text-gray-700 mb-4">Use this reliable method for any division problem:</p>
+                <div className="bg-white rounded-xl p-4 border-2 border-cyan-200 mb-4">
+                  <p className="text-center font-bold text-cyan-700 mb-3 text-lg">Example: 84 ÷ 6</p>
+                  <ol className="space-y-2">
+                    {[
+                      ["Ask:", "How many times does 6 go into 8? → 1 time (since 6 × 1 = 6)"],
+                      ["Multiply:", "1 × 6 = 6. Write 6 below the 8"],
+                      ["Subtract:", "8 − 6 = 2. Write down 2"],
+                      ["Bring down:", "Bring the 4 down next to the 2 → now we have 24"],
+                      ["Ask again:", "How many times does 6 go into 24? → 4 times (since 6 × 4 = 24)"],
+                      ["Multiply:", "4 × 6 = 24. Write 24 below. Subtract: 24 − 24 = 0"],
+                      ["Answer:", "84 ÷ 6 = 14. Check: 14 × 6 = 84 ✓"],
+                    ].map(([label, text], i) => (
+                      <li key={i} className="flex gap-2 text-sm">
+                        <span className="flex-shrink-0 font-bold text-cyan-700 w-20">{label}</span>
+                        <span className="text-gray-700">{text}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+                <p className="text-cyan-700 text-sm font-semibold">The pattern: Divide → Multiply → Subtract → Bring down → Repeat</p>
+              </div>
+
+              {/* Word Problem Strategies */}
+              <div className="bg-green-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-green-700 mb-3">Word Problems — How to Spot Division</h2>
+                <p className="text-gray-700 mb-4">
+                  These words and phrases are clues that you need to divide:
+                </p>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {["shared equally", "split into groups", "each person gets", "distributed", "cut into equal pieces", "how many groups of"].map((phrase) => (
+                    <div key={phrase} className="bg-green-100 rounded-lg px-3 py-2 text-green-800 font-medium text-sm">
+                      "{phrase}"
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-white rounded-xl p-4 border-2 border-green-200">
+                  <p className="font-bold text-green-700 mb-2">Example word problem:</p>
+                  <p className="text-gray-700 mb-2 italic">"36 children are split into equal teams of 9. How many teams are there?"</p>
+                  <p className="text-gray-700 text-sm"><strong>Think:</strong> Total ÷ group size = number of groups</p>
+                  <p className="text-gray-700 text-sm"><strong>Calculate:</strong> 36 ÷ 9 = 4 teams</p>
+                  <p className="text-gray-700 text-sm"><strong>Check:</strong> 4 × 9 = 36 ✓</p>
+                </div>
+              </div>
+
+              {/* Common Mistakes */}
+              <div className="bg-red-50 rounded-xl p-6">
+                <h2 className="text-2xl font-bold text-red-700 mb-3">⚠️ Watch Out — Common Mistakes</h2>
+                <ul className="space-y-3">
+                  {[
+                    ["Division is NOT commutative:", "12 ÷ 4 = 3, but 4 ÷ 12 ≠ 3. Unlike multiplication, order matters!"],
+                    ["Dividing by 1:", "Any number ÷ 1 = that number. 15 ÷ 1 = 15 (not 1)."],
+                    ["Zero as dividend:", "0 ÷ 5 = 0 (zero shared among any number is zero)."],
+                    ["Dividing by zero:", "You CANNOT divide by zero. 5 ÷ 0 is undefined — it has no answer."],
+                    ["Forgetting remainders:", "Check if division is exact or has a remainder. 17 ÷ 5 = 3 R 2, not just 3."],
+                    ["Skipping the check:", "Always verify: Quotient × Divisor + Remainder = Dividend."],
+                  ].map(([label, text], i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="flex-shrink-0 text-red-500 text-xl mt-0.5">✗</span>
+                      <span className="text-gray-700"><strong>{label}</strong> {text}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
               {/* Action Buttons */}

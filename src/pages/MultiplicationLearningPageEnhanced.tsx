@@ -905,6 +905,61 @@ function LessonsView({ onBack, onSelectTable, speak, voiceEnabled }: {
                 <p className="text-lg text-gray-700">{lesson.funFact}</p>
               </div>
             )}
+
+            {/* Worked Example */}
+            <div className="bg-gradient-to-br from-cyan-50 to-teal-50 rounded-2xl p-6">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-teal-500" />
+                Step-by-Step Worked Example
+              </h3>
+              <div className="bg-white rounded-xl p-4 shadow-md mb-4">
+                <p className="text-2xl font-bold text-center text-teal-700 font-mono">{lesson.workedExample.problem}</p>
+              </div>
+              <ol className="space-y-3">
+                {lesson.workedExample.steps.map((step, index) => (
+                  <motion.li
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-start gap-3"
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 bg-teal-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                      {index + 1}
+                    </div>
+                    <p className="text-gray-700 text-lg pt-1">{step}</p>
+                  </motion.li>
+                ))}
+              </ol>
+              <div className="mt-4 bg-teal-100 rounded-xl p-4 text-center">
+                <p className="text-xl font-bold text-teal-800 font-mono">{lesson.workedExample.answer}</p>
+              </div>
+            </div>
+
+            {/* Common Mistakes */}
+            <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl p-6">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span className="text-2xl">⚠️</span>
+                Watch Out — Common Mistakes
+              </h3>
+              <ul className="space-y-3">
+                {lesson.commonMistakes.map((mistake, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="flex-shrink-0 text-red-500 text-xl mt-0.5">✗</span>
+                    <p className="text-gray-700 text-lg">{mistake}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Real-World Connection */}
+            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-6">
+              <h3 className="text-2xl font-bold text-gray-800 mb-3 flex items-center gap-2">
+                <span className="text-2xl">🌍</span>
+                Real-World Connection
+              </h3>
+              <p className="text-lg text-gray-700">{lesson.realWorldExample}</p>
+            </div>
           </div>
         </div>
       </motion.div>
