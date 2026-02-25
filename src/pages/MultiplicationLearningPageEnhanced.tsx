@@ -127,7 +127,7 @@ export function MultiplicationLearningPageEnhanced({ onBack, profileId }: Props)
 
   // Progress tracking
   const [progress, setProgress] = useState<MultiplicationProgress>(() => {
-    const saved = (profile as any)?.multiplicationProgress as MultiplicationProgress || {};
+    const saved = (profile?.multiplicationProgress ?? {}) as MultiplicationProgress;
     // Initialize empty progress for all tables
     const fullProgress: MultiplicationProgress = {};
     for (let i = 1; i <= 12; i++) {
@@ -391,7 +391,7 @@ export function MultiplicationLearningPageEnhanced({ onBack, profileId }: Props)
 
     // Save to profile
     updateProfile(profileId, {
-      multiplicationProgress: newProgress as any
+      multiplicationProgress: newProgress as Record<string, unknown>
     });
 
     // Check for new badges

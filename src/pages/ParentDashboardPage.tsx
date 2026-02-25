@@ -223,7 +223,7 @@ export function ParentDashboardPage({ onBack }: Props) {
               {latestSessions.map((item, index) => {
                 const accuracy = item.type === 'worksheet'
                   ? (item.session as WorksheetSession).percentage
-                  : Math.round(((item.session as any).score / (item.session.problems.length * 10)) * 100);
+                  : Math.round(((item.session as HangmanSession).score / (item.session.problems.length * 10)) * 100);
 
                 return (
                   <motion.div

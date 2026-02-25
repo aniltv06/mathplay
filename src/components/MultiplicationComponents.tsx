@@ -12,11 +12,80 @@ import {
   TrendingUp, Zap, Play, RotateCcw, Timer, Award, Brain
 } from 'lucide-react';
 import { EmbeddedNumberPad } from '../components/EmbeddedNumberPad';
+import type { Profile } from '../context/ProfileContext';
+
+type DifficultyLevel = 'easy' | 'medium' | 'hard';
+type LearningMode = 'select' | 'learn' | 'visualize' | 'practice' | 'quiz' | 'timed' | 'mixed' | 'review';
+
+interface TableProgress {
+  practiced: number;
+  mastered: boolean;
+  lastScore: number;
+  bestTime: number;
+  correctAnswers: number;
+  totalAttempts: number;
+}
+
+interface MultiplicationProgress {
+  [table: number]: TableProgress;
+}
+
+interface QuestionResult {
+  question: string;
+  userAnswer: number;
+  correctAnswer: number;
+  correct: boolean;
+  timeSpent: number;
+  table: number;
+  multiplier: number;
+}
+
+interface MultiplicationGridProps {
+  onBack: () => void;
+  onSelectTable: (table: number, mode?: LearningMode) => void;
+  progress: MultiplicationProgress;
+  difficulty: DifficultyLevel;
+  speak: (text: string) => void;
+  voiceEnabled: boolean;
+}
+
+interface ProgressDashboardProps {
+  onBack: () => void;
+  progress: MultiplicationProgress;
+  profile: Profile;
+  difficulty: DifficultyLevel;
+}
+
+interface PracticeViewProps {
+  selectedTable: number;
+  currentMultiplier: number;
+  learningMode: LearningMode;
+  userAnswer: string;
+  setUserAnswer: (val: string) => void;
+  showFeedback: 'correct' | 'wrong' | null;
+  score: number;
+  completed: number[];
+  difficulty: DifficultyLevel;
+  handleSubmit: (e?: React.FormEvent) => void;
+  handleModeChange: (mode: LearningMode) => void;
+  onBack: () => void;
+  showNumberPad: boolean;
+  timedMode: boolean;
+  timeRemaining: number;
+  questionResults: QuestionResult[];
+  wrongAnswers: Array<{ table: number; multiplier: number }>;
+  currentQuestion: number;
+  startTime: number;
+  questionStartTime: number;
+  progress: MultiplicationProgress;
+  voiceEnabled: boolean;
+  onRestart: () => void;
+}
 
 // ============================================================================
 // MULTIPLICATION GRID COMPONENT - Interactive times table chart
 // ============================================================================
-export function MultiplicationGrid({ onBack, onSelectTable, progress, difficulty, speak, voiceEnabled }: any) {
+export function MultiplicationGrid({ onBack, onSelectTable, progress, difficulty, speak, voiceEnabled }: MultiplicationGridProps) {
   const range = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 10 : 12;
 
   return (
@@ -117,7 +186,7 @@ export function MultiplicationGrid({ onBack, onSelectTable, progress, difficulty
 // ============================================================================
 // PROGRESS DASHBOARD COMPONENT - Track mastery and statistics
 // ============================================================================
-export function ProgressDashboard({ onBack, progress, profile, difficulty }: any) {
+export function ProgressDashboard({ onBack, progress, profile, difficulty }: ProgressDashboardProps) {
   const range = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 10 : 12;
   const tables = [...Array(range)].map((_, i) => i + 1);
 
@@ -295,7 +364,7 @@ export function PracticeView({
   progress,
   voiceEnabled,
   onRestart
-}: any) {
+}: PracticeViewProps) {
   const maxMultiplier = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 10 : 12;
   const totalQuestions = learningMode === 'mixed' ? 20 : maxMultiplier;
   const isCompleted = currentQuestion > totalQuestions;
