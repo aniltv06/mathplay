@@ -10,6 +10,12 @@
 
 export type TransformationType = 'rotate' | 'reflect' | 'translate' | 'scale';
 
+type TransformationParams =
+  | { type: 'rotate'; params: { angle: number } }
+  | { type: 'reflect'; params: { axis: 'vertical' | 'horizontal' | 'diagonal'; axisValue?: number } }
+  | { type: 'translate'; params: { dx: number; dy: number } }
+  | { type: 'scale'; params: { scaleX: number; scaleY?: number } };
+
 export interface Point {
   x: number;
   y: number;
@@ -268,10 +274,7 @@ export function scalePath(path: string, scaleX: number, scaleY?: number): Transf
  */
 export function composeTransformations(
   path: string,
-  transformations: Array<{
-    type: TransformationType;
-    params: any;
-  }>
+  transformations: TransformationParams[]
 ): TransformationResult[] {
   const results: TransformationResult[] = [];
   let currentPath = path;

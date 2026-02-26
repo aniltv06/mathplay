@@ -10,6 +10,7 @@
 
 import { useState, ReactNode } from 'react';
 import { motion, MotionProps } from 'motion/react';
+import type { TargetAndTransition, VariantLabels } from 'motion/react';
 
 interface GradientButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, keyof MotionProps> {
   children: ReactNode;
@@ -23,8 +24,8 @@ interface GradientButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButton
   onClick?: () => void;
   disabled?: boolean;
   type?: 'button' | 'submit' | 'reset';
-  whileTap?: any;
-  whileHover?: any;
+  whileTap?: VariantLabels | TargetAndTransition;
+  whileHover?: VariantLabels | TargetAndTransition;
 }
 
 export function GradientButton({
