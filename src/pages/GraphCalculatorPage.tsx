@@ -477,9 +477,9 @@ export function GraphCalculatorPage({ onBack, profileId }: Props) {
         >
           <button
             onClick={onBack}
-            className="mb-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl backdrop-blur-sm transition-all flex items-center gap-2"
+            className="mb-4 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl backdrop-blur-sm transition-all flex items-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5" aria-hidden="true" />
             Back
           </button>
           <h1 className="text-4xl md:text-5xl text-white mb-2 drop-shadow-lg">

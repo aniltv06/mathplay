@@ -82,10 +82,10 @@ export function ParentDashboardPage({ onBack }: Props) {
           <div className="flex items-center gap-4">
             <button
               onClick={onBack}
-              className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
               title="Back"
             >
-              <ArrowLeft className="w-6 h-6 text-gray-700" />
+              <ArrowLeft className="w-6 h-6 text-gray-700" aria-hidden="true" />
             </button>
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2">

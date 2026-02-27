@@ -124,9 +124,10 @@ export function MathChallengePage({ onBack, profileId }: Props) {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
+        aria-label="Go back to Home"
+        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
       >
-        <ArrowLeft className="w-5 h-5" />
+        <ArrowLeft className="w-5 h-5" aria-hidden="true" />
         Home
       </button>
 
@@ -134,9 +135,10 @@ export function MathChallengePage({ onBack, profileId }: Props) {
       {(gameState === 'difficulty' || gameState === 'finished') && (
         <button
           onClick={() => setShowSettings(true)}
-          className="absolute top-6 right-6 z-10 bg-white hover:bg-gray-100 transition-all p-3 rounded-full shadow-lg"
+          aria-label="Open game settings"
+          className="absolute top-6 right-6 z-10 bg-white hover:bg-gray-100 transition-all p-3 rounded-full shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
         >
-          <Settings className="w-6 h-6 text-gray-800" />
+          <Settings className="w-6 h-6 text-gray-800" aria-hidden="true" />
         </button>
       )}
 

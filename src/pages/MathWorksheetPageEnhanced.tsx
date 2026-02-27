@@ -349,9 +349,10 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
+        aria-label="Go back to Home"
+        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
       >
-        <ArrowLeft className="w-5 h-5" />
+        <ArrowLeft className="w-5 h-5" aria-hidden="true" />
         <span className="hidden sm:inline">Home</span>
       </button>
 
@@ -360,13 +361,14 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
         {/* Sound Toggle */}
         <button
           onClick={toggleSound}
-          className="bg-white hover:bg-gray-100 transition-all p-3 rounded-full shadow-lg"
-          title={soundEnabled ? 'Disable Sounds' : 'Enable Sounds'}
+          aria-label={soundEnabled ? 'Disable sounds' : 'Enable sounds'}
+          aria-pressed={soundEnabled}
+          className="bg-white hover:bg-gray-100 transition-all p-3 rounded-full shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
         >
           {soundEnabled ? (
-            <Volume2 className="w-6 h-6 text-gray-800" />
+            <Volume2 className="w-6 h-6 text-gray-800" aria-hidden="true" />
           ) : (
-            <VolumeX className="w-6 h-6 text-gray-800" />
+            <VolumeX className="w-6 h-6 text-gray-800" aria-hidden="true" />
           )}
         </button>
 
@@ -374,9 +376,10 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
         {(pageState === 'mode-select' || pageState === 'difficulty' || pageState === 'results') && (
           <button
             onClick={() => setShowSettings(true)}
-            className="bg-white hover:bg-gray-100 transition-all p-3 rounded-full shadow-lg"
+            aria-label="Open worksheet settings"
+            className="bg-white hover:bg-gray-100 transition-all p-3 rounded-full shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
           >
-            <Settings className="w-6 h-6 text-gray-800" />
+            <Settings className="w-6 h-6 text-gray-800" aria-hidden="true" />
           </button>
         )}
       </div>

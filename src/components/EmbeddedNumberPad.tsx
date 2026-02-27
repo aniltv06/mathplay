@@ -124,18 +124,24 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
       className="w-full"
     >
       {/* Answer Display */}
-      <div className="bg-white rounded-2xl p-4 mb-4 border-4 border-purple-300">
+      <div
+        className="bg-white rounded-2xl p-4 mb-4 border-4 border-purple-300"
+        role="status"
+        aria-live="polite"
+        aria-label={answer === '' ? 'No answer entered' : `Current answer: ${answer}`}
+      >
         <div
           className={`text-4xl font-bold text-center min-h-[60px] flex items-center justify-center ${
             answer === '' ? 'text-gray-400 opacity-50' : 'text-purple-700'
           }`}
+          aria-hidden="true"
         >
           {answer === '' ? 'Tap numbers' : answer}
         </div>
       </div>
 
       {/* Number Pad Grid */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
+      <div className="grid grid-cols-3 gap-3 mb-4" role="group" aria-label="Number pad">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
           <motion.button
             key={num}
@@ -145,7 +151,8 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
             onMouseLeave={() => setHoveredButton(null)}
             disabled={disabled}
             style={getNumberButtonStyle(num)}
-            className="disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold py-6 rounded-xl shadow-lg transition-all active:shadow-xl"
+            aria-label={`${num}`}
+            className="disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold py-4 min-h-[56px] rounded-xl shadow-lg transition-all active:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-300 focus-visible:ring-offset-2"
           >
             {num}
           </motion.button>
@@ -156,7 +163,8 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
           onClick={handleClear}
           disabled={disabled}
           style={{ backgroundColor: '#fb923c', color: 'white' }} // orange-400
-          className="hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-2xl font-bold py-6 rounded-xl shadow-lg transition-all"
+          aria-label="Clear answer"
+          className="hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-2xl font-bold py-4 min-h-[56px] rounded-xl shadow-lg transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-300 focus-visible:ring-offset-2"
         >
           C
         </motion.button>
@@ -168,7 +176,8 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
           onMouseLeave={() => setHoveredButton(null)}
           disabled={disabled}
           style={getNumberButtonStyle(0)}
-          className="disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold py-6 rounded-xl shadow-lg transition-all active:shadow-xl"
+          aria-label="0"
+          className="disabled:opacity-50 disabled:cursor-not-allowed text-white text-3xl font-bold py-4 min-h-[56px] rounded-xl shadow-lg transition-all active:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-300 focus-visible:ring-offset-2"
         >
           0
         </motion.button>
@@ -178,7 +187,8 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
           onClick={handleBackspace}
           disabled={disabled}
           style={{ backgroundColor: '#facc15', color: 'white' }} // yellow-400
-          className="hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-2xl font-bold py-6 rounded-xl shadow-lg transition-all"
+          aria-label="Backspace"
+          className="hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-2xl font-bold py-4 min-h-[56px] rounded-xl shadow-lg transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-300 focus-visible:ring-offset-2"
         >
           ←
         </motion.button>
@@ -191,7 +201,8 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
           onClick={handleSkipClick}
           disabled={disabled}
           style={{ backgroundColor: '#9ca3af', color: 'white' }} // gray-400
-          className="hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl text-lg font-medium transition-all shadow-md"
+          aria-label="Skip this question"
+          className="hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 min-h-[56px] rounded-xl text-lg font-medium transition-all shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-300 focus-visible:ring-offset-2"
         >
           Skip ⏭️
         </motion.button>
@@ -202,7 +213,8 @@ export function EmbeddedNumberPad({ onSubmit, onSkip, disabled = false, shouldSh
           onMouseLeave={() => setHoveredButton(null)}
           disabled={disabled || answer === ''}
           style={answer === '' || disabled ? undefined : getSubmitButtonStyle()}
-          className={`py-4 rounded-xl text-lg font-medium transition-all shadow-md ${
+          aria-label={answer === '' ? 'Submit answer (enter a number first)' : `Submit answer ${answer}`}
+          className={`py-4 min-h-[56px] rounded-xl text-lg font-medium transition-all shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-300 focus-visible:ring-offset-2 ${
             answer === '' || disabled
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : ''

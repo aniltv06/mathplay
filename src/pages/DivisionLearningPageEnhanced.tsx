@@ -229,9 +229,10 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
 
         <button
           onClick={onBack}
-          className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
+          aria-label="Go back to Home"
+          className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5" aria-hidden="true" />
           <span className="hidden sm:inline">Back to Home</span>
         </button>
 
@@ -515,9 +516,10 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
 
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800"
+        aria-label="Go back to Home"
+        className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
       >
-        <ArrowLeft className="w-5 h-5" />
+        <ArrowLeft className="w-5 h-5" aria-hidden="true" />
         <span className="hidden sm:inline">Back</span>
       </button>
 
@@ -545,7 +547,9 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowVisual(!showVisual)}
-                  className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg transition-all"
+                  aria-label={showVisual ? 'Hide visual representation' : 'Show visual representation'}
+                  aria-pressed={showVisual}
+                  className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
                   {showVisual ? '👁️ Hide Visual' : '👁️ Show Visual'}
                 </button>

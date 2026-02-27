@@ -81,7 +81,7 @@ export function GradientButton({
       style={getButtonStyle()}
       whileTap={whileTap}
       whileHover={whileHover}
-      className={`transition-all ${className}`}
+      className={`transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${className}`}
       {...rest}
     >
       {children}
