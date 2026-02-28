@@ -97,7 +97,18 @@ export default defineConfig({
     minify: 'terser',
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        // Split large dependencies into separate cached chunks
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-motion': ['motion'],
+          'vendor-radix': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-select',
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-tooltip',
+          ],
+        },
         // Add content hash to all assets for cache busting
         assetFileNames: 'assets/[name]-[hash][extname]',
         chunkFileNames: 'assets/[name]-[hash].js',
@@ -107,14 +118,19 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    strictPort: false, // automatically try next port if 3000 is occupied
     open: true,
+    host: true, // expose on local network for mobile device testing
+    cors: true,
     hmr: {
       overlay: true
     }
   },
   preview: {
     port: 4173,
-    open: true
+    strictPort: false,
+    open: true,
+    host: true,
   },
   test: {
     environment: 'jsdom',
