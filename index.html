@@ -41,6 +41,35 @@
 
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.json" />
+
+    <!-- Theme: apply saved preferences before first paint to prevent flash -->
+    <script>
+      (function () {
+        try {
+          var p = JSON.parse(localStorage.getItem('mathplay_theme') || '{}');
+          var mode = p.mode || 'system';
+          var darkTheme = p.darkTheme || 'dark';
+          var lightTheme = p.lightTheme || 'light';
+          var hcEnabled = !!p.highContrastEnabled;
+          var hcSystem  = !!p.highContrastSystemBased;
+          var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var sysHC   = window.matchMedia('(prefers-contrast: more)').matches;
+          var isDark  = mode === 'dark' || (mode === 'system' && sysDark);
+          var classes = [];
+          if (isDark) {
+            classes.push('dark');
+            if (darkTheme === 'soft-dark')              classes.push('soft-dark');
+            else if (darkTheme.indexOf('protanopia') !== -1) classes.push('theme-protan');
+            else if (darkTheme.indexOf('tritanopia')  !== -1) classes.push('theme-tritan');
+          } else {
+            if (lightTheme.indexOf('protanopia') !== -1) classes.push('theme-protan');
+            else if (lightTheme.indexOf('tritanopia') !== -1) classes.push('theme-tritan');
+          }
+          if (hcEnabled && (hcSystem ? sysHC : true)) classes.push('high-contrast');
+          if (classes.length) document.documentElement.className = classes.join(' ');
+        } catch (e) {}
+      })();
+    </script>
   </head>
 
   <body>

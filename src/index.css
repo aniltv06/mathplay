@@ -2108,3 +2108,232 @@ html {
     page-break-inside: avoid;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THEME VARIANTS
+   Applied via classes on <html> by ThemeContext:
+     .dark                 — base dark mode (already defined above)
+     .dark.soft-dark       — warm/dimmed dark (GitHub Dimmed style)
+     .theme-protan         — protanopia & deuteranopia (red-green colorblind)
+     .theme-tritan         — tritanopia (blue-yellow colorblind)
+     .high-contrast        — increased contrast
+     .dark.high-contrast   — increased contrast in dark mode
+───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Soft Dark ──────────────────────────────────────────────────────────── */
+/* Warmer, dimmer dark inspired by GitHub's "Dimmed" theme.                  */
+/* Applied as .dark.soft-dark — overrides the base .dark variables.          */
+html.dark.soft-dark {
+  --background: #22272e;
+  --foreground: #adbac7;
+  --card: #2d333b;
+  --card-foreground: #adbac7;
+  --popover: #2d333b;
+  --popover-foreground: #adbac7;
+  --primary: #539bf5;
+  --primary-foreground: #1c2128;
+  --secondary: #373e47;
+  --secondary-foreground: #adbac7;
+  --muted: #373e47;
+  --muted-foreground: #768390;
+  --accent: #444c56;
+  --accent-foreground: #adbac7;
+  --destructive: #e5534b;
+  --destructive-foreground: #ffffff;
+  --border: #444c56;
+  --input: #2d333b;
+  --ring: #539bf5;
+  --sidebar: #1c2128;
+  --sidebar-foreground: #adbac7;
+  --sidebar-primary: #539bf5;
+  --sidebar-primary-foreground: #1c2128;
+  --sidebar-accent: #2d333b;
+  --sidebar-accent-foreground: #adbac7;
+  --sidebar-border: #444c56;
+  --sidebar-ring: #539bf5;
+}
+
+/* ── Protanopia & Deuteranopia ─────────────────────────────────────────── */
+/* Red-green colorblind mode: greens → blues, reds → oranges.               */
+/* Applied as .theme-protan in both light and dark contexts.                  */
+html.theme-protan {
+  /* Replace greens with blue family */
+  --color-green-100: #dbeafe;
+  --color-green-400: #60a5fa;
+  --color-green-500: #3b82f6;
+  --color-green-600: #2563eb;
+  --color-emerald-100: #cffafe;
+  --color-emerald-500: #06b6d4;
+  --color-emerald-600: #0891b2;
+  /* Replace reds with orange/amber family */
+  --color-red-100: #ffedd5;
+  --color-red-200: #fed7aa;
+  --color-red-400: #fb923c;
+  --color-red-500: #f97316;
+  --color-red-600: #ea580c;
+  /* Semantic destructive → orange */
+  --destructive: #c2410c;
+  --destructive-foreground: #ffffff;
+}
+
+@supports (color: oklch(0% 0 0)) {
+  html.theme-protan {
+    --color-green-100: oklch(.932 .032 255.585);
+    --color-green-400: oklch(.707 .165 254.624);
+    --color-green-500: oklch(.623 .214 259.815);
+    --color-green-600: oklch(.546 .245 262.881);
+    --color-emerald-100: oklch(.956 .045 203.388);
+    --color-emerald-500: oklch(.715 .143 215.221);
+    --color-emerald-600: oklch(.609 .126 221.723);
+    --color-red-100: oklch(.954 .038 75.164);
+    --color-red-200: oklch(.901 .076 70.697);
+    --color-red-400: oklch(.75 .183 55.934);
+    --color-red-500: oklch(.705 .213 47.604);
+    --color-red-600: oklch(.646 .222 41.116);
+    --destructive: oklch(.554 .196 38.402);
+    --destructive-foreground: oklch(1 0 0);
+  }
+}
+
+/* ── Tritanopia ─────────────────────────────────────────────────────────── */
+/* Blue-yellow colorblind mode: blues → purples, yellows → pinks/magentas.   */
+/* Applied as .theme-tritan in both light and dark contexts.                  */
+html.theme-tritan {
+  /* Replace blues with purple family */
+  --color-blue-100: #f3e8ff;
+  --color-blue-400: #c084fc;
+  --color-blue-500: #a855f7;
+  --color-blue-600: #9333ea;
+  --color-cyan-100: #fae8ff;
+  --color-cyan-500: #d946ef;
+  /* Replace yellows with pink/magenta family */
+  --color-yellow-100: #fce7f3;
+  --color-yellow-400: #f472b6;
+  --color-yellow-500: #ec4899;
+  --color-yellow-600: #db2777;
+}
+
+@supports (color: oklch(0% 0 0)) {
+  html.theme-tritan {
+    --color-blue-100: oklch(.946 .033 307.174);
+    --color-blue-400: oklch(.714 .203 305.504);
+    --color-blue-500: oklch(.627 .265 303.9);
+    --color-blue-600: oklch(.558 .288 302.321);
+    --color-cyan-100: oklch(.946 .034 328.363);
+    --color-cyan-500: oklch(.691 .274 332.727);
+    --color-yellow-100: oklch(.948 .028 342.258);
+    --color-yellow-400: oklch(.718 .202 349.761);
+    --color-yellow-500: oklch(.656 .241 354.308);
+    --color-yellow-600: oklch(.592 .249 .584);
+  }
+}
+
+/* ── High Contrast — Light mode ─────────────────────────────────────────── */
+html.high-contrast:not(.dark) {
+  --foreground: oklch(0.06 0 0);
+  --border: rgba(0, 0, 0, 0.4);
+  --ring: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.28 0 0);
+  --input-background: #e8e8ec;
+}
+
+/* ── High Contrast — Dark mode ──────────────────────────────────────────── */
+html.dark.high-contrast {
+  --foreground: oklch(0.98 0 0);
+  --background: oklch(0.08 0 0);
+  --card: oklch(0.12 0 0);
+  --border: oklch(0.52 0 0);
+  --ring: oklch(0.88 0 0);
+  --muted-foreground: oklch(0.84 0 0);
+}
+
+/* ── High Contrast — Soft Dark ──────────────────────────────────────────── */
+/* When both soft-dark and high-contrast are active */
+html.dark.soft-dark.high-contrast {
+  --foreground: #d1d5db;
+  --border: #636e7b;
+  --ring: #adbac7;
+  --muted-foreground: #909dab;
+}
+
+/* ── Smooth color transitions between themes ─────────────────────────────── */
+html {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DARK MODE — PALETTE OVERRIDES
+   The app uses hardcoded Tailwind classes (bg-white, text-gray-800, etc.) that
+   reference CSS palette variables. Since the compiled CSS uses var(--color-*),
+   overriding via higher-specificity selectors (html.dark .bg-white) beats the
+   generated rule (.bg-white) without !important.
+
+   text-white and other light-on-color uses are NOT affected because we target
+   background-color and text-color properties separately, not the variable itself.
+───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Surface colors ─────────────────────────────────────────────────────── */
+html.dark .bg-white       { background-color: #161b22; }
+html.dark .bg-gray-50     { background-color: #0d1117; }
+html.dark .bg-gray-100    { background-color: #161b22; }
+html.dark .bg-gray-200    { background-color: #21262d; }
+
+/* White-with-opacity surfaces (glass cards) */
+html.dark .bg-white\/90   { background-color: rgba(22, 27, 34, 0.92); }
+html.dark .bg-white\/50   { background-color: rgba(22, 27, 34, 0.5);  }
+html.dark .bg-white\/30   { background-color: rgba(22, 27, 34, 0.3);  }
+html.dark .bg-white\/20   { background-color: rgba(22, 27, 34, 0.2);  }
+html.dark .bg-white\/10   { background-color: rgba(22, 27, 34, 0.1);  }
+
+/* ── Text colors ─────────────────────────────────────────────────────────── */
+html.dark .text-gray-800  { color: #c9d1d9; }
+html.dark .text-gray-700  { color: #b1bac4; }
+html.dark .text-gray-600  { color: #8b949e; }
+html.dark .text-gray-500  { color: #6e7681; }
+
+/* ── Hover states ────────────────────────────────────────────────────────── */
+html.dark .hover\:bg-gray-100:hover { background-color: #21262d; }
+html.dark .hover\:bg-gray-200:hover { background-color: #30363d; }
+html.dark .hover\:bg-gray-300:hover { background-color: #3d444d; }
+html.dark .hover\:bg-red-200:hover  { background-color: rgba(125, 34, 34, 0.5); }
+
+/* ── Muted badge/chip backgrounds used in stat boxes ────────────────────── */
+html.dark .from-purple-100 { --tw-gradient-from: #2d1b4e; }
+html.dark .from-blue-100   { --tw-gradient-from: #0c2044; }
+html.dark .from-green-100  { --tw-gradient-from: #0d2618; }
+html.dark .from-yellow-100 { --tw-gradient-from: #2a1a00; }
+html.dark .from-red-100    { --tw-gradient-from: #3b0d0d; }
+html.dark .from-indigo-100 { --tw-gradient-from: #1a1a4e; }
+html.dark .from-cyan-100   { --tw-gradient-from: #082030; }
+
+html.dark .to-pink-100    { --tw-gradient-to: #3b0e1f; }
+html.dark .to-cyan-100    { --tw-gradient-to: #082030; }
+html.dark .to-emerald-100 { --tw-gradient-to: #0d2618; }
+html.dark .to-orange-100  { --tw-gradient-to: #2a1300; }
+
+/* ── Borders ─────────────────────────────────────────────────────────────── */
+html.dark .border-gray-200 { border-color: #30363d; }
+html.dark .border-gray-300 { border-color: #3d444d; }
+
+/* ── Progress bar background track ──────────────────────────────────────── */
+html.dark .bg-gray-200[role="progressbar"] { background-color: #30363d; }
+
+/* ── Soft Dark overrides — warmer palette ────────────────────────────────── */
+html.dark.soft-dark .bg-white      { background-color: #2d333b; }
+html.dark.soft-dark .bg-gray-50    { background-color: #22272e; }
+html.dark.soft-dark .bg-gray-100   { background-color: #2d333b; }
+html.dark.soft-dark .bg-gray-200   { background-color: #373e47; }
+html.dark.soft-dark .bg-white\/90  { background-color: rgba(45, 51, 59, 0.92); }
+html.dark.soft-dark .bg-white\/50  { background-color: rgba(45, 51, 59, 0.5);  }
+html.dark.soft-dark .text-gray-800 { color: #cdd9e5; }
+html.dark.soft-dark .text-gray-700 { color: #b1bac4; }
+html.dark.soft-dark .text-gray-600 { color: #909dab; }
+html.dark.soft-dark .text-gray-500 { color: #768390; }
+
+html.dark.soft-dark .from-purple-100 { --tw-gradient-from: #2d2557; }
+html.dark.soft-dark .from-blue-100   { --tw-gradient-from: #1a3255; }
+html.dark.soft-dark .from-green-100  { --tw-gradient-from: #1a3328; }
+html.dark.soft-dark .from-yellow-100 { --tw-gradient-from: #362200; }
+html.dark.soft-dark .from-indigo-100 { --tw-gradient-from: #202157; }

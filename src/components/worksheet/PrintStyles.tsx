@@ -56,8 +56,7 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             width: 100%;
             box-sizing: border-box;
             max-width: 100%;
-            align-content: space-between;
-            min-height: calc(11in - 1in);
+            align-content: start;
           }
 
           /* Answer key grids without pagination spacing */
@@ -208,12 +207,20 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
           }
 
           .vertical-problem {
-            font-family: monospace;
+            font-family: 'Courier New', Courier, monospace;
             font-size: 1.25rem;
             font-weight: 600;
             margin: 0;
-            width: 100%;
             font-variant-numeric: tabular-nums;
+          }
+
+          /* Answer blank — clean underline instead of underscores */
+          .answer-blank {
+            display: inline-block;
+            border-bottom: 2px solid #374151;
+            min-width: 2.5rem;
+            margin-left: 0.2rem;
+            vertical-align: bottom;
           }
 
           .problem-num {
@@ -577,47 +584,21 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             widows: 2;
           }
 
-          /* Vertical problem formatting */
+          /* Vertical problem formatting — must stay monospace */
           .vertical-problem {
             font-family: 'Courier New', Courier, monospace !important;
             font-size: 14pt !important;
             font-weight: 600 !important;
-            line-height: 1.5 !important;
+            line-height: 1.6 !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            width: 100% !important;
-            margin: 0 !important;
+            white-space: nowrap !important;
             font-variant-numeric: tabular-nums !important;
           }
 
-          .problem-num {
-            text-align: right !important;
-            padding: 2px 30% 2px 4px !important;
+          .vertical-problem * {
+            font-family: 'Courier New', Courier, monospace !important;
             font-variant-numeric: tabular-nums !important;
-            margin-bottom: 4px !important;
-            letter-spacing: 0.15em !important;
-          }
-
-          .problem-op-line {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            padding: 2px 30% 2px 4px !important;
-            margin-bottom: 2px !important;
-          }
-
-          .problem-op {
-            font-size: 14pt !important;
-            font-weight: 700 !important;
-            color: #000 !important;
-            width: 18px !important;
-            text-align: center !important;
-            flex-shrink: 0 !important;
-          }
-
-          .problem-op-line .problem-num {
-            flex: 1 !important;
-            padding: 0 !important;
           }
 
           .problem-line {
@@ -637,6 +618,15 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
             font-weight: 700 !important;
             padding: 2px 4px !important;
             min-height: 0.3in !important;
+          }
+
+          /* Answer blank underline */
+          .answer-blank {
+            display: inline-block !important;
+            border-bottom: 1.5pt solid #000 !important;
+            min-width: 0.9in !important;
+            margin-left: 0.1in !important;
+            vertical-align: bottom !important;
           }
 
           /* Flash cards with clear borders */
@@ -748,11 +738,6 @@ export function PrintStyles({ isResizing }: PrintStylesProps) {
               #000 0.18in,
               #000 0.19in
             ) !important;
-          }
-
-          /* Score/date fields - high contrast */
-          span {
-            font-family: Georgia, 'Times New Roman', Times, serif !important;
           }
 
           /* Motivational footer */

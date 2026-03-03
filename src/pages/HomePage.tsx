@@ -8,6 +8,7 @@ import { motion } from 'motion/react';
 import {
   Grid3x3, LogOut, Trophy, Edit, Printer, Shapes, Divide,
   Hash, TrendingUp, Percent, Clock, DollarSign, Target, LineChart,
+  Palette,
   type LucideProps,
 } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
@@ -15,6 +16,7 @@ import { useProgress } from '../context/ProgressContext';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useI18n } from '../i18n/I18nContext';
 import { EditProfileModal } from '../components/EditProfileModal';
+import { AppearanceModal } from '../components/AppearanceModal';
 import type { Page } from '../App';
 import { formatName } from '../utils/formatters';
 
@@ -153,6 +155,7 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
   const { t } = useI18n();
   const profile = getProfile(profileId);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showAppearance, setShowAppearance] = useState(false);
   const profileProgress = getProfileProgress(profileId);
 
   const handleNavigation = (page: Page) => {
@@ -212,6 +215,14 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               </div>
               <div className="flex items-center gap-3">
                 <LanguageSelector />
+                <button
+                  onClick={() => setShowAppearance(true)}
+                  className="bg-purple-100 hover:bg-purple-200 text-purple-600 px-3 py-2 rounded-xl transition-all flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+                  aria-label="Open appearance settings"
+                >
+                  <Palette className="w-5 h-5" aria-hidden="true" />
+                  <span className="hidden sm:inline text-sm font-medium">Theme</span>
+                </button>
                 <button
                   onClick={onLogout}
                   className="bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-xl transition-all flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
@@ -330,6 +341,14 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
           profile={profile}
           isOpen
           onClose={() => setShowEditProfile(false)}
+        />
+      )}
+
+      {/* Appearance Modal */}
+      {showAppearance && (
+        <AppearanceModal
+          isOpen
+          onClose={() => setShowAppearance(false)}
         />
       )}
     </div>

@@ -3,6 +3,7 @@
  * Handles rendering different problem types (horizontal, vertical, flash cards)
  */
 
+import React from 'react';
 import { Problem, WorksheetSettings } from './types';
 
 interface ProblemRenderProps {
@@ -89,7 +90,8 @@ export function renderHorizontalProblem({ problem, index, settings }: ProblemRen
         <span className="problem-number">{index + 1}.</span>
         <div className="problem-text-wrapper">
           <div className="problem-text" aria-label={`Problem ${index + 1}: ${problem.num1} ${problem.operation} ${problem.num2}`}>
-            {problem.num1} {problem.operation} {problem.num2} = {showAnswer ? problem.answer : '_______'}
+            {problem.num1} {problem.operation} {problem.num2} ={' '}
+            {showAnswer ? problem.answer : <span className="answer-blank" aria-label="answer line" />}
           </div>
           {settings.includeWorkspace && !showAnswer && (
             <div className="workspace">
@@ -104,25 +106,44 @@ export function renderHorizontalProblem({ problem, index, settings }: ProblemRen
 }
 
 export function renderVerticalProblem({ problem, index, settings }: ProblemRenderProps) {
+  const showAnswer = settings.answerKeyPosition === 'side-by-side';
+  const n1  = String(problem.num1);
+  const n2  = String(problem.num2);
+  const ans = String(problem.answer);
+  // Width of widest number determines column size; +2ch for operator area
+  const maxDigits = Math.max(n1.length, n2.length);
+  const boxWidth  = `${maxDigits + 2}ch`;
+
+  // Shared row layout: [2ch op slot][flex-1 right-aligned number]
+  const row = (op: React.ReactNode, num: string, numColor?: string) => (
+    <div style={{ display: 'flex', alignItems: 'baseline', whiteSpace: 'nowrap' }}>
+      <span style={{ width: '2ch', flexShrink: 0, textAlign: 'center',
+                     fontWeight: 700, color: op ? '#7c3aed' : 'transparent' }}>
+        {op || '+'}
+      </span>
+      <span style={{ flex: 1, textAlign: 'right',
+                     color: numColor, fontWeight: numColor ? 700 : undefined }}>
+        {num}
+      </span>
+    </div>
+  );
+
   return (
     <div key={index} className="problem-box-vertical">
-      <div className="vertical-problem-number" aria-label={`Problem ${index + 1}`}>
-        #{index + 1}
-      </div>
-      <div className="vertical-problem" aria-label={`${problem.num1} ${problem.operation} ${problem.num2}`}>
-        <div className="problem-num">{problem.num1}</div>
-        <div className="problem-op-line">
-          <span className="problem-op">{problem.operation}</span>
-          <span className="problem-num">{problem.num2}</span>
-        </div>
-        <div className="problem-line"></div>
-        {settings.answerKeyPosition === 'side-by-side' ? (
-          <div className="problem-answer" aria-label={`Answer: ${problem.answer}`}>
-            {problem.answer}
-          </div>
-        ) : (
-          <div className="problem-blank"></div>
-        )}
+      <span className="vertical-problem-number" aria-hidden="true">#{index + 1}</span>
+      <div
+        className="vertical-problem"
+        role="math"
+        aria-label={`${n1} ${problem.operation} ${n2}`}
+        style={{ width: boxWidth }}
+      >
+        {row(null,             n1)}
+        {row(problem.operation, n2)}
+        <div className="problem-line" />
+        {showAnswer
+          ? row(null, ans, '#16a34a')
+          : <div className="problem-blank" />
+        }
       </div>
     </div>
   );

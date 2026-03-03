@@ -117,10 +117,10 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000,
-    strictPort: false, // automatically try next port if 3000 is occupied
+    port: 3001,
+    strictPort: false, // automatically try next port if 3001 is occupied
     open: true,
-    host: true, // expose on local network for mobile device testing
+    host: 'localhost', // bind to localhost; set to true to expose on local network
     cors: true,
     hmr: {
       overlay: true

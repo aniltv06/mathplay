@@ -8,7 +8,9 @@ import { ProfileProvider } from './context/ProfileContext';
 import { I18nProvider } from './i18n/I18nContext';
 import { VoiceFeedbackProvider } from './hooks/useVoiceFeedback';
 import { ProgressProvider } from './context/ProgressContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ProfileSelector } from './components/ProfileSelector';
+import { TimerMusicWidget } from './components/TimerMusicWidget';
 import type { Language } from './i18n/translations';
 
 // Lazy-load all pages for code splitting
@@ -146,18 +148,21 @@ function AppContent({ language }: { language: Language }) {
       <Suspense fallback={<PageFallback />}>
         {renderPage()}
       </Suspense>
+      {selectedProfile && <TimerMusicWidget />}
     </VoiceFeedbackProvider>
   );
 }
 
 export default function App() {
   return (
-    <ProfileProvider>
-      <ProgressProvider>
-        <I18nProvider>
-          {({ language }) => <AppContent language={language} />}
-        </I18nProvider>
-      </ProgressProvider>
-    </ProfileProvider>
+    <ThemeProvider>
+      <ProfileProvider>
+        <ProgressProvider>
+          <I18nProvider>
+            {({ language }) => <AppContent language={language} />}
+          </I18nProvider>
+        </ProgressProvider>
+      </ProfileProvider>
+    </ThemeProvider>
   );
 }
