@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Percent, CheckCircle, XCircle } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { useGameState } from '../hooks/useGameState';
 import { useI18n } from '../i18n/I18nContext';
 import { GradientButton } from '../components/GradientButton';
 
@@ -42,11 +43,9 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
   const [difficulty, setDifficulty] = useState<DifficultyLevel>('beginner');
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
+  const { score, streak, attempts, addCorrect, addWrong } = useGameState();
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
-  const [score, setScore] = useState(0);
-  const [attempts, setAttempts] = useState(0);
   const [showVisual, setShowVisual] = useState(true);
-  const [streak, setStreak] = useState(0);
   const [previousProblems, setPreviousProblems] = useState<Problem[]>([]);
 
   // Generate fraction to decimal problem
@@ -213,11 +212,9 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
                      (currentProblem.type === 'percent-to-fraction' && answer === currentProblem.answer);
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
-    setAttempts(prev => prev + 1);
 
     if (isCorrect) {
-      setScore(prev => prev + 1);
-      setStreak(prev => prev + 1);
+      addCorrect('');
       speak(`Correct! ${currentProblem.displayQuestion.replace('?', currentProblem.answer)}`);
 
       if (profile) {
@@ -236,7 +233,7 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
         setFeedback(null);
       }, 1500);
     } else {
-      setStreak(0);
+      addWrong('');
       speak(`Not quite. The answer is ${currentProblem.answer}`);
 
       if (profile) {

@@ -13,20 +13,13 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Save } from 'lucide-react';
 import type { Profile } from '../context/ProfileContext';
 import { useProfiles } from '../context/ProfileContext';
+import { AVATAR_OPTIONS } from '../utils/constants';
 
 interface Props {
   profile: Profile;
   isOpen: boolean;
   onClose: () => void;
 }
-
-const AVATAR_OPTIONS = [
-  '👦', '👧', '🧒', '👶',
-  '🐶', '🐱', '🐼', '🦊', '🐸', '🦁', '🐯', '🐻',
-  '🐨', '🐰', '🦄', '🐙', '🦖', '🦕', '🐢', '🐝',
-  '🦋', '🐵', '🐷', '🐮', '🐹', '🦉', '🦜', '🐧',
-  '🦈', '🐳', '🦒', '🦏', '🦘', '🦥'
-];
 
 export function EditProfileModal({ profile, isOpen, onClose }: Props) {
   const { updateProfile } = useProfiles();

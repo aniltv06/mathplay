@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Hash, CheckCircle, XCircle, Trophy } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { useGameState } from '../hooks/useGameState';
 import { useI18n } from '../i18n/I18nContext';
 import { GradientButton } from '../components/GradientButton';
 
@@ -37,11 +38,9 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
   const [difficulty, setDifficulty] = useState<DifficultyLevel>('beginner');
   const [currentProblem, setCurrentProblem] = useState<FactorialProblem | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
+  const { score, streak, attempts, addCorrect, addWrong } = useGameState();
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
-  const [score, setScore] = useState(0);
-  const [attempts, setAttempts] = useState(0);
   const [showSteps, setShowSteps] = useState(true);
-  const [streak, setStreak] = useState(0);
 
   // Calculate factorial
   const calculateFactorial = (n: number): { answer: number; steps: string[] } => {
@@ -111,11 +110,9 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
     const isCorrect = answer === currentProblem.answer;
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
-    setAttempts(prev => prev + 1);
 
     if (isCorrect) {
-      setScore(prev => prev + 1);
-      setStreak(prev => prev + 1);
+      addCorrect('');
       speak(`Correct! ${currentProblem.number} factorial equals ${currentProblem.answer}`);
 
       if (profile) {
@@ -134,7 +131,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
         setFeedback(null);
       }, 1500);
     } else {
-      setStreak(0);
+      addWrong('');
       speak(`Not quite. ${currentProblem.number} factorial equals ${currentProblem.answer}`);
 
       if (profile) {

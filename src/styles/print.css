@@ -1,0 +1,100 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   PRINT STYLES
+   Consolidated from index.css @media print block.
+   Imported by src/main.tsx so these rules apply globally.
+───────────────────────────────────────────────────────────────────────────── */
+
+@media print {
+  /* Hide non-printable elements */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Print-friendly body */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Print content optimization */
+  .print-content {
+    max-width: 100% !important;
+    padding: 20px !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Page breaks */
+  .page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Remove shadows and backgrounds for print */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Ensure borders are visible */
+  .border-2,
+  .border {
+    border-color: #333 !important;
+  }
+
+  /* Print-friendly text colors */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    color: black !important;
+  }
+
+  /* Problem display optimization */
+  .grid {
+    break-inside: avoid;
+  }
+
+  /* Ensure rounded corners don't break */
+  .rounded-lg,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl {
+    border-radius: 8px !important;
+  }
+
+  /* Background colors for problem boxes */
+  .bg-gray-50 {
+    background: #f9f9f9 !important;
+    border: 1px solid #ddd !important;
+  }
+
+  .bg-green-50 {
+    background: #f0f9f0 !important;
+    border: 1px solid #90EE90 !important;
+  }
+
+  .bg-green-100 {
+    background: #e8f5e8 !important;
+    border: 1px solid #90EE90 !important;
+  }
+
+  .bg-red-100 {
+    background: #ffe8e8 !important;
+    border: 1px solid #ffb3b3 !important;
+  }
+
+  /* Answer key emphasis */
+  .text-green-600 {
+    color: #16a34a !important;
+    font-weight: bold !important;
+  }
+
+  /* Ensure proper spacing */
+  @page {
+    margin: 1cm;
+  }
+
+  /* Avoid breaking problem boxes across pages */
+  .border-2.border-gray-300 {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

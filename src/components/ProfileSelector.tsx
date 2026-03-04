@@ -10,19 +10,12 @@ import { useProfiles } from '../context/ProfileContext';
 import { EditProfileModal } from './EditProfileModal';
 import { formatName } from '../utils/formatters';
 import { GradientButton } from './GradientButton';
+import { AVATAR_OPTIONS } from '../utils/constants';
 
 interface Props {
   onSelectProfile: (profileId: string) => void;
   onNavigateToDashboard?: () => void;
 }
-
-const AVATAR_OPTIONS = [
-  '👦', '👧', '🧒', '👶',
-  '🐶', '🐱', '🐼', '🦊', '🐸', '🦁', '🐯', '🐻',
-  '🐨', '🐰', '🦄', '🐙', '🦖', '🦕', '🐢', '🐝',
-  '🦋', '🐵', '🐷', '🐮', '🐹', '🦉', '🦜', '🐧',
-  '🦈', '🐳', '🦒', '🦏', '🦘', '🦥'
-];
 
 export function ProfileSelector({ onSelectProfile, onNavigateToDashboard }: Props) {
   const { profiles, addProfile, deleteProfile } = useProfiles();
