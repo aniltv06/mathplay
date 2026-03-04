@@ -10,7 +10,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft, Percent } from 'lucide-react';
 import { FeedbackAnimation } from '../components/shared/FeedbackAnimation';
 import { useProfiles } from '../context/ProfileContext';
-import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { useFeedback } from '../hooks/useFeedback';
 import { useGameState } from '../hooks/useGameState';
 import { useI18n } from '../i18n/I18nContext';
 import { GradientButton } from '../components/GradientButton';
@@ -36,7 +36,7 @@ interface Problem {
 
 export function FractionsDecimalsPage({ onBack, profileId }: Props) {
   const { getProfile, updateProfile } = useProfiles();
-  const { speak } = useVoiceFeedback();
+  const { celebrateCorrect, announceWrong } = useFeedback();
   const { t } = useI18n();
   const profile = getProfile(profileId);
 
@@ -216,7 +216,7 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
 
     if (isCorrect) {
       addCorrect('');
-      speak(`Correct! ${currentProblem.displayQuestion.replace('?', currentProblem.answer)}`);
+      celebrateCorrect(`Correct! ${currentProblem.displayQuestion.replace('?', currentProblem.answer)}`);
 
       if (profile) {
         updateProfile(profileId, {
@@ -235,7 +235,7 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
       }, 1500);
     } else {
       addWrong('');
-      speak(`Not quite. The answer is ${currentProblem.answer}`);
+      announceWrong(`Not quite. The answer is ${currentProblem.answer}`);
 
       if (profile) {
         updateProfile(profileId, {

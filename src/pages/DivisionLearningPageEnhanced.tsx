@@ -10,7 +10,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft, Divide, Trophy, Volume2, VolumeX } from 'lucide-react';
 import { FeedbackAnimation } from '../components/shared/FeedbackAnimation';
 import { useProfiles } from '../context/ProfileContext';
-import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { useFeedback } from '../hooks/useFeedback';
 import { useGameState } from '../hooks/useGameState';
 import { useI18n } from '../i18n/I18nContext';
 import { GradientButton } from '../components/GradientButton';
@@ -32,7 +32,7 @@ interface DivisionProblem {
 
 export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
   const { getProfile, updateProfile } = useProfiles();
-  const { speak } = useVoiceFeedback();
+  const { celebrateCorrect, announceWrong } = useFeedback();
   const { t } = useI18n();
   const profile = getProfile(profileId);
 
@@ -121,7 +121,7 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
 
     if (isCorrect) {
       addCorrect('');
-      speak(`Correct! ${currentProblem.dividend} divided by ${currentProblem.divisor} equals ${currentProblem.quotient}`);
+      celebrateCorrect(`Correct! ${currentProblem.dividend} divided by ${currentProblem.divisor} equals ${currentProblem.quotient}`);
 
       // Update profile stats
       if (profile) {
@@ -142,7 +142,7 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
       }, 1500);
     } else {
       addWrong('');
-      speak(`Not quite. ${currentProblem.dividend} divided by ${currentProblem.divisor} equals ${currentProblem.quotient}`);
+      announceWrong(`Not quite. ${currentProblem.dividend} divided by ${currentProblem.divisor} equals ${currentProblem.quotient}`);
 
       if (profile) {
         updateProfile(profileId, {

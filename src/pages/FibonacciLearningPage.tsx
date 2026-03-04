@@ -10,7 +10,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft, TrendingUp, Trophy } from 'lucide-react';
 import { FeedbackAnimation } from '../components/shared/FeedbackAnimation';
 import { useProfiles } from '../context/ProfileContext';
-import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { useFeedback } from '../hooks/useFeedback';
 import { useGameState } from '../hooks/useGameState';
 import { useI18n } from '../i18n/I18nContext';
 import { GradientButton } from '../components/GradientButton';
@@ -31,7 +31,7 @@ interface FibonacciProblem {
 
 export function FibonacciLearningPage({ onBack, profileId }: Props) {
   const { getProfile, updateProfile } = useProfiles();
-  const { speak } = useVoiceFeedback();
+  const { celebrateCorrect, announceWrong } = useFeedback();
   const { t } = useI18n();
   const profile = getProfile(profileId);
 
@@ -98,7 +98,7 @@ export function FibonacciLearningPage({ onBack, profileId }: Props) {
 
     if (isCorrect) {
       addCorrect('');
-      speak(`Correct! The ${currentProblem.position}th Fibonacci number is ${currentProblem.answer}`);
+      celebrateCorrect(`Correct! The ${currentProblem.position}th Fibonacci number is ${currentProblem.answer}`);
 
       if (profile) {
         updateProfile(profileId, {
@@ -117,7 +117,7 @@ export function FibonacciLearningPage({ onBack, profileId }: Props) {
       }, 1500);
     } else {
       addWrong('');
-      speak(`Not quite. The ${currentProblem.position}th Fibonacci number is ${currentProblem.answer}`);
+      announceWrong(`Not quite. The ${currentProblem.position}th Fibonacci number is ${currentProblem.answer}`);
 
       if (profile) {
         updateProfile(profileId, {

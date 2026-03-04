@@ -10,7 +10,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft, Hash, Trophy } from 'lucide-react';
 import { FeedbackAnimation } from '../components/shared/FeedbackAnimation';
 import { useProfiles } from '../context/ProfileContext';
-import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
+import { useFeedback } from '../hooks/useFeedback';
 import { useGameState } from '../hooks/useGameState';
 import { useI18n } from '../i18n/I18nContext';
 import { GradientButton } from '../components/GradientButton';
@@ -31,7 +31,7 @@ interface FactorialProblem {
 
 export function FactorialLearningPage({ onBack, profileId }: Props) {
   const { getProfile, updateProfile } = useProfiles();
-  const { speak } = useVoiceFeedback();
+  const { celebrateCorrect, announceWrong } = useFeedback();
   const { t } = useI18n();
   const profile = getProfile(profileId);
 
@@ -114,7 +114,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
 
     if (isCorrect) {
       addCorrect('');
-      speak(`Correct! ${currentProblem.number} factorial equals ${currentProblem.answer}`);
+      celebrateCorrect(`Correct! ${currentProblem.number} factorial equals ${currentProblem.answer}`);
 
       if (profile) {
         updateProfile(profileId, {
@@ -133,7 +133,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
       }, 1500);
     } else {
       addWrong('');
-      speak(`Not quite. ${currentProblem.number} factorial equals ${currentProblem.answer}`);
+      announceWrong(`Not quite. ${currentProblem.number} factorial equals ${currentProblem.answer}`);
 
       if (profile) {
         updateProfile(profileId, {
