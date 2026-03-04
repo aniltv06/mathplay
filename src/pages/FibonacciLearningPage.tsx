@@ -6,8 +6,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, TrendingUp, CheckCircle, XCircle, Trophy } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ArrowLeft, TrendingUp, Trophy } from 'lucide-react';
+import { FeedbackAnimation } from '../components/shared/FeedbackAnimation';
 import { useProfiles } from '../context/ProfileContext';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
 import { useGameState } from '../hooks/useGameState';
@@ -518,34 +519,7 @@ export function FibonacciLearningPage({ onBack, profileId }: Props) {
                     autoFocus
                   />
 
-                  <AnimatePresence>
-                    {feedback && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.5 }}
-                        className={`mt-6 p-4 rounded-xl flex items-center justify-center gap-2 ${
-                          feedback === 'correct'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
-                        }`}
-                      >
-                        {feedback === 'correct' ? (
-                          <>
-                            <CheckCircle className="w-6 h-6" />
-                            <span className="text-xl font-bold">Correct! Great job!</span>
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-6 h-6" />
-                            <span className="text-xl font-bold">
-                              Try again! The answer is {currentProblem.answer}
-                            </span>
-                          </>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <FeedbackAnimation feedback={feedback} correctAnswer={currentProblem.answer} />
 
                   <div className="mt-6">
                     <button
