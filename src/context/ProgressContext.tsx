@@ -34,11 +34,8 @@ export interface ProgressData {
 interface ProgressContextType {
   progressData: ProgressData;
   startActivity: (profileId: string, activityId: string) => void;
-  updateActivity: (profileId: string, activityId: string, update: Partial<ActivityProgress>) => void;
-  completeActivity: (profileId: string, activityId: string) => void;
   getActivityProgress: (profileId: string, activityId: string) => ActivityProgress | null;
   getProfileProgress: (profileId: string) => ProgressData[string] | null;
-  addTimeSpent: (profileId: string, activityId: string, seconds: number) => void;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
@@ -117,88 +114,6 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const updateActivity = (
-    profileId: string,
-    activityId: string,
-    update: Partial<ActivityProgress>
-  ) => {
-    setProgressData(prev => {
-      const profile = prev[profileId] || {
-        activities: {},
-        overallProgress: 0,
-        totalTimeSpent: 0,
-        activitiesStarted: 0,
-        activitiesCompleted: 0,
-        lastActive: Date.now(),
-      };
-
-      const activity = profile.activities[activityId] || {
-        ...defaultActivityProgress,
-        activityId,
-      };
-
-      const updatedActivity = { ...activity, ...update, lastAccessed: Date.now() };
-
-      return {
-        ...prev,
-        [profileId]: {
-          ...profile,
-          activities: {
-            ...profile.activities,
-            [activityId]: updatedActivity,
-          },
-          lastActive: Date.now(),
-        },
-      };
-    });
-  };
-
-  const completeActivity = (profileId: string, activityId: string) => {
-    setProgressData(prev => {
-      const profile = prev[profileId] || {
-        activities: {},
-        overallProgress: 0,
-        totalTimeSpent: 0,
-        activitiesStarted: 0,
-        activitiesCompleted: 0,
-        lastActive: Date.now(),
-      };
-
-      const activity = profile.activities[activityId] || {
-        ...defaultActivityProgress,
-        activityId,
-      };
-
-      const updatedActivity = {
-        ...activity,
-        completionPercentage: 100,
-        lastAccessed: Date.now(),
-      };
-
-      const completedCount = Object.values({
-        ...profile.activities,
-        [activityId]: updatedActivity,
-      }).filter(a => a.completionPercentage === 100).length;
-
-      const totalActivities = Object.keys(profile.activities).length;
-      const overallProgress = totalActivities > 0 ? (completedCount / totalActivities) * 100 : 0;
-
-      return {
-        ...prev,
-        [profileId]: {
-          ...profile,
-          activities: {
-            ...profile.activities,
-            [activityId]: updatedActivity,
-          },
-          activitiesCompleted: completedCount,
-          overallProgress,
-          lastActive: Date.now(),
-        },
-      };
-    });
-  };
-
   const getActivityProgress = (profileId: string, activityId: string): ActivityProgress | null => {
     return progressData[profileId]?.activities[activityId] || null;
   };
@@ -207,51 +122,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     return progressData[profileId] || null;
   };
 
-  const addTimeSpent = (profileId: string, activityId: string, seconds: number) => {
-    setProgressData(prev => {
-      const profile = prev[profileId] || {
-        activities: {},
-        overallProgress: 0,
-        totalTimeSpent: 0,
-        activitiesStarted: 0,
-        activitiesCompleted: 0,
-        lastActive: Date.now(),
-      };
-
-      const activity = profile.activities[activityId] || {
-        ...defaultActivityProgress,
-        activityId,
-      };
-
-      return {
-        ...prev,
-        [profileId]: {
-          ...profile,
-          activities: {
-            ...profile.activities,
-            [activityId]: {
-              ...activity,
-              timeSpent: activity.timeSpent + seconds,
-              lastAccessed: Date.now(),
-            },
-          },
-          totalTimeSpent: profile.totalTimeSpent + seconds,
-          lastActive: Date.now(),
-        },
-      };
-    });
-  };
-
   return (
     <ProgressContext.Provider
       value={{
         progressData,
         startActivity,
-        updateActivity,
-        completeActivity,
         getActivityProgress,
         getProfileProgress,
-        addTimeSpent,
       }}
     >
       {children}

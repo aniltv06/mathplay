@@ -13,6 +13,12 @@ import { useGameState } from '../hooks/useGameState';
 import { useFeedback } from '../hooks/useFeedback';
 import { GradientButton } from '../components/GradientButton';
 import { FeedbackAnimation } from '../components/shared/FeedbackAnimation';
+import {
+  type DifficultyLevel,
+  type MoneyProblem,
+  generateProblem,
+  CoinVisuals,
+} from './moneyShoppingHelpers';
 
 interface Props {
   onBack: () => void;
@@ -20,25 +26,6 @@ interface Props {
 }
 
 type Mode = 'learn' | 'practice' | 'challenge';
-type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
-type ProblemType = 'count-coins' | 'make-amount' | 'make-change' | 'shopping';
-
-interface Coin {
-  name: string;
-  value: number;
-  count: number;
-  emoji: string;
-}
-
-interface MoneyProblem {
-  type: ProblemType;
-  coins?: Coin[];
-  totalAmount?: number;
-  itemPrice?: number;
-  amountPaid?: number;
-  answer: number;
-  displayQuestion: string;
-}
 
 export function MoneyShoppingPage({ onBack, profileId }: Props) {
   const { getProfile, updateProfile } = useProfiles();
@@ -53,172 +40,10 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [showVisual, setShowVisual] = useState(true);
 
-  // US coin definitions
-  const coinTypes = [
-    { name: 'Penny', value: 1, emoji: '🪙' },
-    { name: 'Nickel', value: 5, emoji: '🪙' },
-    { name: 'Dime', value: 10, emoji: '🪙' },
-    { name: 'Quarter', value: 25, emoji: '🪙' },
-  ];
-
-  // Generate coin counting problem
-  const generateCountCoins = (): MoneyProblem => {
-    const coins: Coin[] = [];
-    let totalAmount = 0;
-
-    if (difficulty === 'beginner') {
-      // Single coin type
-      const coinType = coinTypes[Math.floor(Math.random() * coinTypes.length)];
-      const count = Math.floor(Math.random() * 8) + 2; // 2-9 coins
-      totalAmount = coinType.value * count;
-      coins.push({
-        name: coinType.name,
-        value: coinType.value,
-        count,
-        emoji: coinType.emoji,
-      });
-    } else if (difficulty === 'intermediate') {
-      // 2-3 coin types
-      const numTypes = Math.floor(Math.random() * 2) + 2; // 2 or 3 types
-      const selectedTypes = [...coinTypes].sort(() => Math.random() - 0.5).slice(0, numTypes);
-
-      selectedTypes.forEach(coinType => {
-        const count = Math.floor(Math.random() * 5) + 1; // 1-5 of each
-        totalAmount += coinType.value * count;
-        coins.push({
-          name: coinType.name,
-          value: coinType.value,
-          count,
-          emoji: coinType.emoji,
-        });
-      });
-    } else {
-      // All coin types
-      coinTypes.forEach(coinType => {
-        const count = Math.floor(Math.random() * 4) + 1; // 1-4 of each
-        totalAmount += coinType.value * count;
-        coins.push({
-          name: coinType.name,
-          value: coinType.value,
-          count,
-          emoji: coinType.emoji,
-        });
-      });
-    }
-
-    return {
-      type: 'count-coins',
-      coins,
-      answer: totalAmount,
-      displayQuestion: 'How much money is shown?',
-    };
-  };
-
-  // Generate make amount problem
-  const generateMakeAmount = (): MoneyProblem => {
-    let targetAmount: number;
-
-    if (difficulty === 'beginner') {
-      targetAmount = [5, 10, 25, 50][Math.floor(Math.random() * 4)];
-    } else if (difficulty === 'intermediate') {
-      targetAmount = Math.floor(Math.random() * 10) * 5 + 10; // 10-50 in 5¢ increments
-    } else {
-      targetAmount = Math.floor(Math.random() * 20) * 5 + 25; // 25-100 in 5¢ increments
-    }
-
-    return {
-      type: 'make-amount',
-      totalAmount: targetAmount,
-      answer: targetAmount,
-      displayQuestion: `Make ${targetAmount}¢ using coins`,
-    };
-  };
-
-  // Generate make change problem
-  const generateMakeChange = (): MoneyProblem => {
-    let itemPrice: number, amountPaid: number;
-
-    if (difficulty === 'beginner') {
-      itemPrice = Math.floor(Math.random() * 40) + 10; // 10-49¢
-      amountPaid = 50;
-    } else if (difficulty === 'intermediate') {
-      itemPrice = Math.floor(Math.random() * 70) + 10; // 10-79¢
-      amountPaid = [50, 100][Math.floor(Math.random() * 2)];
-    } else {
-      itemPrice = Math.floor(Math.random() * 150) + 50; // 50-199¢
-      amountPaid = 200;
-    }
-
-    const change = amountPaid - itemPrice;
-
-    return {
-      type: 'make-change',
-      itemPrice,
-      amountPaid,
-      answer: change,
-      displayQuestion: `Item costs ${itemPrice}¢, you pay ${amountPaid}¢. What's the change?`,
-    };
-  };
-
-  // Generate shopping problem
-  const generateShopping = (): MoneyProblem => {
-    const items = [
-      { name: 'Apple', price: 25 },
-      { name: 'Banana', price: 15 },
-      { name: 'Cookie', price: 50 },
-      { name: 'Juice', price: 75 },
-      { name: 'Candy', price: 10 },
-      { name: 'Chips', price: 60 },
-    ];
-
-    let numItems: number, total = 0;
-    const selectedItems: typeof items = [];
-
-    if (difficulty === 'beginner') {
-      numItems = 2;
-    } else if (difficulty === 'intermediate') {
-      numItems = 3;
-    } else {
-      numItems = 4;
-    }
-
-    for (let i = 0; i < numItems; i++) {
-      const item = items[Math.floor(Math.random() * items.length)];
-      selectedItems.push(item);
-      total += item.price;
-    }
-
-    const itemNames = selectedItems.map(item => item.name).join(', ');
-
-    return {
-      type: 'shopping',
-      totalAmount: total,
-      answer: total,
-      displayQuestion: `Shopping: ${itemNames}. Total cost?`,
-    };
-  };
-
-  // Generate problem based on difficulty and mode
-  const generateProblem = (): MoneyProblem => {
-    const rand = Math.random();
-
-    if (difficulty === 'beginner') {
-      return rand < 0.7 ? generateCountCoins() : generateMakeAmount();
-    } else if (difficulty === 'intermediate') {
-      if (rand < 0.4) return generateCountCoins();
-      if (rand < 0.7) return generateMakeChange();
-      return generateShopping();
-    } else {
-      if (rand < 0.3) return generateCountCoins();
-      if (rand < 0.5) return generateMakeChange();
-      return generateShopping();
-    }
-  };
-
   // Initialize first problem when mode or difficulty changes
   useEffect(() => {
     if (mode !== 'learn') {
-      setCurrentProblem(generateProblem());
+      setCurrentProblem(generateProblem(difficulty));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, difficulty]);
@@ -246,7 +71,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
       }
 
       setTimeout(() => {
-        setCurrentProblem(generateProblem());
+        setCurrentProblem(generateProblem(difficulty));
         setUserAnswer('');
         setFeedback(null);
       }, 1500);
@@ -274,84 +99,6 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
     if (e.key === 'Enter') {
       handleSubmit();
     }
-  };
-
-  // Render coin visualization
-  const renderCoins = () => {
-    if (!currentProblem || !showVisual || !currentProblem.coins) return null;
-
-    const getCoinStyle = (value: number): React.CSSProperties => {
-      const baseStyle: React.CSSProperties = {
-        width: '3rem',
-        height: '3rem',
-        borderRadius: '50%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        fontWeight: 'bold',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-      };
-
-      switch (value) {
-        case 1: // Penny (copper)
-          return {
-            ...baseStyle,
-            background: 'linear-gradient(to bottom right, #f97316, #b45309)',
-          };
-        case 5: // Nickel (silver)
-          return {
-            ...baseStyle,
-            background: 'linear-gradient(to bottom right, #64748b, #334155)',
-          };
-        case 10: // Dime (light silver)
-          return {
-            ...baseStyle,
-            background: 'linear-gradient(to bottom right, #9ca3af, #4b5563)',
-          };
-        case 25: // Quarter (dark silver)
-          return {
-            ...baseStyle,
-            background: 'linear-gradient(to bottom right, #475569, #1e293b)',
-          };
-        default:
-          return {
-            ...baseStyle,
-            background: 'linear-gradient(to bottom right, #fbbf24, #ca8a04)',
-          };
-      }
-    };
-
-    return (
-      <div className="bg-green-50 rounded-xl p-6 mb-6">
-        <h3 className="text-lg font-bold text-green-800 mb-4 text-center">
-          Count the Coins
-        </h3>
-        <div className="space-y-4">
-          {currentProblem.coins.map((coin, idx) => (
-            <div key={idx} className="bg-white rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-gray-800">{coin.name}s</span>
-                <span className="text-sm text-gray-600">{coin.value}¢ each</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {Array.from({ length: coin.count }).map((_, i) => (
-                  <div
-                    key={i}
-                    style={getCoinStyle(coin.value)}
-                  >
-                    {coin.value}
-                  </div>
-                ))}
-              </div>
-              <div className="mt-2 text-right text-sm text-gray-600">
-                {coin.count} × {coin.value}¢ = {coin.count * coin.value}¢
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
   };
 
   if (!profile) return null;
@@ -585,10 +332,10 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
                 {mode === 'practice' ? 'Practice Mode' : 'Challenge Mode'}
               </h2>
               <div className="flex gap-2 justify-center">
-                {['beginner', 'intermediate', 'advanced'].map((level) => (
+                {(['beginner', 'intermediate', 'advanced'] as DifficultyLevel[]).map((level) => (
                   <button
                     key={level}
-                    onClick={() => setDifficulty(level as DifficultyLevel)}
+                    onClick={() => setDifficulty(level)}
                     className={`px-4 py-2 rounded-lg transition-all ${
                       difficulty === level
                         ? 'bg-green-500 text-white'
@@ -603,7 +350,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
 
             {currentProblem && (
               <>
-                {renderCoins()}
+                {showVisual && <CoinVisuals problem={currentProblem} />}
 
                 <div className="text-center mb-8">
                   <div className="text-4xl font-bold text-gray-800 mb-6">
