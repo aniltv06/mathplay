@@ -662,7 +662,7 @@ export function GraphCalculatorPage({ onBack, profileId }: Props) {
                 type="text"
                 value={customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 placeholder="x^2 + 1"
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none font-mono text-sm mb-3"
               />

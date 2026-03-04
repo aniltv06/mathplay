@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import { DifficultySelector, OperationSelection } from '../components/DifficultySelector';
 import { GameBoard } from '../components/GameBoard';
 import { FinalScore } from '../components/FinalScore';
@@ -25,26 +26,11 @@ export function MathChallengePage({ onBack, profileId }: Props) {
   const [showSettings, setShowSettings] = useState(false);
 
   // Load settings from localStorage or use defaults
-  const [gameSettings, setGameSettings] = useState<GameSettings>(() => {
-    const saved = localStorage.getItem('hangmanSettings');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return {
-          problemTypes: ['addition', 'subtraction', 'multiplication', 'division'],
-          livesCount: 6,
-          timeBonus: true,
-          streakBonus: true,
-        };
-      }
-    }
-    return {
-      problemTypes: ['addition', 'subtraction', 'multiplication', 'division'],
-      livesCount: 6,
-      timeBonus: true,
-      streakBonus: true,
-    };
+  const [gameSettings, setGameSettings] = useLocalStorage<GameSettings>('hangmanSettings', {
+    problemTypes: ['addition', 'subtraction', 'multiplication', 'division'],
+    livesCount: 6,
+    timeBonus: true,
+    streakBonus: true,
   });
 
   const [finalStats, setFinalStats] = useState<GameStats | null>(null);
@@ -79,13 +65,6 @@ export function MathChallengePage({ onBack, profileId }: Props) {
       problemTypes: newProblemTypes,
     };
 
-    // Save to localStorage
-    try {
-      localStorage.setItem('hangmanSettings', JSON.stringify(updatedSettings));
-    } catch (error) {
-      console.error('Failed to save hangman settings:', error);
-    }
-
     setGameSettings(updatedSettings);
     setGameState('playing');
   };
@@ -102,12 +81,6 @@ export function MathChallengePage({ onBack, profileId }: Props) {
   };
 
   const handleSettingsSave = (settings: GameSettings) => {
-    // Save to localStorage for persistence
-    try {
-      localStorage.setItem('hangmanSettings', JSON.stringify(settings));
-    } catch (error) {
-      console.error('Failed to save hangman settings:', error);
-    }
     setGameSettings(settings);
     setShowSettings(false);
   };

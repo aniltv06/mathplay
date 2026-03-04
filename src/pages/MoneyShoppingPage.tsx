@@ -6,12 +6,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, DollarSign, CheckCircle, XCircle, ShoppingCart } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ArrowLeft, DollarSign } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
-import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
-import { useI18n } from '../i18n/I18nContext';
+import { useGameState } from '../hooks/useGameState';
+import { useFeedback } from '../hooks/useFeedback';
 import { GradientButton } from '../components/GradientButton';
+import { FeedbackAnimation } from '../components/shared/FeedbackAnimation';
 
 interface Props {
   onBack: () => void;
@@ -41,8 +42,8 @@ interface MoneyProblem {
 
 export function MoneyShoppingPage({ onBack, profileId }: Props) {
   const { getProfile, updateProfile } = useProfiles();
-  const { speak } = useVoiceFeedback();
-  const { t } = useI18n();
+  const { score, streak, attempts, addCorrect, addWrong } = useGameState();
+  const { celebrateCorrect, announceWrong } = useFeedback();
   const profile = getProfile(profileId);
 
   const [mode, setMode] = useState<Mode>('learn');
@@ -50,10 +51,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
   const [currentProblem, setCurrentProblem] = useState<MoneyProblem | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
-  const [score, setScore] = useState(0);
-  const [attempts, setAttempts] = useState(0);
   const [showVisual, setShowVisual] = useState(true);
-  const [streak, setStreak] = useState(0);
 
   // US coin definitions
   const coinTypes = [
@@ -191,7 +189,6 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
     }
 
     const itemNames = selectedItems.map(item => item.name).join(', ');
-    const itemPrices = selectedItems.map(item => `${item.price}¢`).join(' + ');
 
     return {
       type: 'shopping',
@@ -233,12 +230,10 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
     const isCorrect = answer === currentProblem.answer;
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
-    setAttempts(prev => prev + 1);
 
     if (isCorrect) {
-      setScore(prev => prev + 1);
-      setStreak(prev => prev + 1);
-      speak(`Correct! The answer is ${currentProblem.answer} cents`);
+      addCorrect('');
+      celebrateCorrect(`Correct! The answer is ${currentProblem.answer} cents`);
 
       if (profile) {
         updateProfile(profileId, {
@@ -256,8 +251,8 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
         setFeedback(null);
       }, 1500);
     } else {
-      setStreak(0);
-      speak(`Not quite. The answer is ${currentProblem.answer} cents`);
+      addWrong('');
+      announceWrong(`Not quite. The answer is ${currentProblem.answer} cents`);
 
       if (profile) {
         updateProfile(profileId, {
@@ -620,7 +615,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
                       type="number"
                       value={userAnswer}
                       onChange={(e) => setUserAnswer(e.target.value)}
-                      onKeyPress={handleKeyPress}
+                      onKeyDown={handleKeyPress}
                       className="text-4xl text-center font-bold border-4 border-green-300 rounded-xl px-6 py-4 w-48 focus:border-green-500 focus:outline-none"
                       placeholder="?"
                       autoFocus
@@ -628,34 +623,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
                     <span className="text-3xl text-gray-600">¢</span>
                   </div>
 
-                  <AnimatePresence>
-                    {feedback && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.5 }}
-                        className={`mt-6 p-4 rounded-xl flex items-center justify-center gap-2 ${
-                          feedback === 'correct'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
-                        }`}
-                      >
-                        {feedback === 'correct' ? (
-                          <>
-                            <CheckCircle className="w-6 h-6" />
-                            <span className="text-xl font-bold">Correct! Great job!</span>
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-6 h-6" />
-                            <span className="text-xl font-bold">
-                              Try again! The answer is {currentProblem.answer}¢
-                            </span>
-                          </>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <FeedbackAnimation feedback={feedback} correctAnswer={`${currentProblem.answer}¢`} />
 
                   <div className="mt-6">
                     <button

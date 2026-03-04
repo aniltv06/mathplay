@@ -12,7 +12,6 @@ import { FeedbackAnimation } from '../components/shared/FeedbackAnimation';
 import { useProfiles } from '../context/ProfileContext';
 import { useFeedback } from '../hooks/useFeedback';
 import { useGameState } from '../hooks/useGameState';
-import { useI18n } from '../i18n/I18nContext';
 import { GradientButton } from '../components/GradientButton';
 
 interface Props {
@@ -32,7 +31,6 @@ interface FibonacciProblem {
 export function FibonacciLearningPage({ onBack, profileId }: Props) {
   const { getProfile, updateProfile } = useProfiles();
   const { celebrateCorrect, announceWrong } = useFeedback();
-  const { t } = useI18n();
   const profile = getProfile(profileId);
 
   const [mode, setMode] = useState<Mode>('learn');

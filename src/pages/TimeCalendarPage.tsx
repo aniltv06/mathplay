@@ -6,12 +6,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ArrowLeft, Clock } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
-import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
-import { useI18n } from '../i18n/I18nContext';
+import { useGameState } from '../hooks/useGameState';
+import { useFeedback } from '../hooks/useFeedback';
 import { GradientButton } from '../components/GradientButton';
+import { FeedbackAnimation } from '../components/shared/FeedbackAnimation';
 
 interface Props {
   onBack: () => void;
@@ -30,8 +31,8 @@ interface TimeProblem {
 
 export function TimeCalendarPage({ onBack, profileId }: Props) {
   const { getProfile, updateProfile } = useProfiles();
-  const { speak } = useVoiceFeedback();
-  const { t } = useI18n();
+  const { score, streak, attempts, addCorrect, addWrong } = useGameState();
+  const { celebrateCorrect, announceWrong } = useFeedback();
   const profile = getProfile(profileId);
 
   const [mode, setMode] = useState<Mode>('learn');
@@ -39,10 +40,7 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
   const [currentProblem, setCurrentProblem] = useState<TimeProblem | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
-  const [score, setScore] = useState(0);
-  const [attempts, setAttempts] = useState(0);
   const [showClock, setShowClock] = useState(true);
-  const [streak, setStreak] = useState(0);
 
   const generateProblem = (): TimeProblem => {
     let hours: number, minutes: number;
@@ -81,12 +79,10 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
 
     const isCorrect = userAnswer.trim() === currentProblem.answer;
     setFeedback(isCorrect ? 'correct' : 'incorrect');
-    setAttempts(prev => prev + 1);
 
     if (isCorrect) {
-      setScore(prev => prev + 1);
-      setStreak(prev => prev + 1);
-      speak(`Correct! The time is ${currentProblem.answer}`);
+      addCorrect('');
+      celebrateCorrect(`Correct! The time is ${currentProblem.answer}`);
 
       if (profile) {
         updateProfile(profileId, {
@@ -104,8 +100,8 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
         setFeedback(null);
       }, 1500);
     } else {
-      setStreak(0);
-      speak(`Not quite. The time is ${currentProblem.answer}`);
+      addWrong('');
+      announceWrong(`Not quite. The time is ${currentProblem.answer}`);
 
       if (profile) {
         updateProfile(profileId, {
@@ -365,40 +361,13 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
                     type="text"
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                     className="text-4xl text-center font-mono font-bold border-4 border-orange-300 rounded-xl px-6 py-4 w-64 focus:border-orange-500 focus:outline-none"
                     placeholder="0:00"
                     autoFocus
                   />
 
-                  <AnimatePresence>
-                    {feedback && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.5 }}
-                        className={`mt-6 p-4 rounded-xl flex items-center justify-center gap-2 ${
-                          feedback === 'correct'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
-                        }`}
-                      >
-                        {feedback === 'correct' ? (
-                          <>
-                            <CheckCircle className="w-6 h-6" />
-                            <span className="text-xl font-bold">Correct! Great job!</span>
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-6 h-6" />
-                            <span className="text-xl font-bold">
-                              Try again! The time is {currentProblem.answer}
-                            </span>
-                          </>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <FeedbackAnimation feedback={feedback} correctAnswer={currentProblem.answer} />
 
                   <div className="mt-6">
                     <button
