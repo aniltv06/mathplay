@@ -10,6 +10,7 @@ import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import './index.css';
 import './styles/themes.css';
 import './styles/print.css';
+import './styles/worksheet.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');
