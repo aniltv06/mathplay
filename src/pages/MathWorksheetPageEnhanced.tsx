@@ -12,7 +12,7 @@ import type { Difficulty, Problem, ProblemSettings, WorksheetSession, Badge } fr
 import { DifficultySelector } from '../components/DifficultySelector';
 import { WorksheetSettingsPanel } from '../components/WorksheetSettingsPanel';
 import { WorksheetView } from '../components/WorksheetView';
-import { WorksheetResultsEnhanced } from '../components/WorksheetResultsEnhanced';
+import { WorksheetResults } from '../components/shared/WorksheetResults';
 import { ModeSelectionMenu } from '../components/WorksheetEnhancedComponents';
 import { useProfiles } from '../context/ProfileContext';
 import { useVoiceFeedback } from '../hooks/useVoiceFeedback';
@@ -421,7 +421,7 @@ export function MathWorksheetPageEnhanced({ onBack, profileId }: Props) {
         )}
 
         {pageState === 'results' && session && (
-          <WorksheetResultsEnhanced
+          <WorksheetResults
             session={session}
             onTryAgain={handleTryAgain}
             onBack={onBack}
