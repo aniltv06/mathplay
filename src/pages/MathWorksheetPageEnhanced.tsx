@@ -10,7 +10,7 @@ import { ArrowLeft, Settings, Volume2, VolumeX } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { Difficulty, Problem, ProblemSettings, WorksheetSession, Badge } from '../types';
 import { DifficultySelector } from '../components/DifficultySelector';
-import { WorksheetSettingsPanel } from '../components/WorksheetSettingsPanel';
+import { WorksheetSettingsPanel } from '../components/settings';
 import { WorksheetView } from '../components/WorksheetView';
 import { WorksheetResults } from '../components/shared/WorksheetResults';
 import { ModeSelectionMenu } from '../components/WorksheetEnhancedComponents';

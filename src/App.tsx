@@ -9,7 +9,7 @@ import { I18nProvider } from './i18n/I18nContext';
 import { VoiceFeedbackProvider } from './hooks/useVoiceFeedback';
 import { ProgressProvider } from './context/ProgressContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { ProfileSelector } from './components/ProfileSelector';
+import { ProfileSelector } from './components/profile';
 import { TimerMusicWidget } from './components/TimerMusicWidget';
 import type { Language } from './i18n/translations';
 

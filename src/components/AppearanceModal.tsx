@@ -1,2 +1,1 @@
-// Moved to src/components/settings/AppearanceModal.tsx
-export { AppearanceModal } from './settings/AppearanceModal';
+// Moved to src/components/settings/ — import from './settings'
