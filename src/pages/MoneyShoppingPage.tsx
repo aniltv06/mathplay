@@ -5,7 +5,7 @@
  * @email aniltv06@gmail.com
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, DollarSign } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
@@ -38,18 +38,66 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
   const [currentProblem, setCurrentProblem] = useState<MoneyProblem | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
+  const [wrongAttemptCount, setWrongAttemptCount] = useState(0);
   const [showVisual, setShowVisual] = useState(true);
+  // Challenge mode timer
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [timerActive, setTimerActive] = useState(false);
 
   // Initialize first problem when mode or difficulty changes
   useEffect(() => {
     if (mode !== 'learn') {
       setCurrentProblem(generateProblem(difficulty));
+      if (mode === 'challenge') {
+        setTimeLeft(30);
+        setTimerActive(true);
+      } else {
+        setTimerActive(false);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, difficulty]);
 
+  const handleBack = () => {
+    if (attempts > 0) {
+      if (!window.confirm('Leave this session? Your current progress will be lost.')) return;
+    }
+    setMode('learn');
+  };
+
+  // Challenge mode countdown
+  const handleTimeUp = useCallback(() => {
+    setTimerActive(false);
+    setFeedback('incorrect');
+    setWrongAttemptCount((c) => c + 1);
+    addWrong();
+    setTimeout(() => {
+      setCurrentProblem(generateProblem(difficulty));
+      setUserAnswer('');
+      setFeedback(null);
+      setWrongAttemptCount(0);
+      setTimeLeft(30);
+      setTimerActive(true);
+    }, 2000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addWrong, difficulty]);
+
+  useEffect(() => {
+    if (!timerActive || mode !== 'challenge') return;
+    const id = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          handleTimeUp();
+          return 30;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [timerActive, mode, handleTimeUp]);
+
   const handleSubmit = () => {
-    if (!currentProblem || userAnswer === '') return;
+    if (!currentProblem || userAnswer === '' || feedback !== null) return;
 
     const answer = parseInt(userAnswer);
     const isCorrect = answer === currentProblem.answer;
@@ -57,8 +105,10 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
     if (isCorrect) {
-      addCorrect('');
+      addCorrect();
       celebrateCorrect(`Correct! The answer is ${currentProblem.answer} cents`);
+      setWrongAttemptCount(0);
+      setTimerActive(false); // pause during feedback
 
       if (profile) {
         updateProfile(profileId, {
@@ -74,10 +124,21 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
         setCurrentProblem(generateProblem(difficulty));
         setUserAnswer('');
         setFeedback(null);
+        setWrongAttemptCount(0);
+        if (mode === 'challenge') {
+          setTimeLeft(30);
+          setTimerActive(true);
+        }
       }, 1500);
     } else {
-      addWrong('');
-      announceWrong(`Not quite. The answer is ${currentProblem.answer} cents`);
+      const newCount = wrongAttemptCount + 1;
+      setWrongAttemptCount(newCount);
+      addWrong();
+      if (newCount > 1) {
+        announceWrong(`The answer is ${currentProblem.answer} cents`);
+      } else {
+        announceWrong('Not quite, try again!');
+      }
 
       if (profile) {
         updateProfile(profileId, {
@@ -91,6 +152,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
 
       setTimeout(() => {
         setFeedback(null);
+        setUserAnswer('');
       }, 2000);
     }
   };
@@ -114,6 +176,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
 
         <button
           onClick={onBack}
+          aria-label="Go back to Home"
           className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
         >
           <ArrowLeft className="w-5 h-5" aria-hidden="true" />
@@ -278,7 +341,8 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
       </div>
 
       <button
-        onClick={onBack}
+        onClick={handleBack}
+        aria-label="Go back to learn view"
         className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
       >
         <ArrowLeft className="w-5 h-5" aria-hidden="true" />
@@ -309,12 +373,14 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowVisual(!showVisual)}
+                  aria-label={showVisual ? 'Hide coin visual' : 'Show coin visual'}
+                  aria-pressed={showVisual}
                   className="bg-green-100 hover:bg-green-200 text-green-700 px-4 py-2 rounded-lg transition-all"
                 >
                   {showVisual ? '👁️ Hide Visual' : '👁️ Show Visual'}
                 </button>
                 <button
-                  onClick={() => setMode('learn')}
+                  onClick={handleBack}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-all"
                 >
                   📚 Learn
@@ -329,14 +395,22 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
             <div className="text-center mb-6">
               <h2 className="text-3xl font-bold text-green-600 mb-2">
-                {mode === 'practice' ? 'Practice Mode' : 'Challenge Mode'}
+                {mode === 'practice' ? '💰 Practice Mode' : '⚡ Challenge Mode'}
               </h2>
+              {mode === 'challenge' && (
+                <div className={`text-5xl font-bold mb-2 ${timeLeft <= 10 ? 'text-red-600 animate-pulse' : 'text-green-500'}`}
+                  aria-live="polite" aria-label={`${timeLeft} seconds remaining`}
+                >
+                  {timeLeft}s
+                </div>
+              )}
               <div className="flex gap-2 justify-center">
                 {(['beginner', 'intermediate', 'advanced'] as DifficultyLevel[]).map((level) => (
                   <button
                     key={level}
                     onClick={() => setDifficulty(level)}
-                    className={`px-4 py-2 rounded-lg transition-all ${
+                    aria-pressed={difficulty === level}
+                    className={`px-4 py-3 min-h-[44px] rounded-lg transition-all ${
                       difficulty === level
                         ? 'bg-green-500 text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -370,7 +444,7 @@ export function MoneyShoppingPage({ onBack, profileId }: Props) {
                     <span className="text-3xl text-gray-600">¢</span>
                   </div>
 
-                  <FeedbackAnimation feedback={feedback} correctAnswer={`${currentProblem.answer}¢`} />
+                  <FeedbackAnimation feedback={feedback} correctAnswer={`${currentProblem.answer}¢`} wrongAttemptCount={wrongAttemptCount} />
 
                   <div className="mt-6">
                     <button

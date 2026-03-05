@@ -247,16 +247,16 @@ export function HomePage({ onNavigate, onLogout, profileId }: Props) {
               </div>
               <div className="bg-gradient-to-br from-yellow-100 to-orange-100 p-4 rounded-xl">
                 <div className="text-sm text-gray-600 mb-1">{t.highScore}</div>
-                <div className="text-3xl font-bold text-yellow-600">{profile.stats.hangmanHighScore}</div>
+                <div className="text-3xl font-bold text-yellow-600">{profile.stats.hangmanHighScore || '—'}</div>
               </div>
               <div className="bg-gradient-to-br from-green-100 to-emerald-100 p-4 rounded-xl">
                 <div className="text-sm text-gray-600 mb-1">{t.accuracy}</div>
-                <div className="text-3xl font-bold text-green-600">{accuracy}%</div>
+                <div className="text-3xl font-bold text-green-600">{totalAnswered > 0 ? `${accuracy}%` : '—'}</div>
               </div>
               <div className="bg-gradient-to-br from-indigo-100 to-purple-100 p-4 rounded-xl">
                 <div className="text-sm text-gray-600 mb-1">Activities Started</div>
                 <div className="text-3xl font-bold text-indigo-600">
-                  {profileProgress?.activitiesStarted ?? 0}
+                  {profileProgress?.activitiesStarted || '—'}
                 </div>
               </div>
             </div>

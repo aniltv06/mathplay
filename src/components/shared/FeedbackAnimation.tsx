@@ -1,6 +1,8 @@
 /**
  * Reusable feedback animation overlay for learning pages.
  * Shows correct/incorrect result with animated entry and exit.
+ * On the first wrong attempt shows "Try again!" without revealing the answer.
+ * On subsequent wrong attempts reveals the correct answer.
  */
 
 import { AnimatePresence, motion } from 'motion/react';
@@ -9,13 +11,18 @@ import { CheckCircle, XCircle } from 'lucide-react';
 interface Props {
   feedback: 'correct' | 'incorrect' | null;
   correctAnswer?: string | number;
+  /** How many wrong attempts have been made on this question (1 = first try wrong). */
+  wrongAttemptCount?: number;
 }
 
-export function FeedbackAnimation({ feedback, correctAnswer }: Props) {
+export function FeedbackAnimation({ feedback, correctAnswer, wrongAttemptCount = 1 }: Props) {
+  const revealAnswer = wrongAttemptCount > 1 && correctAnswer !== undefined;
+
   return (
     <AnimatePresence>
       {feedback && (
         <motion.div
+          role="alert"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.5 }}
@@ -34,9 +41,9 @@ export function FeedbackAnimation({ feedback, correctAnswer }: Props) {
             <>
               <XCircle className="w-6 h-6" />
               <span className="text-xl font-bold">
-                {correctAnswer !== undefined
-                  ? `Try again! The answer is ${correctAnswer}`
-                  : 'Try again!'}
+                {revealAnswer
+                  ? `The answer is ${correctAnswer}`
+                  : 'Not quite, try again!'}
               </span>
             </>
           )}

@@ -5,7 +5,7 @@
  * @email aniltv06@gmail.com
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Clock } from 'lucide-react';
 import { useProfiles } from '../context/ProfileContext';
@@ -40,7 +40,11 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
   const [currentProblem, setCurrentProblem] = useState<TimeProblem | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
+  const [wrongAttemptCount, setWrongAttemptCount] = useState(0);
   const [showClock, setShowClock] = useState(true);
+  // Challenge mode timer
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [timerActive, setTimerActive] = useState(false);
 
   const generateProblem = (): TimeProblem => {
     let hours: number, minutes: number;
@@ -66,23 +70,79 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
     };
   };
 
-  // Initialize first problem when mode or difficulty changes
+  // Reset wrong-attempt counter whenever we move to a new problem
   useEffect(() => {
     if (mode !== 'learn') {
       setCurrentProblem(generateProblem());
+      if (mode === 'challenge') {
+        setTimeLeft(30);
+        setTimerActive(true);
+      } else {
+        setTimerActive(false);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, difficulty]);
 
-  const handleSubmit = () => {
-    if (!currentProblem || userAnswer === '') return;
+  // Challenge mode countdown
+  const handleTimeUp = useCallback(() => {
+    setTimerActive(false);
+    setFeedback('incorrect');
+    setWrongAttemptCount((c) => c + 1);
+    addWrong();
+    setTimeout(() => {
+      setCurrentProblem(generateProblem());
+      setUserAnswer('');
+      setFeedback(null);
+      setWrongAttemptCount(0);
+      setTimeLeft(30);
+      setTimerActive(true);
+    }, 2000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addWrong]);
 
-    const isCorrect = userAnswer.trim() === currentProblem.answer;
+  useEffect(() => {
+    if (!timerActive || mode !== 'challenge') return;
+    const id = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          handleTimeUp();
+          return 30;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [timerActive, mode, handleTimeUp]);
+
+  const handleBack = () => {
+    if (attempts > 0) {
+      if (!window.confirm('Leave this session? Your current progress will be lost.')) return;
+    }
+    setMode('learn');
+  };
+
+  const normalizeTime = (raw: string): string => {
+    const trimmed = raw.trim();
+    const parts = trimmed.split(':');
+    if (parts.length !== 2) return trimmed;
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    if (isNaN(h) || isNaN(m)) return trimmed;
+    return `${h}:${m.toString().padStart(2, '0')}`;
+  };
+
+  const handleSubmit = () => {
+    if (!currentProblem || userAnswer === '' || feedback !== null) return;
+
+    const isCorrect = normalizeTime(userAnswer) === currentProblem.answer;
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
     if (isCorrect) {
-      addCorrect('');
+      addCorrect();
       celebrateCorrect(`Correct! The time is ${currentProblem.answer}`);
+      setWrongAttemptCount(0);
+      setTimerActive(false); // pause during feedback
 
       if (profile) {
         updateProfile(profileId, {
@@ -98,10 +158,22 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
         setCurrentProblem(generateProblem());
         setUserAnswer('');
         setFeedback(null);
+        setWrongAttemptCount(0);
+        if (mode === 'challenge') {
+          setTimeLeft(30);
+          setTimerActive(true);
+        }
       }, 1500);
     } else {
-      addWrong('');
-      announceWrong(`Not quite. The time is ${currentProblem.answer}`);
+      const newCount = wrongAttemptCount + 1;
+      setWrongAttemptCount(newCount);
+      addWrong();
+      // Only speak the answer after the second wrong attempt
+      if (newCount > 1) {
+        announceWrong(`The time is ${currentProblem.answer}`);
+      } else {
+        announceWrong('Not quite, try again!');
+      }
 
       if (profile) {
         updateProfile(profileId, {
@@ -115,6 +187,7 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
 
       setTimeout(() => {
         setFeedback(null);
+        setUserAnswer('');
       }, 2000);
     }
   };
@@ -180,6 +253,7 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
 
         <button
           onClick={onBack}
+          aria-label="Go back to Home"
           className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
         >
           <ArrowLeft className="w-5 h-5" aria-hidden="true" />
@@ -280,7 +354,8 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
       </div>
 
       <button
-        onClick={onBack}
+        onClick={handleBack}
+        aria-label="Go back to learn view"
         className="absolute top-6 left-6 z-50 bg-white hover:bg-gray-100 transition-all px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2"
       >
         <ArrowLeft className="w-5 h-5" aria-hidden="true" />
@@ -310,12 +385,14 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowClock(!showClock)}
+                  aria-label={showClock ? 'Hide clock' : 'Show clock'}
+                  aria-pressed={showClock}
                   className="bg-orange-100 hover:bg-orange-200 text-orange-700 px-4 py-2 rounded-lg transition-all"
                 >
                   {showClock ? '👁️ Hide Clock' : '👁️ Show Clock'}
                 </button>
                 <button
-                  onClick={() => setMode('learn')}
+                  onClick={handleBack}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-all"
                 >
                   📚 Learn
@@ -329,14 +406,22 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
             <div className="text-center mb-6">
               <h2 className="text-3xl font-bold text-orange-600 mb-2">
-                {mode === 'practice' ? 'Practice Mode' : 'Challenge Mode'}
+                {mode === 'practice' ? '🕐 Practice Mode' : '⚡ Challenge Mode'}
               </h2>
+              {mode === 'challenge' && (
+                <div className={`text-5xl font-bold mb-2 ${timeLeft <= 10 ? 'text-red-600 animate-pulse' : 'text-orange-500'}`}
+                  aria-live="polite" aria-label={`${timeLeft} seconds remaining`}
+                >
+                  {timeLeft}s
+                </div>
+              )}
               <div className="flex gap-2 justify-center">
                 {['beginner', 'intermediate', 'advanced'].map((level) => (
                   <button
                     key={level}
                     onClick={() => setDifficulty(level as DifficultyLevel)}
-                    className={`px-4 py-2 rounded-lg transition-all ${
+                    aria-pressed={difficulty === level}
+                    className={`px-4 py-3 min-h-[44px] rounded-lg transition-all ${
                       difficulty === level
                         ? 'bg-orange-500 text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -367,7 +452,7 @@ export function TimeCalendarPage({ onBack, profileId }: Props) {
                     autoFocus
                   />
 
-                  <FeedbackAnimation feedback={feedback} correctAnswer={currentProblem.answer} />
+                  <FeedbackAnimation feedback={feedback} correctAnswer={currentProblem.answer} wrongAttemptCount={wrongAttemptCount} />
 
                   <div className="mt-6">
                     <button

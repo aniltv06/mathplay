@@ -48,7 +48,7 @@ interface Props {
 export function MultiplicationLearningPageEnhanced({ onBack, profileId }: Props) {
   const { getProfile, updateProfile, awardBadge } = useProfiles();
   const profile = getProfile(profileId);
-  const { speak, enabled: voiceEnabled } = useVoiceFeedback();
+  const { speak, enabled: voiceEnabled, setEnabled: setVoiceEnabled } = useVoiceFeedback();
 
   // Main navigation
   const [mainMode, setMainMode] = useState<MainMode>('menu');
@@ -423,17 +423,16 @@ export function MultiplicationLearningPageEnhanced({ onBack, profileId }: Props)
         <span className="hidden sm:inline">Home</span>
       </button>
 
-      {/* Voice indicator */}
-      {voiceEnabled && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="absolute top-6 right-6 z-50 bg-green-500/90 backdrop-blur-sm px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-white"
-        >
-          <Volume2 className="w-5 h-5 animate-pulse" />
-          <span className="text-sm font-medium">Voice On</span>
-        </motion.div>
-      )}
+      {/* Voice toggle */}
+      <button
+        onClick={() => setVoiceEnabled(!voiceEnabled)}
+        aria-label={voiceEnabled ? 'Turn voice off' : 'Turn voice on'}
+        aria-pressed={voiceEnabled}
+        className={`absolute top-6 right-6 z-50 backdrop-blur-sm px-4 py-3 rounded-full shadow-lg flex items-center gap-2 text-white transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 ${voiceEnabled ? 'bg-green-500/90 hover:bg-green-600/90' : 'bg-gray-500/90 hover:bg-gray-600/90'}`}
+      >
+        <Volume2 className={`w-5 h-5 ${voiceEnabled ? 'animate-pulse' : ''}`} aria-hidden="true" />
+        <span className="text-sm font-medium">{voiceEnabled ? 'Voice On' : 'Voice Off'}</span>
+      </button>
 
       <div className="relative z-10 px-4 py-20">
         <div className="max-w-7xl mx-auto">

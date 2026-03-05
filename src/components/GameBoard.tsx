@@ -202,7 +202,7 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
           speakProblem(newProblem.num1, newProblem.operation, newProblem.num2);
         }
       }
-    }, 1500);
+    }, 2500);
   }, [isGameOver, speak, allProblems.length, lives, score, correctAnswers, wrongAnswers, totalQuestions, streak, maxStreak, onGameOver, generateProblem, speakProblem, saveSession]);
 
   // Timer
@@ -273,7 +273,7 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
         if (newProblem) {
           speakProblem(newProblem.num1, newProblem.operation, newProblem.num2);
         }
-      }, 1000);
+      }, 1500);
     } else {
       handleWrongAnswer();
     }
@@ -284,7 +284,11 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
     handleWrongAnswer();
   };
 
-  if (!problem) return null;
+  if (!problem) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-white text-2xl animate-pulse">Loading problem…</div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
@@ -391,6 +395,7 @@ export function GameBoard({ difficulty, settings, onGameOver, profileId }: Props
             <AnimatePresence>
               {feedback && (
                 <motion.div
+                  role="alert"
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.5 }}
