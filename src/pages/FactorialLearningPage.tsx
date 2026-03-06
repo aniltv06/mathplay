@@ -111,7 +111,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
     if (isCorrect) {
-      addCorrect('');
+      addCorrect();
       celebrateCorrect(`Correct! ${currentProblem.number} factorial equals ${currentProblem.answer}`);
 
       if (profile) {
@@ -130,7 +130,7 @@ export function FactorialLearningPage({ onBack, profileId }: Props) {
         setFeedback(null);
       }, 1500);
     } else {
-      addWrong('');
+      addWrong();
       announceWrong(`Not quite. ${currentProblem.number} factorial equals ${currentProblem.answer}`);
 
       if (profile) {

@@ -120,7 +120,7 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
     if (isCorrect) {
-      addCorrect('');
+      addCorrect();
       celebrateCorrect(`Correct! ${currentProblem.dividend} divided by ${currentProblem.divisor} equals ${currentProblem.quotient}`);
 
       // Update profile stats
@@ -141,7 +141,7 @@ export function DivisionLearningPageEnhanced({ onBack, profileId }: Props) {
         setFeedback(null);
       }, 1500);
     } else {
-      addWrong('');
+      addWrong();
       announceWrong(`Not quite. ${currentProblem.dividend} divided by ${currentProblem.divisor} equals ${currentProblem.quotient}`);
 
       if (profile) {

@@ -213,7 +213,7 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
     if (isCorrect) {
-      addCorrect('');
+      addCorrect();
       celebrateCorrect(`Correct! ${currentProblem.displayQuestion.replace('?', currentProblem.answer)}`);
 
       if (profile) {
@@ -232,7 +232,7 @@ export function FractionsDecimalsPage({ onBack, profileId }: Props) {
         setFeedback(null);
       }, 1500);
     } else {
-      addWrong('');
+      addWrong();
       announceWrong(`Not quite. The answer is ${currentProblem.answer}`);
 
       if (profile) {

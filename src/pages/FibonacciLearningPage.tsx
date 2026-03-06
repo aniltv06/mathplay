@@ -95,7 +95,7 @@ export function FibonacciLearningPage({ onBack, profileId }: Props) {
     setFeedback(isCorrect ? 'correct' : 'incorrect');
 
     if (isCorrect) {
-      addCorrect('');
+      addCorrect();
       celebrateCorrect(`Correct! The ${currentProblem.position}th Fibonacci number is ${currentProblem.answer}`);
 
       if (profile) {
@@ -114,7 +114,7 @@ export function FibonacciLearningPage({ onBack, profileId }: Props) {
         setFeedback(null);
       }, 1500);
     } else {
-      addWrong('');
+      addWrong();
       announceWrong(`Not quite. The ${currentProblem.position}th Fibonacci number is ${currentProblem.answer}`);
 
       if (profile) {
